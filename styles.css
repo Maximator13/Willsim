@@ -45,6 +45,8 @@
   --lime-hover: #e2f592;
   --line: #dedfd7;
   --line-light: #eceee6;
+  --on-dark: #ffffff; /* texte sur fond vert foncé */
+  --on-dark-muted: #bfd0c3;
   
   /* Typographie */
   --sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -407,6 +409,8 @@ h1, h2, h3, h4, p {
 }
 
 .mobile-nav-link .link-num {
+  min-width: 16px;
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
   color: var(--accent-text);
@@ -557,6 +561,7 @@ h1, h2, h3, h4, p {
   letter-spacing: -0.035em;
   color: var(--ink);
   margin-bottom: 22px;
+  text-wrap: balance;
 }
 
 .hero h1 span {
@@ -774,6 +779,7 @@ h1, h2, h3, h4, p {
   letter-spacing: -0.03em;
   color: var(--ink);
   margin: 0;
+  text-wrap: balance;
 }
 
 .section-intro {
@@ -1690,4 +1696,227 @@ a.detail-val:hover {
   font-weight: 700;
   background: var(--lime);
   color: var(--ink);
+}
+
+/* ==========================================================================
+   Sections Mission / Projets / bloc légal (2026-10)
+   ========================================================================== */
+
+/* Navigation : libellés sur une ligne ; sous 1024 px, place au tiroir (burger)
+   car la nav bureau + le CTA ne tiennent pas sans déborder */
+.main-nav a {
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .main-nav {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+}
+
+/* Section Mission (fond blanc pour la distinguer de #formations qui suit) */
+.purpose {
+  background: var(--paper-card);
+  border-bottom: 1px solid var(--line);
+}
+
+.purpose-quote {
+  margin: 0 0 48px;
+  padding: clamp(24px, 4vw, 44px);
+  background: var(--green-dark);
+  border-left: 4px solid var(--lime);
+  border-radius: var(--radius-md);
+}
+
+.purpose-quote blockquote {
+  margin: 0;
+}
+
+.purpose-quote blockquote p {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--on-dark);
+}
+
+.purpose-quote figcaption {
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-dark-muted);
+}
+
+.purpose-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.purpose-pillar {
+  padding: 26px 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.purpose-pillar .program-icon {
+  margin-bottom: 16px;
+}
+
+.purpose-pillar h3 {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.purpose-pillar p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* Section Projets & formations à venir (réutilise .program-grid / .program-card) */
+.projects {
+  background: var(--paper-deep);
+  border-block: 1px solid var(--line);
+}
+
+.projects-grid .skills-tags {
+  margin-bottom: 0;
+}
+
+/* Badge « Formation à venir » distinct de « Projet en préparation » */
+.program-badge-training {
+  background: var(--green);
+  color: var(--on-dark);
+}
+
+.projects-cta {
+  margin: 40px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-secondary);
+}
+
+/* inline-block : la flèche ne passe pas seule à la ligne sur mobile */
+.projects-cta a {
+  display: inline-block;
+}
+
+.projects-cta a,
+.section-intro a {
+  font-weight: 700;
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.projects-cta a:hover,
+.section-intro a:hover {
+  color: var(--ink);
+}
+
+/* Bloc légal du pied de page : 32 px sous .footer-main (index) ; aucune marge
+   quand il ouvre le pied de page (pages légales et 404, cf. :first-child) */
+.footer-legal-info {
+  margin-top: 32px;
+  padding: clamp(20px, 3vw, 28px);
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.footer-legal-info:first-child {
+  margin-top: 0;
+}
+
+.footer-legal-title {
+  margin: 0 0 16px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+
+.legal-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 40px;
+  margin: 0;
+}
+
+.legal-facts-wide {
+  grid-column: 1 / -1;
+}
+
+.legal-facts dt {
+  margin-bottom: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.legal-facts dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.legal-facts-wide dd {
+  font-weight: 500;
+}
+
+/* Tablette : tiroir sous l'en-tête de 76 px (64 px sous 768 px, cf. correctifs audit)
+   et grille des projets sur 2 colonnes */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .mobile-nav {
+    inset: 76px 0 0 0;
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .purpose-quote {
+    margin-bottom: 32px;
+  }
+
+  .purpose-pillars {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .legal-facts {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Titres : retours à la ligne forcés réservés au bureau */
+  .section-heading h2 br {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .purpose-pillar {
+    padding: 20px 16px;
+  }
 }

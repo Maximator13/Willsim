@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#17251f">
     <!-- Titre et métadonnées SEO prioritaires -->
-    <title>Willsim — Association Robotique, Code &amp; Formation Numérique</title>
+    <title>Willsim — Association IA, Robotique &amp; Mécatronique</title>
     <meta
       name="description"
-      content="Willsim est une association à but non lucratif proposant des cours et ateliers pratiques en robotique, développement web et simulation 3D pour tous les niveaux."
+      content="WILLSIM, association loi 1901, promeut l'intelligence artificielle en ingénierie et en mécatronique : ressources gratuites, ateliers et projets étudiants."
     >
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://willsim.fr/">
@@ -22,8 +22,8 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Willsim">
     <meta property="og:url" content="https://willsim.fr/">
-    <meta property="og:title" content="Willsim — Association Robotique, Code &amp; Formation Numérique">
-    <meta property="og:description" content="Cours et ateliers pratiques en robotique, développement web et simulation 3D. Une association ouverte à tous pour apprendre en faisant.">
+    <meta property="og:title" content="Willsim — Association IA, Robotique &amp; Mécatronique">
+    <meta property="og:description" content="Association dédiée à l'IA appliquée à l'ingénierie et à la mécatronique : ressources pédagogiques gratuites, ateliers et soutien aux projets étudiants.">
     <!-- Image de partage hébergée sur le site (plus de hotlink Unsplash) -->
     <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
     <meta property="og:image:type" content="image/jpeg">
@@ -33,8 +33,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Willsim — Association Robotique, Code &amp; Formation Numérique">
-    <meta name="twitter:description" content="Cours et ateliers pratiques en robotique, développement web et simulation 3D au sein de l'association Willsim.">
+    <meta name="twitter:title" content="Willsim — Association IA, Robotique &amp; Mécatronique">
+    <meta name="twitter:description" content="Démocratiser l'intelligence artificielle en ingénierie et en mécatronique : projets, formations et ressources gratuites avec l'association WILLSIM.">
     <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
     <meta name="twitter:image:alt" content="Logo et nom de l'association Willsim : robotique, code et IA">
 
@@ -53,10 +53,15 @@
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "EducationalOrganization",
+          "@type": ["EducationalOrganization", "NGO"],
           "@id": "https://willsim.fr/#organization",
           "name": "Willsim",
-          "legalName": "Association Willsim",
+          "legalName": "WILLSIM",
+          "identifier": {
+            "@type": "PropertyValue",
+            "propertyID": "RNA",
+            "value": "W842013616"
+          },
           "alternateName": ["Willsim Association", "Association Willsim", "Willsim Robotique", "Willsim Numérique"],
           "url": "https://willsim.fr",
           "logo": {
@@ -64,9 +69,13 @@
             "url": "https://willsim.fr/logo.png"
           },
           "image": "https://willsim.fr/logo.png",
-          "description": "Association à but non lucratif dédiée à l'apprentissage pratique du numérique : ateliers et cours de robotique, développement informatique et simulation 3D pour tous.",
+          "description": "Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.",
           "email": "contact@willsim.fr",
           "knowsAbout": [
+            "Intelligence artificielle",
+            "Mécatronique",
+            "Vision par ordinateur",
+            "IA embarquée",
             "Robotique",
             "Systèmes embarqués",
             "Arduino",
@@ -172,7 +181,7 @@
          de Manrope, police du H1 (élément LCP). @font-face dans styles.css. -->
     <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- ?v= : à incrémenter à chaque mise en ligne pour invalider le cache navigateur -->
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
   </head>
 
   <body>
@@ -188,11 +197,12 @@
           <span class="brand-text">willsim<span class="brand-period">.</span></span>
         </a>
 
-        <!-- Navigation bureau -->
+        <!-- Navigation bureau (« Notre approche » reste accessible via le tiroir et le pied de page) -->
         <nav class="main-nav" aria-label="Navigation principale">
+          <a href="#mission">Notre mission</a>
           <a href="#formations">Nos formations</a>
+          <a href="#projets">Projets IA</a>
           <a href="#association">L’association</a>
-          <a href="#approche">Notre approche</a>
           <a href="#faq">FAQ</a>
           <a href="#contact">Contact</a>
         </nav>
@@ -237,24 +247,32 @@
         </div>
 
         <nav class="mobile-nav-links" aria-label="Navigation mobile">
-          <a class="mobile-nav-link" href="#formations">
+          <a class="mobile-nav-link" href="#mission">
             <span class="link-num">01</span>
+            <span class="link-label">Notre mission</span>
+          </a>
+          <a class="mobile-nav-link" href="#formations">
+            <span class="link-num">02</span>
             <span class="link-label">Nos formations</span>
           </a>
+          <a class="mobile-nav-link" href="#projets">
+            <span class="link-num">03</span>
+            <span class="link-label">Projets IA</span>
+          </a>
           <a class="mobile-nav-link" href="#association">
-            <span class="link-num">02</span>
+            <span class="link-num">04</span>
             <span class="link-label">L’association</span>
           </a>
           <a class="mobile-nav-link" href="#approche">
-            <span class="link-num">03</span>
+            <span class="link-num">05</span>
             <span class="link-label">Notre approche</span>
           </a>
           <a class="mobile-nav-link" href="#faq">
-            <span class="link-num">04</span>
+            <span class="link-num">06</span>
             <span class="link-label">Questions fréquentes</span>
           </a>
           <a class="mobile-nav-link" href="#contact">
-            <span class="link-num">05</span>
+            <span class="link-num">07</span>
             <span class="link-label">Nous contacter</span>
           </a>
         </nav>
@@ -277,13 +295,13 @@
         <div class="hero-copy">
           <div class="eyebrow">
             <span class="eyebrow-dot"></span>
-            <span>ASSOCIATION ROBOTIQUE &amp; FORMATION AU NUMÉRIQUE</span>
+            <span>ASSOCIATION IA, INGÉNIERIE &amp; MÉCATRONIQUE</span>
           </div>
 
-          <h1>L'association robotique &amp; code<br> accessible <span>à chacun.</span></h1>
+          <h1>L'IA, la robotique &amp; le code<br> accessibles <span>à chacun.</span></h1>
 
           <p class="hero-description">
-            <strong>Willsim</strong> est une association à but non lucratif qui transmet des compétences concrètes : découvrez nos cours et ateliers en <strong>robotique</strong>, <strong>programmation informatique</strong> et <strong>simulation 3D</strong>, conçus pour faire progresser étudiants, salariés et passionnés.
+            <strong>Willsim</strong> est une association à but non lucratif qui démocratise l'<strong>intelligence artificielle</strong> en ingénierie et en mécatronique&nbsp;: <strong>robotique</strong>, <strong>programmation</strong> et <strong>simulation</strong>, avec des ressources gratuites et des ateliers pratiques.
           </p>
 
           <!-- Un seul CTA principal (plein) = l'action de conversion ; l'autre reste secondaire (contour) -->
@@ -409,16 +427,70 @@
         </div>
       </section>
 
+      <!-- Section Mission : objet statutaire de l'association (texte officiel) -->
+      <section class="purpose section-padding" id="mission" aria-labelledby="mission-title">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> NOTRE MISSION</p>
+              <h2 id="mission-title">L'IA au service de l'ingénierie <br>et de la mécatronique.</h2>
+            </div>
+            <p class="section-intro">
+              Association loi 1901 récemment créée, <strong>Willsim</strong> s'est fixé un cap précis, inscrit dans ses statuts&nbsp;: faire de l'intelligence artificielle un outil concret pour celles et ceux qui conçoivent, programment et construisent des systèmes.
+            </p>
+          </div>
+
+          <!-- Phrase de mission reproduite textuellement (article 2 des statuts) -->
+          <figure class="purpose-quote">
+            <blockquote>
+              <p>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</p>
+            </blockquote>
+            <figcaption>Objet de l'association WILLSIM, article 2 des statuts</figcaption>
+          </figure>
+
+          <!-- Les trois moyens d'action prévus par les statuts -->
+          <div class="purpose-pillars">
+            <article class="purpose-pillar">
+              <span class="program-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </span>
+              <h3>Ressources pédagogiques gratuites</h3>
+              <p>
+                Créer, centraliser et diffuser en ligne des ressources gratuites (tutoriels, fiches de synthèse, exemples de code) pour appliquer l'IA à des cas concrets d'ingénierie.
+              </p>
+            </article>
+            <article class="purpose-pillar">
+              <span class="program-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </span>
+              <h3>Événements &amp; ateliers</h3>
+              <p>
+                Organiser des ateliers pratiques et des rencontres pour manipuler capteurs, actionneurs et modèles d'IA sur du matériel réel, puis partager les retours d'expérience.
+              </p>
+            </article>
+            <article class="purpose-pillar">
+              <span class="program-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </span>
+              <h3>Soutien aux projets étudiants</h3>
+              <p>
+                Accompagner les étudiants qui intègrent l'IA dans un système mécatronique&nbsp;: retours techniques, partage de méthodes et entraide entre porteurs de projets.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <!-- Section Formations -->
       <section class="programs section-padding" id="formations">
         <div class="page-width">
           <div class="section-heading">
           <div>
             <p class="eyebrow"><span class="eyebrow-dot"></span> ATELIERS DE ROBOTIQUE &amp; PROGRAMMATION</p>
-            <h2>Des cours et ateliers pratiques<br>pour tous les niveaux.</h2>
+            <h2>Des cours et ateliers pratiques <br>pour tous les niveaux.</h2>
           </div>
           <p class="section-intro">
-            L'association <strong>Willsim</strong> propose des cursus structurés et 100% pratiques. Que vous cherchiez une <strong>association de robotique</strong> pour expérimenter sur matériel réel ou des cours de code, nous vous accompagnons étape par étape.
+            L'association <strong>Willsim</strong> prépare des ateliers structurés et 100&nbsp;% pratiques. Que vous cherchiez une <strong>association de robotique</strong> pour expérimenter sur matériel réel ou des cours de code, nous vous accompagnerons étape par étape. Nos formations en intelligence artificielle sont présentées juste après, dans <a href="#projets">Projets &amp; formations à venir</a>.
           </p>
         </div>
 
@@ -427,7 +499,7 @@
           <article class="program-card">
             <div class="card-head">
               <span class="program-number">01</span>
-              <span class="program-badge">Populaire</span>
+              <span class="program-badge">Fondamentaux</span>
             </div>
             <div class="card-icon-wrapper">
               <span class="program-icon" aria-hidden="true">
@@ -466,7 +538,7 @@
             </div>
             <h3>Atelier Robotique &amp; Systèmes Embarqués</h3>
             <p class="card-desc">
-              Rejoignez notre atelier de robotique : manipulez des capteurs, moteurs et cartes Arduino ou ESP32, et assemblez vos premiers robots autonomes et connectés.
+              Notre futur atelier de robotique&nbsp;: manipuler des capteurs, moteurs et cartes Arduino ou ESP32, et assembler vos premiers robots autonomes et connectés.
             </p>
             <div class="skills-tags">
               <span>Arduino</span>
@@ -515,6 +587,141 @@
         </div>
       </section>
 
+      <!-- Section Projets & formations à venir : rien n'est présenté comme déjà réalisé
+           (association créée en septembre 2026) ; badges de statut à mettre à jour au lancement -->
+      <section class="projects section-padding" id="projets" aria-labelledby="projets-title">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> NOS PROJETS &amp; FORMATIONS À VENIR</p>
+              <h2 id="projets-title">Quand l'IA rencontre <br>la mécatronique.</h2>
+            </div>
+            <p class="section-intro">
+              <strong>Willsim</strong> vient d'être créée&nbsp;: voici les projets et les formations que nous préparons. Fil conducteur&nbsp;: relier un modèle d'IA à un système physique (capteurs, moteurs, bras ou robot mobile), puis tester l'ensemble sur du matériel réel.
+            </p>
+          </div>
+
+          <div class="program-grid projects-grid">
+            <!-- Projet 1 : vision + bras robotique -->
+            <article class="program-card">
+              <div class="card-head">
+                <span class="program-number">01</span>
+                <span class="program-badge">Projet en préparation</span>
+              </div>
+              <h3>Bras robotique guidé par vision</h3>
+              <p class="card-desc">
+                Objectif&nbsp;: repérer des objets avec une caméra, les identifier grâce à un modèle de détection, puis les saisir et les trier automatiquement avec un bras robotique (pick-and-place).
+              </p>
+              <div class="skills-tags">
+                <span>Vision par ordinateur</span>
+                <span>Détection d'objets</span>
+                <span>Python</span>
+                <span>OpenCV</span>
+                <span>Cinématique</span>
+              </div>
+            </article>
+
+            <!-- Projet 2 : maintenance prédictive -->
+            <article class="program-card">
+              <div class="card-head">
+                <span class="program-number">02</span>
+                <span class="program-badge">Projet en préparation</span>
+              </div>
+              <h3>Maintenance prédictive d'un moteur</h3>
+              <p class="card-desc">
+                Objectif&nbsp;: mesurer les vibrations et le courant d'un moteur électrique, entraîner un modèle de détection d'anomalies, puis l'embarquer au plus près du moteur pour signaler une dérive avant la panne.
+              </p>
+              <div class="skills-tags">
+                <span>Capteurs de vibration</span>
+                <span>Mesure de courant</span>
+                <span>Traitement du signal</span>
+                <span>Détection d'anomalies</span>
+                <span>IA embarquée</span>
+              </div>
+            </article>
+
+            <!-- Projet 3 : robot mobile autonome -->
+            <article class="program-card">
+              <div class="card-head">
+                <span class="program-number">03</span>
+                <span class="program-badge">Projet en préparation</span>
+              </div>
+              <h3>Robot mobile autonome</h3>
+              <p class="card-desc">
+                Objectif&nbsp;: concevoir un robot capable de cartographier son environnement (SLAM), de reconnaître les obstacles grâce à un modèle de vision embarqué et d'adapter sa trajectoire en temps réel.
+              </p>
+              <div class="skills-tags">
+                <span>ROS 2</span>
+                <span>SLAM</span>
+                <span>Lidar</span>
+                <span>Vision embarquée</span>
+                <span>Planification de trajectoire</span>
+              </div>
+            </article>
+
+            <!-- Projet 4 : apprentissage par renforcement, simulation vers réel -->
+            <article class="program-card">
+              <div class="card-head">
+                <span class="program-number">04</span>
+                <span class="program-badge">Projet en préparation</span>
+              </div>
+              <h3>Du jumeau numérique au robot réel</h3>
+              <p class="card-desc">
+                Objectif&nbsp;: entraîner un contrôleur par apprentissage par renforcement dans une simulation, puis le transférer sur un robot physique et mesurer l'écart entre simulation et réalité.
+              </p>
+              <div class="skills-tags">
+                <span>Apprentissage par renforcement</span>
+                <span>Jumeau numérique</span>
+                <span>Simulation physique</span>
+                <span>Sim-to-real</span>
+              </div>
+            </article>
+
+            <!-- Formation 1 : initiation -->
+            <article class="program-card">
+              <div class="card-head">
+                <span class="program-number">05</span>
+                <span class="program-badge program-badge-training">Formation à venir</span>
+              </div>
+              <h3>Initiation à l'IA pour l'ingénierie</h3>
+              <p class="card-desc">
+                Comprendre les bases de l'apprentissage automatique et les appliquer à des données techniques&nbsp;: mesures de capteurs, signaux et images.
+              </p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>Apprentissage automatique</span>
+                <span>Analyse de données</span>
+                <span>Réseaux de neurones</span>
+              </div>
+            </article>
+
+            <!-- Formation 2 : TinyML -->
+            <article class="program-card">
+              <div class="card-head">
+                <span class="program-number">06</span>
+                <span class="program-badge program-badge-training">Formation à venir</span>
+              </div>
+              <h3>IA embarquée sur microcontrôleur</h3>
+              <p class="card-desc">
+                Faire tourner un petit réseau de neurones directement sur un microcontrôleur&nbsp;: collecte des données, entraînement, optimisation puis déploiement sur la carte.
+              </p>
+              <div class="skills-tags">
+                <span>TinyML</span>
+                <span>ESP32</span>
+                <span>Quantification</span>
+                <span>C / C++</span>
+              </div>
+            </article>
+          </div>
+
+          <!-- Lien texte secondaire : le CTA principal reste « Rejoindre l'association » -->
+          <p class="projects-cta">
+            Une idée de projet, l'envie de vous former ou de contribuer&#8239;?
+            <a href="#contact">Proposez un projet ou rejoignez-nous <span aria-hidden="true">↗</span></a>
+          </p>
+        </div>
+      </section>
+
       <!-- Section Association -->
       <section class="mission" id="association">
         <div class="mission-inner page-width">
@@ -541,8 +748,8 @@
               </div>
               <div class="mission-stat-sep"></div>
               <div class="mission-stat-badge">
-                <strong>Ouvert</strong>
-                <span>Toute l'année</span>
+                <strong>Adhésions</strong>
+                <span>ouvertes</span>
               </div>
             </div>
           </div>
@@ -551,7 +758,7 @@
             <p class="eyebrow eyebrow-light"><span class="eyebrow-dot"></span> NOTRE VOCATION</p>
             <h2>Le numérique est plus fort <span>quand il se partage.</span></h2>
             <p>
-              L'association <strong>Willsim</strong> est née d'une conviction claire : l'apprentissage des technologies — de la <strong>robotique</strong> à la <strong>programmation informatique</strong> — doit être accessible à tous. Notre association à but non lucratif crée un espace d'entraide et d'expérimentation où chacun peut progresser sans barrière financière ni prérequis élitiste.
+              L'association <strong>Willsim</strong> est née d'une conviction&nbsp;: l'intelligence artificielle et les technologies de l'ingénierie — de la <strong>robotique</strong> à la <strong>programmation</strong> — doivent être accessibles à tous. Notre association à but non lucratif crée un espace d'entraide et d'expérimentation où chacun peut progresser sans barrière financière ni prérequis élitiste.
             </p>
 
             <div class="values-grid">
@@ -606,10 +813,10 @@
           <div class="approach-header-grid">
           <div>
             <p class="eyebrow"><span class="eyebrow-dot"></span> MÉTHODOLOGIE</p>
-            <h2>Progresser à votre rythme,<br>étape par étape.</h2>
+            <h2>Progresser à votre rythme, <br>étape par étape.</h2>
           </div>
           <p class="approach-intro">
-            Chaque adhérent arrive avec son histoire, ses compétences et ses objectifs. Nous concevons un parcours sur mesure pour garantir des résultats rapides et durables.
+            Chaque adhérent arrive avec son histoire, ses compétences et ses objectifs. Nous concevons un parcours sur mesure pour vous faire progresser de façon durable.
           </p>
         </div>
 
@@ -640,7 +847,7 @@
             <div class="step-body">
               <h3>Pratique immersive & Ateliers</h3>
               <p>
-                Fini la théorie passive. Vous écrivez du code, manipulez du matériel, résolvez des bugs concrets avec le soutien continu d'un mentor expérimenté.
+                Fini la théorie passive. Vous écrirez du code, manipulerez du matériel et résoudrez des bugs concrets avec l'appui de membres plus expérimentés.
               </p>
               <ul class="step-list">
                 <li>Projets concrets dès le 1er jour</li>
@@ -658,7 +865,7 @@
             <div class="step-body">
               <h3>Autonomie & Concrétisation</h3>
               <p>
-                Vous repartez avec des compétences validées, un projet fonctionnel à valoriser dans votre CV ou votre portfolio, et l'autonomie pour continuer d'apprendre.
+                L'objectif&nbsp;: repartir avec un projet fonctionnel à valoriser dans votre CV ou votre portfolio, et l'autonomie pour continuer d'apprendre.
               </p>
               <ul class="step-list">
                 <li>Déploiement et finalisation de projets</li>
@@ -678,7 +885,7 @@
             <div class="section-heading faq-heading">
               <div>
                 <p class="eyebrow"><span class="eyebrow-dot"></span> QUESTIONS FRÉQUENTES</p>
-                <h2>Tout ce que vous<br>devez savoir.</h2>
+                <h2>Tout ce que vous <br>devez savoir.</h2>
               </div>
               <p class="section-intro">
                 Vous avez une question avant de nous rejoindre ? Retrouvez ici les réponses aux interrogations les plus courantes.
@@ -693,7 +900,7 @@
             </summary>
             <div class="faq-answer">
               <p>
-                Non, absolument pas ! Une grande partie de nos ateliers est spécifiquement calibrée pour les grands débutants. Nous partons des fondamentaux avec des explications simples, imagées et progressives.
+                Non, absolument pas&#8239;! Nos ateliers sont conçus pour les grands débutants&nbsp;: nous partirons des fondamentaux avec des explications simples, imagées et progressives.
               </p>
             </div>
           </details>
@@ -782,7 +989,7 @@
 
           <div class="contact-action-panel">
             <div class="action-card-inner">
-              <h3>Rejoindre la prochaine session</h3>
+              <h3>Être informé des premières sessions</h3>
               <p>Envoyez-nous un message en un clic pour faire le point sur vos objectifs d'apprentissage.</p>
               
               <a
@@ -812,14 +1019,16 @@
             <span class="brand-text">willsim<span class="brand-period">.</span></span>
           </a>
           <p class="footer-tagline">
-            Association à but non lucratif dédiée à l'apprentissage et à la démocratisation des technologies : développement informatique, robotique et simulation.
+            Association loi 1901 dédiée à l'intelligence artificielle appliquée à l'ingénierie et à la mécatronique&nbsp;: ressources pédagogiques gratuites, ateliers et soutien aux projets étudiants.
           </p>
         </div>
 
         <div class="footer-links-col">
           <strong>Navigation</strong>
           <nav aria-label="Navigation secondaire">
+            <a href="#mission">Notre mission</a>
             <a href="#formations">Nos formations</a>
+            <a href="#projets">Projets IA</a>
             <a href="#association">L’association</a>
             <a href="#approche">Notre approche</a>
             <a href="#faq">Questions fréquentes</a>
@@ -837,6 +1046,17 @@
         </div>
       </div>
 
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+
       <!-- Bas de page commun à toutes les pages : liens légaux + réouverture du bandeau cookies -->
       <div class="footer-bottom page-width">
         <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
@@ -849,6 +1069,6 @@
       </div>
     </footer>
 
-    <script src="script.js?v=2" defer></script>
+    <script src="script.js?v=3" defer></script>
   </body>
 </html>

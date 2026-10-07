@@ -3,9 +3,6 @@
 /* En-tête simplifié : le lien retour reste visible sur mobile */
 .site-header .header-cta { display: inline-flex; }
 
-/* Pied de page réduit */
-.site-footer { padding-top: 0; }
-
 /* Contenu juridique */
 .legal {
   max-width: 760px;
