@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Plan du site pour l'indexation Google / Bing
+Sitemap: https://willsim.fr/sitemap.xml

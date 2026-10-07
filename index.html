@@ -1,359 +1,854 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Willsim démocratise l'intelligence artificielle dans la mécatronique grâce à des ressources gratuites pour les étudiants.">
-  <meta name="theme-color" content="#07111f">
-  <title>Willsim — IA & mécatronique</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #07111f;
-      --bg-soft: #0b192b;
-      --card: rgba(18, 36, 58, .72);
-      --line: rgba(156, 193, 226, .16);
-      --text: #f3f8ff;
-      --muted: #a7b9cc;
-      --accent: #65e6c0;
-      --accent-strong: #28bfa0;
-      --blue: #78a9ff;
-      --shadow: 0 24px 70px rgba(0, 0, 0, .28);
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <!-- Titre et métadonnées SEO prioritaires -->
+    <title>Willsim — Association Robotique, Code &amp; Formation Numérique</title>
+    <meta
+      name="description"
+      content="Willsim est une association à but non lucratif proposant des cours et ateliers pratiques en robotique, développement web et simulation 3D pour tous les niveaux."
+    >
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://willsim.fr/">
+
+    <!-- Géolocalisation & langue -->
+    <meta name="geo.region" content="FR">
+    <meta name="geo.placename" content="France">
+    <meta property="og:locale" content="fr_FR">
+
+    <!-- Open Graph (Facebook, LinkedIn, Google Discover) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Willsim">
+    <meta property="og:url" content="https://willsim.fr/">
+    <meta property="og:title" content="Willsim — Association Robotique, Code &amp; Formation Numérique">
+    <meta property="og:description" content="Cours et ateliers pratiques en robotique, développement web et simulation 3D. Une association ouverte à tous pour apprendre en faisant.">
+    <!-- Image de partage hébergée sur le site (plus de hotlink Unsplash) -->
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association Willsim : robotique, code et IA">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Willsim — Association Robotique, Code &amp; Formation Numérique">
+    <meta name="twitter:description" content="Cours et ateliers pratiques en robotique, développement web et simulation 3D au sein de l'association Willsim.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association Willsim : robotique, code et IA">
+
+    <!-- Favicon standard & multi-résolution -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <!-- Données structurées Schema.org complètes (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "EducationalOrganization",
+          "@id": "https://willsim.fr/#organization",
+          "name": "Willsim",
+          "legalName": "Association Willsim",
+          "alternateName": ["Willsim Association", "Association Willsim", "Willsim Robotique", "Willsim Numérique"],
+          "url": "https://willsim.fr",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://willsim.fr/logo.png"
+          },
+          "image": "https://willsim.fr/logo.png",
+          "description": "Association à but non lucratif dédiée à l'apprentissage pratique du numérique : ateliers et cours de robotique, développement informatique et simulation 3D pour tous.",
+          "email": "contact@willsim.fr",
+          "knowsAbout": [
+            "Robotique",
+            "Systèmes embarqués",
+            "Arduino",
+            "Développement web",
+            "Programmation Python",
+            "JavaScript",
+            "Simulation numérique 3D",
+            "Formation informatique associative"
+          ],
+          "areaServed": {
+            "@type": "Country",
+            "name": "France"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://willsim.fr/#website",
+          "url": "https://willsim.fr",
+          "name": "Willsim",
+          "alternateName": "Willsim Association",
+          "publisher": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "inLanguage": "fr-FR"
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://willsim.fr/#formations-list",
+          "name": "Ateliers et formations de l'association Willsim",
+          "itemListElement": [
+            {
+              "@type": "Course",
+              "position": 1,
+              "name": "Atelier Développement Web & Programmation",
+              "description": "Apprenez à coder des sites et des logiciels : HTML, CSS, JavaScript, Python et projets réels.",
+              "provider": {
+                "@id": "https://willsim.fr/#organization"
+              }
+            },
+            {
+              "@type": "Course",
+              "position": 2,
+              "name": "Atelier Robotique & Systèmes Embarqués",
+              "description": "Assemblez et programmez des robots, manipulez des microcontrôleurs Arduino, ESP32, capteurs et moteurs.",
+              "provider": {
+                "@id": "https://willsim.fr/#organization"
+              }
+            },
+            {
+              "@type": "Course",
+              "position": 3,
+              "name": "Atelier Simulation Numérique & 3D",
+              "description": "Modélisation 3D, physique virtuelle et simulation interactive pour prototyper sans limites.",
+              "provider": {
+                "@id": "https://willsim.fr/#organization"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://willsim.fr/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Faut-il déjà savoir programmer pour rejoindre Willsim ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Non, absolument pas ! Les ateliers de l'association Willsim sont adaptés à tous les niveaux, y compris aux débutants complets avec une progression pas à pas."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "À qui s'adressent exactement les cours et ateliers de l'association Willsim ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Nos ateliers de robotique et de développement s'adressent aux étudiants, aux salariés, aux personnes en reconversion professionnelle et aux passionnés de technologie."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quel matériel doit-on apporter pour les ateliers de code et robotique ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Un simple ordinateur portable suffit. Le matériel d'expérimentation en robotique (cartes électroniques, capteurs, composants) est mutualisé par l'association lors des sessions."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Comment s'inscrire ou adhérer à l'association Willsim ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Il vous suffit de nous contacter par email à contact@willsim.fr ou via notre site pour convenir d'un premier échange convivial et découvrir les créneaux disponibles."
+              }
+            }
+          ]
+        }
+      ]
     }
+    </script>
 
-    * { box-sizing: border-box; }
+    <!-- Polices auto-hébergées (RGPD : plus d'appel à Google Fonts). Préchargement
+         de Manrope, police du H1 (élément LCP). @font-face dans styles.css. -->
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- ?v= : à incrémenter à chaque mise en ligne pour invalider le cache navigateur -->
+    <link rel="stylesheet" href="styles.css?v=2">
+  </head>
 
-    html { scroll-behavior: smooth; }
+  <body>
+    <!-- Lien d'évitement : premier élément atteint au clavier (WCAG 2.4.1) -->
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
 
-    body {
-      margin: 0;
-      min-width: 320px;
-      background:
-        radial-gradient(circle at 83% 8%, rgba(63, 125, 255, .18), transparent 28rem),
-        radial-gradient(circle at 12% 42%, rgba(34, 193, 160, .1), transparent 24rem),
-        var(--bg);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.6;
-    }
+    <!-- En-tête principal -->
+    <header class="site-header" id="top">
+      <div class="header-container page-width">
+        <a class="brand" href="#accueil" aria-label="Willsim, retour en haut de la page">
+          <!-- Logo 76 px WebP (3 Ko) au lieu du PNG 1024 px (417 Ko) -->
+          <img class="brand-logo-img" src="assets/img/logo-76.webp" alt="" width="36" height="36">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
 
-    a { color: inherit; }
+        <!-- Navigation bureau -->
+        <nav class="main-nav" aria-label="Navigation principale">
+          <a href="#formations">Nos formations</a>
+          <a href="#association">L’association</a>
+          <a href="#approche">Notre approche</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Contact</a>
+        </nav>
 
-    .container {
-      width: min(1120px, calc(100% - 40px));
-      margin: 0 auto;
-    }
+        <div class="header-actions">
+          <a class="header-cta" href="#contact">
+            <span>Rejoindre l'association</span>
+            <span class="cta-arrow" aria-hidden="true">↗</span>
+          </a>
 
-    .site-header {
-      padding: 28px 0;
-      border-bottom: 1px solid rgba(156, 193, 226, .1);
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 11px;
-      color: var(--text);
-      font-size: 1.15rem;
-      font-weight: 750;
-      letter-spacing: .02em;
-      text-decoration: none;
-    }
-
-    .brand-mark {
-      display: grid;
-      width: 34px;
-      height: 34px;
-      place-items: center;
-      border: 1px solid rgba(101, 230, 192, .55);
-      border-radius: 10px;
-      background: rgba(101, 230, 192, .09);
-      color: var(--accent);
-      font-size: .82rem;
-      font-weight: 800;
-    }
-
-    .nav-link {
-      color: var(--muted);
-      font-size: .92rem;
-      text-decoration: none;
-      transition: color .2s ease;
-    }
-
-    .nav-link:hover, .nav-link:focus-visible { color: var(--accent); }
-
-    .hero {
-      position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
-      align-items: center;
-      gap: clamp(40px, 8vw, 110px);
-      min-height: 610px;
-      padding: 82px 0 100px;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      margin: 0 0 23px;
-      color: var(--accent);
-      font-size: .77rem;
-      font-weight: 750;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-    }
-
-    .eyebrow::before {
-      width: 28px;
-      height: 1px;
-      background: var(--accent);
-      content: "";
-    }
-
-    h1, h2, p { margin-top: 0; }
-
-    h1 {
-      max-width: 690px;
-      margin-bottom: 25px;
-      font-size: clamp(3.3rem, 8vw, 6.7rem);
-      letter-spacing: -.075em;
-      line-height: .94;
-    }
-
-    h1 span {
-      color: var(--accent);
-      font-weight: 400;
-    }
-
-    .hero-copy {
-      max-width: 570px;
-      margin-bottom: 33px;
-      color: var(--muted);
-      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 51px;
-      padding: 0 22px;
-      border: 1px solid var(--accent);
-      border-radius: 9px;
-      background: var(--accent);
-      color: #062118;
-      font-weight: 750;
-      text-decoration: none;
-      box-shadow: 0 10px 28px rgba(40, 191, 160, .18);
-      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
-    }
-
-    .button:hover, .button:focus-visible {
-      background: #8af1d5;
-      box-shadow: 0 13px 34px rgba(40, 191, 160, .28);
-      transform: translateY(-2px);
-    }
-
-    .visual {
-      position: relative;
-      min-height: 350px;
-    }
-
-    .visual::before, .visual::after {
-      position: absolute;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      content: "";
-    }
-
-    .visual::before {
-      inset: 10% 2% 10% 8%;
-      transform: rotate(-18deg);
-    }
-
-    .visual::after {
-      inset: 0 11% 20% 0;
-      border-color: rgba(101, 230, 192, .26);
-      transform: rotate(28deg);
-    }
-
-    .network {
-      position: absolute;
-      inset: 12% 10% 12% 7%;
-      overflow: hidden;
-      border: 1px solid rgba(120, 169, 255, .23);
-      border-radius: 22px;
-      background: linear-gradient(145deg, rgba(21, 48, 78, .83), rgba(10, 24, 42, .6));
-      box-shadow: var(--shadow);
-    }
-
-    .network::before {
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(120, 169, 255, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(120, 169, 255, .08) 1px, transparent 1px);
-      background-size: 33px 33px;
-      content: "";
-      mask-image: linear-gradient(135deg, black, transparent 75%);
-    }
-
-    .node {
-      position: absolute;
-      width: 13px;
-      height: 13px;
-      border: 3px solid var(--accent);
-      border-radius: 50%;
-      background: var(--bg);
-      box-shadow: 0 0 0 8px rgba(101, 230, 192, .1), 0 0 25px var(--accent);
-    }
-
-    .node:nth-child(1) { top: 25%; left: 24%; }
-    .node:nth-child(2) { top: 54%; left: 53%; border-color: var(--blue); box-shadow: 0 0 0 8px rgba(120, 169, 255, .1), 0 0 25px var(--blue); }
-    .node:nth-child(3) { right: 19%; bottom: 21%; }
-    .node:nth-child(4) { top: 18%; right: 29%; border-color: var(--blue); box-shadow: 0 0 0 8px rgba(120, 169, 255, .1), 0 0 25px var(--blue); }
-
-    .circuit {
-      position: absolute;
-      height: 1px;
-      transform-origin: left center;
-      background: linear-gradient(90deg, var(--accent), var(--blue));
-      opacity: .75;
-    }
-
-    .circuit:nth-child(5) { top: 28%; left: 27%; width: 33%; transform: rotate(35deg); }
-    .circuit:nth-child(6) { top: 58%; left: 55%; width: 27%; transform: rotate(-34deg); }
-    .circuit:nth-child(7) { top: 22%; left: 28%; width: 43%; transform: rotate(-8deg); }
-
-    .mission {
-      display: grid;
-      grid-template-columns: .7fr 1.3fr;
-      gap: 60px;
-      padding: 86px 0;
-      border-top: 1px solid var(--line);
-    }
-
-    .section-label {
-      margin: 7px 0 0;
-      color: var(--accent);
-      font-size: .79rem;
-      font-weight: 750;
-      letter-spacing: .13em;
-      text-transform: uppercase;
-    }
-
-    h2 {
-      margin-bottom: 18px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      letter-spacing: -.05em;
-      line-height: 1.05;
-    }
-
-    .mission p {
-      max-width: 700px;
-      margin-bottom: 0;
-      color: var(--muted);
-      font-size: 1.13rem;
-    }
-
-    .contact {
-      margin-bottom: 86px;
-      padding: clamp(34px, 6vw, 66px);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: linear-gradient(115deg, var(--card), rgba(11, 25, 43, .45));
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-
-    .contact p {
-      max-width: 510px;
-      margin: 0 auto 27px;
-      color: var(--muted);
-    }
-
-    footer {
-      padding: 27px 0 31px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: .82rem;
-      text-align: center;
-    }
-
-    @media (max-width: 720px) {
-      .container { width: min(100% - 32px, 560px); }
-      .hero {
-        grid-template-columns: 1fr;
-        min-height: auto;
-        padding: 70px 0 70px;
-      }
-      .visual { min-height: 280px; }
-      .mission { grid-template-columns: 1fr; gap: 18px; padding: 65px 0; }
-      .contact { margin-bottom: 65px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { transition-duration: .01ms !important; }
-    }
-  </style>
-</head>
-<body>
-  <header class="site-header">
-    <nav class="container nav" aria-label="Navigation principale">
-      <a class="brand" href="#accueil" aria-label="Willsim, retour à l'accueil">
-        <span class="brand-mark" aria-hidden="true">W/</span>
-        Willsim
-      </a>
-      <a class="nav-link" href="#mission">Notre mission</a>
-    </nav>
-  </header>
-
-  <main id="accueil">
-    <section class="container hero" aria-labelledby="hero-title">
-      <div>
-        <p class="eyebrow">Association étudiante · Tech for good</p>
-        <h1 id="hero-title">Willsim<span>.</span></h1>
-        <p class="hero-copy">Faire dialoguer l'intelligence artificielle et la mécatronique pour construire les compétences de demain.</p>
-        <a class="button" href="mailto:maximcoquet@gmail.com">Nous contacter <span aria-hidden="true">↗</span></a>
-      </div>
-      <div class="visual" aria-hidden="true">
-        <div class="network">
-          <span class="node"></span>
-          <span class="node"></span>
-          <span class="node"></span>
-          <span class="node"></span>
-          <span class="circuit"></span>
-          <span class="circuit"></span>
-          <span class="circuit"></span>
+          <!-- Bouton hamburger mobile -->
+          <button
+            type="button"
+            class="nav-toggle"
+            id="nav-toggle"
+            aria-label="Ouvrir le menu de navigation"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+          >
+            <span class="burger-box">
+              <span class="burger-line"></span>
+              <span class="burger-line"></span>
+              <span class="burger-line"></span>
+            </span>
+          </button>
         </div>
       </div>
-    </section>
+    </header>
 
-    <section class="container mission" id="mission" aria-labelledby="mission-title">
-      <p class="section-label">01 / Notre mission</p>
-      <div>
-        <h2 id="mission-title">Apprendre. Expérimenter. Partager.</h2>
-        <p>Willsim a pour but de promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans la mécatronique, notamment via la création de cours en ligne gratuits pour les étudiants.</p>
+    <!-- Tiroir de navigation mobile -->
+    <!-- "inert" (et non aria-hidden) : fermé, le tiroir est retiré du clavier ET des
+         lecteurs d'écran ; script.js le retire à l'ouverture. -->
+    <div class="mobile-nav" id="mobile-nav" inert>
+      <div class="mobile-nav-backdrop"></div>
+      <div class="mobile-nav-panel">
+        <div class="mobile-nav-header">
+          <div class="mobile-brand-group">
+            <img class="brand-logo-img" src="assets/img/logo-76.webp" alt="" width="32" height="32" loading="lazy" decoding="async">
+            <span class="mobile-brand">willsim<span class="brand-period">.</span></span>
+          </div>
+          <span class="mobile-badge">Association Tech</span>
+        </div>
+
+        <nav class="mobile-nav-links" aria-label="Navigation mobile">
+          <a class="mobile-nav-link" href="#formations">
+            <span class="link-num">01</span>
+            <span class="link-label">Nos formations</span>
+          </a>
+          <a class="mobile-nav-link" href="#association">
+            <span class="link-num">02</span>
+            <span class="link-label">L’association</span>
+          </a>
+          <a class="mobile-nav-link" href="#approche">
+            <span class="link-num">03</span>
+            <span class="link-label">Notre approche</span>
+          </a>
+          <a class="mobile-nav-link" href="#faq">
+            <span class="link-num">04</span>
+            <span class="link-label">Questions fréquentes</span>
+          </a>
+          <a class="mobile-nav-link" href="#contact">
+            <span class="link-num">05</span>
+            <span class="link-label">Nous contacter</span>
+          </a>
+        </nav>
+
+        <div class="mobile-nav-footer">
+          <a class="button button-lime mobile-nav-cta" href="#contact">
+            Rejoindre l'association <span aria-hidden="true">↗</span>
+          </a>
+          <p class="mobile-contact-note">
+            Des questions ? Écrivez-nous à :<br>
+            <a href="mailto:contact@willsim.fr" class="mobile-mail">contact@willsim.fr</a>
+          </p>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="container contact" id="contact" aria-labelledby="contact-title">
-      <h2 id="contact-title">Une question ou une idée&nbsp;?</h2>
-      <p>Échangeons autour de l'IA, de la mécatronique et de l'apprentissage accessible à toutes et tous.</p>
-      <a class="button" href="mailto:maximcoquet@gmail.com">Nous contacter <span aria-hidden="true">↗</span></a>
-    </section>
-  </main>
+    <main id="contenu" tabindex="-1">
+      <!-- Hero Section -->
+      <section class="hero page-width" id="accueil">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>ASSOCIATION ROBOTIQUE &amp; FORMATION AU NUMÉRIQUE</span>
+          </div>
 
-  <footer>
-    <div class="container">Willsim est une association loi 1901 à but non lucratif. Numéro RNA : W842013616</div>
-  </footer>
-</body>
+          <h1>L'association robotique &amp; code<br> accessible <span>à chacun.</span></h1>
+
+          <p class="hero-description">
+            <strong>Willsim</strong> est une association à but non lucratif qui transmet des compétences concrètes : découvrez nos cours et ateliers en <strong>robotique</strong>, <strong>programmation informatique</strong> et <strong>simulation 3D</strong>, conçus pour faire progresser étudiants, salariés et passionnés.
+          </p>
+
+          <!-- Un seul CTA principal (plein) = l'action de conversion ; l'autre reste secondaire (contour) -->
+          <div class="hero-actions">
+            <a class="button button-dark" href="#contact">
+              <span>Rejoindre l'association</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a class="button button-outline" href="#formations">
+              <span>Découvrir nos ateliers</span>
+              <span aria-hidden="true">↓</span>
+            </a>
+          </div>
+
+          <div class="hero-badges">
+            <div class="hero-badge-item">
+              <span class="badge-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </span>
+              <span class="badge-text">Association à but non lucratif</span>
+            </div>
+            <div class="hero-badge-item">
+              <span class="badge-icon" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="badge-text">Accessible à tous les profils</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="visual-header-badge">
+            <span class="pulse-dot"></span>
+            <span>ASSOCIATION WILLSIM · ATELIERS PRATIQUES</span>
+          </div>
+
+          <!-- Photos auto-hébergées en WebP (plus d'appel à Unsplash = pas de transfert d'IP),
+               srcset pour servir la bonne taille, width/height pour éviter le CLS -->
+          <div class="visual-cards-grid">
+            <figure class="visual-card visual-card-primary">
+              <img
+                src="assets/img/atelier-code-900.webp"
+                srcset="assets/img/atelier-code-600.webp 600w, assets/img/atelier-code-900.webp 900w"
+                sizes="(max-width: 1024px) 92vw, 560px"
+                width="900" height="599"
+                alt="Atelier d'apprentissage du code et de programmation web - Association Willsim"
+                fetchpriority="high"
+                decoding="async"
+              >
+              <figcaption>
+                <span class="photo-tag">01 · PROGRAMMATION</span>
+                <strong>Développement Web &amp; Logiciel</strong>
+                <span class="photo-sub">Du code à vos premières applications</span>
+              </figcaption>
+            </figure>
+
+            <figure class="visual-card">
+              <img
+                src="assets/img/robotique-650.webp"
+                srcset="assets/img/robotique-400.webp 400w, assets/img/robotique-650.webp 650w"
+                sizes="(max-width: 1024px) 46vw, 280px"
+                width="650" height="433"
+                decoding="async"
+                alt="Atelier robotique, capteurs et microcontrôleurs Arduino - Association robotique Willsim"
+                loading="lazy"
+              >
+              <figcaption>
+                <span class="photo-tag">02 · ROBOTIQUE</span>
+                <strong>Électronique &amp; Robots</strong>
+              </figcaption>
+            </figure>
+
+            <figure class="visual-card">
+              <img
+                src="assets/img/simulation-650.webp"
+                srcset="assets/img/simulation-400.webp 400w, assets/img/simulation-650.webp 650w"
+                sizes="(max-width: 1024px) 46vw, 280px"
+                width="650" height="433"
+                decoding="async"
+                alt="Simulation numérique 3D et modélisation physique virtuelle - Association Willsim"
+                loading="lazy"
+              >
+              <figcaption>
+                <span class="photo-tag">03 · INNOVATION</span>
+                <strong>Simulation &amp; 3D</strong>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bande de confiance / Chiffres clés -->
+      <section class="trust-strip" aria-label="Engagements et valeurs de l'association">
+        <div class="trust-container page-width">
+          <div class="trust-item">
+            <span class="trust-number">100%</span>
+            <div class="trust-content">
+              <strong>Axé sur la pratique</strong>
+              <p>Projets réels et manipulations dès les premières séances.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-number">0€</span>
+            <div class="trust-content">
+              <strong>But non lucratif</strong>
+              <p>Cadre associatif bienveillant, orienté vers la transmission.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-number">1:1</span>
+            <div class="trust-content">
+              <strong>Accompagnement humain</strong>
+              <p>Mentorat adapté à votre rythme et vos objectifs personnels.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-number">∞</span>
+            <div class="trust-content">
+              <strong>Tous niveaux bienvenus</strong>
+              <p>Étudiants, salariés ou en reconversion, sans prérequis élitiste.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Formations -->
+      <section class="programs section-padding" id="formations">
+        <div class="page-width">
+          <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> ATELIERS DE ROBOTIQUE &amp; PROGRAMMATION</p>
+            <h2>Des cours et ateliers pratiques<br>pour tous les niveaux.</h2>
+          </div>
+          <p class="section-intro">
+            L'association <strong>Willsim</strong> propose des cursus structurés et 100% pratiques. Que vous cherchiez une <strong>association de robotique</strong> pour expérimenter sur matériel réel ou des cours de code, nous vous accompagnons étape par étape.
+          </p>
+        </div>
+
+        <div class="program-grid">
+          <!-- Carte 1 : Dév -->
+          <article class="program-card">
+            <div class="card-head">
+              <span class="program-number">01</span>
+              <span class="program-badge">Populaire</span>
+            </div>
+            <div class="card-icon-wrapper">
+              <span class="program-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </span>
+            </div>
+            <h3>Développement Web &amp; Programmation</h3>
+            <p class="card-desc">
+              Apprenez à coder des applications interactives, maîtrisez les langages Python et JavaScript, et concevez des logiciels complets avec l'aide de nos mentors associatifs.
+            </p>
+            <div class="skills-tags">
+              <span>HTML / CSS</span>
+              <span>JavaScript</span>
+              <span>Python</span>
+              <span>Git &amp; GitHub</span>
+              <span>API REST</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-meta">Format hybride · Débutant à Avancé</span>
+              <a href="#contact" class="card-link" aria-label="Participer à l'atelier programmation">
+                <span>Participer</span> <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Carte 2 : Robotique -->
+          <article class="program-card">
+            <div class="card-head">
+              <span class="program-number">02</span>
+              <span class="program-badge">Pratique</span>
+            </div>
+            <div class="card-icon-wrapper">
+              <span class="program-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>
+              </span>
+            </div>
+            <h3>Atelier Robotique &amp; Systèmes Embarqués</h3>
+            <p class="card-desc">
+              Rejoignez notre atelier de robotique : manipulez des capteurs, moteurs et cartes Arduino ou ESP32, et assemblez vos premiers robots autonomes et connectés.
+            </p>
+            <div class="skills-tags">
+              <span>Arduino</span>
+              <span>ESP32</span>
+              <span>Capteurs & Moteurs</span>
+              <span>C / C++</span>
+              <span>IoT</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-meta">Ateliers pratiques · Projets guidés</span>
+              <a href="#contact" class="card-link" aria-label="Participer à l'atelier robotique">
+                <span>Participer</span> <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Carte 3 : Simulation -->
+          <article class="program-card">
+            <div class="card-head">
+              <span class="program-number">03</span>
+              <span class="program-badge">Innovant</span>
+            </div>
+            <div class="card-icon-wrapper">
+              <span class="program-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </span>
+            </div>
+            <h3>Simulation & Modélisation 3D</h3>
+            <p class="card-desc">
+              Explorez la physique virtuelle, la modélisation spatiale et les environnements de simulation numérique pour prototyper sans contrainte matérielle.
+            </p>
+            <div class="skills-tags">
+              <span>Moteurs 3D</span>
+              <span>Simulation Physique</span>
+              <span>Jumeaux Numériques</span>
+              <span>Visualisation</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-meta">Études de cas · Projets sur mesure</span>
+              <a href="#contact" class="card-link" aria-label="Participer à l'atelier simulation">
+                <span>Participer</span> <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+        </div>
+        </div>
+      </section>
+
+      <!-- Section Association -->
+      <section class="mission" id="association">
+        <div class="mission-inner page-width">
+          <div class="mission-visual-col">
+            <figure class="mission-photo-frame">
+              <img
+                src="assets/img/atelier-mission-900.webp"
+                srcset="assets/img/atelier-mission-600.webp 600w, assets/img/atelier-mission-900.webp 900w"
+                sizes="(max-width: 1024px) 92vw, 560px"
+                width="900" height="600"
+                decoding="async"
+                alt="Atelier pratique de robotique, programmation et électronique - Association Willsim"
+                loading="lazy"
+              >
+              <div class="mission-photo-overlay">
+                <span class="pulse-dot"></span>
+                <span>Ateliers pratiques · Robotique &amp; Code</span>
+              </div>
+            </figure>
+            <div class="mission-stats-strip">
+              <div class="mission-stat-badge">
+                <strong>100%</strong>
+                <span>Transmission &amp; Bénévolat</span>
+              </div>
+              <div class="mission-stat-sep"></div>
+              <div class="mission-stat-badge">
+                <strong>Ouvert</strong>
+                <span>Toute l'année</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission-copy">
+            <p class="eyebrow eyebrow-light"><span class="eyebrow-dot"></span> NOTRE VOCATION</p>
+            <h2>Le numérique est plus fort <span>quand il se partage.</span></h2>
+            <p>
+              L'association <strong>Willsim</strong> est née d'une conviction claire : l'apprentissage des technologies — de la <strong>robotique</strong> à la <strong>programmation informatique</strong> — doit être accessible à tous. Notre association à but non lucratif crée un espace d'entraide et d'expérimentation où chacun peut progresser sans barrière financière ni prérequis élitiste.
+            </p>
+
+            <div class="values-grid">
+              <div class="value-item">
+                <span class="value-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <div>
+                  <strong>Accessibilité</strong>
+                  <p>Pas de barrière à l'entrée. Nous adaptons la pédagogie à chacun.</p>
+                </div>
+              </div>
+              <div class="value-item">
+                <span class="value-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <div>
+                  <strong>Pédagogie active</strong>
+                  <p>On comprend mieux en faisant : moins de slides, plus de réalisations.</p>
+                </div>
+              </div>
+              <div class="value-item">
+                <span class="value-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </span>
+                <div>
+                  <strong>Entraide continue</strong>
+                  <p>Une communauté solidaire pour débloquer les problèmes et avancer.</p>
+                </div>
+              </div>
+              <div class="value-item">
+                <span class="value-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div>
+                  <strong>Esprit associatif</strong>
+                  <p>Un engagement éthique et désintéressé tourné vers l'impact humain.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mission-actions">
+              <a class="button button-light" href="#contact">Rejoindre l'association <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Approche -->
+      <section class="approach section-padding" id="approche">
+        <div class="page-width">
+          <div class="approach-header-grid">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> MÉTHODOLOGIE</p>
+            <h2>Progresser à votre rythme,<br>étape par étape.</h2>
+          </div>
+          <p class="approach-intro">
+            Chaque adhérent arrive avec son histoire, ses compétences et ses objectifs. Nous concevons un parcours sur mesure pour garantir des résultats rapides et durables.
+          </p>
+        </div>
+
+        <div class="approach-steps-container">
+          <article class="approach-step-card">
+            <div class="step-badge">
+              <span class="step-num">01</span>
+              <span class="step-title-short">Écoute</span>
+            </div>
+            <div class="step-body">
+              <h3>Diagnostic personnalisé</h3>
+              <p>
+                Nous échangeons sur vos envies, votre niveau actuel et le projet que vous souhaitez mener à bien. Nous définissons ensemble une feuille de route claire.
+              </p>
+              <ul class="step-list">
+                <li>Bilan des acquis et des ambitions</li>
+                <li>Choix des technologies adaptées</li>
+                <li>Planification flexible</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="approach-step-card">
+            <div class="step-badge">
+              <span class="step-num">02</span>
+              <span class="step-title-short">Action</span>
+            </div>
+            <div class="step-body">
+              <h3>Pratique immersive & Ateliers</h3>
+              <p>
+                Fini la théorie passive. Vous écrivez du code, manipulez du matériel, résolvez des bugs concrets avec le soutien continu d'un mentor expérimenté.
+              </p>
+              <ul class="step-list">
+                <li>Projets concrets dès le 1er jour</li>
+                <li>Revue bienveillante du travail</li>
+                <li>Entraide entre adhérents</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="approach-step-card">
+            <div class="step-badge">
+              <span class="step-num">03</span>
+              <span class="step-title-short">Impact</span>
+            </div>
+            <div class="step-body">
+              <h3>Autonomie & Concrétisation</h3>
+              <p>
+                Vous repartez avec des compétences validées, un projet fonctionnel à valoriser dans votre CV ou votre portfolio, et l'autonomie pour continuer d'apprendre.
+              </p>
+              <ul class="step-list">
+                <li>Déploiement et finalisation de projets</li>
+                <li>Méthodes d'apprentissage autonome</li>
+                <li>Accès au réseau de l'association</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+        </div>
+      </section>
+
+      <!-- Section FAQ -->
+      <section class="faq section-padding" id="faq">
+        <div class="page-width">
+          <div class="faq-container">
+            <div class="section-heading faq-heading">
+              <div>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> QUESTIONS FRÉQUENTES</p>
+                <h2>Tout ce que vous<br>devez savoir.</h2>
+              </div>
+              <p class="section-intro">
+                Vous avez une question avant de nous rejoindre ? Retrouvez ici les réponses aux interrogations les plus courantes.
+              </p>
+            </div>
+
+        <div class="faq-accordion">
+          <details class="faq-item" open>
+            <summary class="faq-question">
+              <span>Faut-il déjà savoir programmer pour rejoindre Willsim ?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Non, absolument pas ! Une grande partie de nos ateliers est spécifiquement calibrée pour les grands débutants. Nous partons des fondamentaux avec des explications simples, imagées et progressives.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>À qui s'adressent exactement les cours et ateliers de l'association Willsim ?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Nos cours et ateliers de robotique et de programmation s'adressent à toute personne désireuse d'apprendre : étudiants en filière technique ou générale, professionnels souhaitant automatiser des processus, personnes en reconversion professionnelle ou passionnés d'électronique et de technologie.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Quel matériel doit-on apporter pour les ateliers de code et robotique ?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Un simple ordinateur portable classique (Windows, Mac ou Linux) suffit pour débuter. Aucun matériel coûteux n'est exigé. Pour les ateliers de robotique, les composants électroniques, cartes Arduino/ESP32, capteurs et moteurs sont mutualisés par l'association Willsim lors de chaque séance.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Comment s'inscrire ou adhérer à l'association Willsim ?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Il vous suffit de nous contacter via le bouton ci-dessous ou par email à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a>. Nous fixerons un premier échange téléphonique ou visio convivial pour comprendre vos besoins et vous proposer la formule la plus adaptée.
+              </p>
+            </div>
+          </details>
+        </div>
+        </div>
+        </div>
+      </section>
+
+      <!-- Section Contact & Inscription -->
+      <section class="contact-section" id="contact">
+        <div class="page-width">
+          <div class="contact-card">
+          <div class="contact-content">
+            <p class="eyebrow eyebrow-light"><span class="eyebrow-dot"></span> ÉCHANGEONS ENSEMBLE</p>
+            <h2>Prêt à donner vie à vos projets technologiques ?</h2>
+            <p class="contact-lead">
+              Que vous ayez une idée précise en tête ou simplement l'envie de découvrir le développement et la robotique, notre équipe est à votre écoute pour vous conseiller.
+            </p>
+
+            <div class="contact-details">
+              <div class="detail-row">
+                <span class="detail-icon" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </span>
+                <div>
+                  <span class="detail-label">Par email direct :</span>
+                  <a href="mailto:contact@willsim.fr" class="detail-val">contact@willsim.fr</a>
+                </div>
+              </div>
+              <div class="detail-row">
+                <span class="detail-icon" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <div>
+                  <span class="detail-label">Cadre d'intervention :</span>
+                  <span class="detail-val">Ateliers présentiels &amp; sessions distanciel</span>
+                </div>
+              </div>
+              <div class="detail-row">
+                <span class="detail-icon" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <div>
+                  <span class="detail-label">Délai de réponse :</span>
+                  <span class="detail-val">Sous 24 à 48 heures ouvrées</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-action-panel">
+            <div class="action-card-inner">
+              <h3>Rejoindre la prochaine session</h3>
+              <p>Envoyez-nous un message en un clic pour faire le point sur vos objectifs d'apprentissage.</p>
+              
+              <a
+                href="mailto:contact@willsim.fr?subject=Demande%20d'information%20-%20Ateliers%20Willsim&amp;body=Bonjour%20l'%C3%A9quipe%20Willsim%2C%0A%0AJe%20souhaiterais%20avoir%20des%20informations%20sur%20vos%20ateliers%20de%20%3A%0A%5B%20%5D%20D%C3%A9veloppement%0A%5B%20%5D%20Robotique%0A%5B%20%5D%20Simulation%0A%0AMon%20niveau%20actuel%20%3A%0AMes%20objectifs%20%3A%0A%0AMerci%20d'avance%20!"
+                class="button button-lime button-full"
+              >
+                <span>Envoyer un message à l'association</span>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </span>
+              </a>
+
+              <span class="action-caption">Sans engagement · Réponse personnalisée</span>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="site-footer">
+      <div class="footer-main page-width">
+        <div class="footer-brand-col">
+          <a class="brand footer-brand" href="#top" aria-label="Willsim, retour au haut de page">
+            <img class="brand-logo-img" src="assets/img/logo-76.webp" alt="" width="38" height="38" loading="lazy" decoding="async">
+            <span class="brand-text">willsim<span class="brand-period">.</span></span>
+          </a>
+          <p class="footer-tagline">
+            Association à but non lucratif dédiée à l'apprentissage et à la démocratisation des technologies : développement informatique, robotique et simulation.
+          </p>
+        </div>
+
+        <div class="footer-links-col">
+          <strong>Navigation</strong>
+          <nav aria-label="Navigation secondaire">
+            <a href="#formations">Nos formations</a>
+            <a href="#association">L’association</a>
+            <a href="#approche">Notre approche</a>
+            <a href="#faq">Questions fréquentes</a>
+            <a href="#contact">Prendre contact</a>
+          </nav>
+        </div>
+
+        <div class="footer-contact-col">
+          <strong>Coordonnées</strong>
+          <p>
+            Association Willsim<br>
+            Email : <a href="mailto:contact@willsim.fr">contact@willsim.fr</a><br>
+            Site : <a href="https://willsim.fr">willsim.fr</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Bas de page commun à toutes les pages : liens légaux + réouverture du bandeau cookies -->
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="script.js?v=2" defer></script>
+  </body>
 </html>

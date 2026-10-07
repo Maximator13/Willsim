@@ -1,0 +1,65 @@
+/* WILLSIM — Pages légales et 404 (complète styles.css) */
+
+/* En-tête simplifié : le lien retour reste visible sur mobile */
+.site-header .header-cta { display: inline-flex; }
+
+/* Pied de page réduit */
+.site-footer { padding-top: 0; }
+
+/* Contenu juridique */
+.legal {
+  max-width: 760px;
+  padding-block: clamp(40px, 7vw, 80px);
+}
+.legal h1 {
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+.legal h2 {
+  font-family: var(--display);
+  font-size: 1.25rem;
+  margin: 40px 0 12px;
+}
+.legal h3 {
+  font-size: 1rem;
+  margin: 24px 0 8px;
+}
+.legal p,
+.legal li { color: var(--ink-secondary); }
+.legal ul { padding-left: 20px; }
+.legal a:not(.button) {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.legal .updated {
+  font-size: 13px;
+  color: var(--muted);
+}
+.legal .link-button {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.table-scroll { overflow-x: auto; }
+.legal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--paper-card);
+}
+.legal th,
+.legal td {
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  vertical-align: top;
+}
+.legal th { background: var(--paper-deep); }
+
+/* 404 */
+.not-found { text-align: center; }
+.not-found .button { margin-top: 12px; }

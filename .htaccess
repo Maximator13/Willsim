@@ -1,0 +1,67 @@
+# ----------------------------------------------------------------------
+# 1. HTTPS + domaine canonique unique : https://willsim.fr (Infomaniak)
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTP -> HTTPS. Derrière le proxy Infomaniak, HTTPS vaut "off" mais
+  # X-Forwarded-Proto vaut "https" : les deux conditions évitent la boucle.
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://willsim.fr%{REQUEST_URI} [L,R=301]
+
+  # www -> sans www (évite le contenu dupliqué ; canonical et sitemap = willsim.fr)
+  RewriteCond %{HTTP_HOST} ^www\.willsim\.fr$ [NC]
+  RewriteRule ^ https://willsim.fr%{REQUEST_URI} [L,R=301]
+
+  # Fichiers et dossiers cachés (.git, .env...) interdits, sauf .well-known (Let's Encrypt)
+  RewriteRule "(^|/)\.(?!well-known/)" - [F]
+</IfModule>
+
+# Fichiers du dépôt qui n'ont rien à faire en ligne
+<FilesMatch "^(README\.md|.*\.py)$">
+  Require all denied
+</FilesMatch>
+
+# ----------------------------------------------------------------------
+# 2. Page 404 personnalisée
+# ----------------------------------------------------------------------
+ErrorDocument 404 /404.html
+
+# ----------------------------------------------------------------------
+# 3. Compression GZIP / DEFLATE
+# ----------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/xml
+</IfModule>
+
+# ----------------------------------------------------------------------
+# 4. Cache navigateur via Cache-Control (mod_expires est sans effet sur
+#    l'offre Starter, constaté à l'audit ; mod_headers fonctionne).
+#    CSS/JS sont versionnés (?v=) dans le HTML : incrémenter à chaque mise en ligne.
+# ----------------------------------------------------------------------
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|png|jpe?g|ico|svg|woff2|css|js)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# ----------------------------------------------------------------------
+# 5. En-têtes de sécurité (HSTS est déjà ajouté par Infomaniak)
+# ----------------------------------------------------------------------
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+
+  # CSP : tout est auto-hébergé ; seul Matomo (après consentement) est autorisé.
+  # Remplacer willsim.matomo.cloud par l'adresse réelle de l'instance Matomo
+  # (même valeur que MATOMO_URL dans script.js).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://willsim.matomo.cloud https://cdn.matomo.cloud; connect-src 'self' https://willsim.matomo.cloud; img-src 'self' data: https://willsim.matomo.cloud; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+</IfModule>
