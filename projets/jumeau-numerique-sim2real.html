@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Du jumeau numérique au robot réel — Projet WILLSIM</title>
+    <meta name="description" content="Projet WILLSIM en préparation. Entraîner un contrôleur par apprentissage par renforcement en simulation, le transférer sur un système réel et mesurer l'écart.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/projets/jumeau-numerique-sim2real.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/projets/jumeau-numerique-sim2real.html">
+    <meta property="og:title" content="Du jumeau numérique au robot réel — Projet WILLSIM">
+    <meta property="og:description" content="Projet WILLSIM en préparation. Entraîner un contrôleur par apprentissage par renforcement en simulation, le transférer sur un système réel et mesurer l'écart.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Du jumeau numérique au robot réel — Projet WILLSIM">
+    <meta name="twitter:description" content="Projet WILLSIM en préparation. Entraîner un contrôleur par apprentissage par renforcement en simulation, le transférer sur un système réel et mesurer l'écart.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : présentation de projet (en préparation) + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CreativeWork",
+          "@id": "https://willsim.fr/projets/jumeau-numerique-sim2real.html#projet",
+          "url": "https://willsim.fr/projets/jumeau-numerique-sim2real.html",
+          "name": "Du jumeau numérique au robot réel",
+          "description": "Projet WILLSIM en préparation. Entraîner un contrôleur par apprentissage par renforcement en simulation, le transférer sur un système réel et mesurer l'écart.",
+          "inLanguage": "fr",
+          "creativeWorkStatus": "En préparation",
+          "keywords": "apprentissage par renforcement, jumeau numérique, simulation physique, sim-to-real, pendule inversé",
+          "isAccessibleForFree": true,
+          "publisher": {
+            "@type": [
+              "EducationalOrganization",
+              "NGO"
+            ],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "mentions": [
+            {
+              "@type": "Course",
+              "name": "Apprentissage par renforcement et jumeau numérique",
+              "url": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html"
+            },
+            {
+              "@type": "Course",
+              "name": "Commande de moteurs et régulation PID",
+              "url": "https://willsim.fr/cours/commande-moteurs-pid.html"
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Accueil",
+              "item": "https://willsim.fr/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Projets",
+              "item": "https://willsim.fr/#projets"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Du jumeau numérique au robot réel",
+              "item": "https://willsim.fr/projets/jumeau-numerique-sim2real.html"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/">Cours</a>
+          <a href="/#projets" aria-current="true">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/#projets">Projets</a></li>
+              <li><span aria-current="page">Du jumeau numérique au robot réel</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Projet associatif · Apprentissage par renforcement</p>
+          <h1>Du jumeau numérique au robot réel</h1>
+          <p class="page-lead">Entraîner un contrôleur par apprentissage par renforcement dans une simulation, puis le transférer sur un robot physique et mesurer l'écart entre simulation et réalité. Un projet pour comprendre pourquoi ce qui fonctionne en simulation ne fonctionne pas toujours dans le monde réel, et comment réduire cet écart.</p>
+
+          <div class="page-badges">
+            <span class="status-badge">Projet en préparation</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Statut</dt><dd>En préparation</dd></div>
+            <div><dt>Domaines</dt><dd>Apprentissage par renforcement, simulation, automatique</dd></div>
+            <div><dt>Compétences</dt><dd>Modélisation, identification, commande</dd></div>
+            <div><dt>Matériel envisagé</dt><dd>Pendule inversé rotatif motorisé, codeurs, microcontrôleur</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectif-titre">
+            <h2 id="objectif-titre">Objectif du projet</h2>
+            <p>Le support envisagé en priorité est un pendule inversé rotatif (pendule de Furuta)&nbsp;: un bras horizontal entraîné par un moteur, au bout duquel un pendule tourne librement dans un plan vertical. Ce système est relativement simple à construire, peu risqué à basse tension et bien décrit dans la littérature, tout en restant difficile à commander&nbsp;: il est instable et sous-actionné, avec un seul moteur pour deux articulations. Le choix définitif sera arrêté avec le cahier des charges.</p>
+            <ul class="objectives">
+              <li>Construire un jumeau numérique du système, dont les paramètres sont identifiés à partir de mesures réelles.</li>
+              <li>Entraîner en simulation une politique capable de redresser le pendule puis de le maintenir à la verticale.</li>
+              <li>Transférer cette politique sur le système réel, avec des sécurités indépendantes du réseau de neurones.</li>
+              <li>Mesurer l'écart entre simulation et réalité, et comparer la politique apprise à un contrôleur classique conçu sur le même modèle.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="problematique-titre">
+            <h2 id="problematique-titre">Problématique d'ingénierie</h2>
+            <p>Entraîner un contrôleur directement sur le système réel demanderait des milliers d'essais, avec un risque d'usure et de casse. La simulation lève cette contrainte mais introduit un nouveau problème&nbsp;: l'écart entre simulation et réalité (en anglais, <span lang="en">reality gap</span>).</p>
+            <ul>
+              <li><strong>Modèle imparfait&nbsp;:</strong> frottements, jeu mécanique, saturation du moteur, bruit des capteurs et retards de communication sont mal représentés dans une simulation idéale. Un contrôleur appris peut exploiter les défauts du simulateur et échouer sur le système réel.</li>
+              <li><strong>Identification des paramètres&nbsp;:</strong> inerties, frottements et constante de couple du moteur devront être estimés à partir d'essais réels, puis validés en comparant des trajectoires mesurées et simulées.</li>
+              <li><strong>Randomisation de domaine&nbsp;:</strong> faire varier aléatoirement ces paramètres pendant l'entraînement pousse la politique à rester robuste face aux incertitudes, plutôt qu'à se spécialiser sur un seul modèle.</li>
+              <li><strong>Cadence et retards&nbsp;:</strong> la politique sera exécutée à fréquence fixe&nbsp;; la période de commande, le retard et la saturation de l'actionneur devront être reproduits fidèlement dans la simulation.</li>
+              <li><strong>Mesures disponibles&nbsp;:</strong> la politique ne doit utiliser que des grandeurs réellement mesurables sur le système (angles issus des codeurs, vitesses estimées), et non des informations que seul le simulateur connaît.</li>
+              <li><strong>Sécurité&nbsp;:</strong> la limitation de la commande, les butées et l'arrêt automatique en cas de dépassement d'angle seront programmés indépendamment de la politique apprise.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="architecture-titre">
+            <h2 id="architecture-titre">Architecture envisagée</h2>
+            <p>Le même environnement logiciel servira à l'entraînement en simulation et à l'exécution sur le système réel, afin que seul le «&nbsp;monde&nbsp;» change entre les deux.</p>
+            <ul>
+              <li><strong>Système physique&nbsp;:</strong> un moteur à courant continu équipé d'un codeur entraîne le bras&nbsp;; un second codeur mesure l'angle du pendule, monté sur roulement.</li>
+              <li><strong>Calcul&nbsp;:</strong> un microcontrôleur exécute la boucle temps réel à fréquence fixe&nbsp;: lecture des codeurs, commande du moteur par MLI (modulation de largeur d'impulsion) et sécurités. La politique, un petit réseau de neurones, pourra tourner sur le microcontrôleur ou sur un ordinateur relié par liaison série&nbsp;; la latence de chaque option sera mesurée.</li>
+              <li><strong>Jumeau numérique&nbsp;:</strong> un modèle physique du pendule, écrit à partir des équations du mouvement ou construit dans un moteur de simulation comme MuJoCo, présenté sous forme d'environnement Gymnasium et recalé sur les mesures réelles.</li>
+              <li><strong>Apprentissage&nbsp;:</strong> un algorithme d'apprentissage par renforcement de type acteur-critique (PPO ou SAC), issu d'une bibliothèque existante comme Stable-Baselines3. La récompense favorisera un pendule vertical, un bras proche de sa position centrale et une commande modérée.</li>
+              <li><strong>Rôle de l'IA&nbsp;:</strong> la politique apprise calcule la commande du moteur à partir des mesures. Un contrôleur classique conçu sur le même modèle (redressement par une loi fondée sur l'énergie, stabilisation par retour d'état de type LQR) servira de référence pour juger l'apport réel de l'apprentissage.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel envisagé</h2>
+            <p>Liste indicative, à confirmer lors de la rédaction du cahier des charges&nbsp;: aucun matériel n'est encore acheté ni réservé.</p>
+            <ul>
+              <li>un moteur à courant continu avec codeur incrémental et son module de commande&nbsp;;</li>
+              <li>un second codeur incrémental pour mesurer l'angle du pendule&nbsp;;</li>
+              <li>une structure mécanique rigide (pièces imprimées en 3D ou usinées) et des roulements&nbsp;;</li>
+              <li>une carte à microcontrôleur&nbsp;;</li>
+              <li>une alimentation basse tension limitée en courant et un bouton d'arrêt d'urgence&nbsp;;</li>
+              <li>un ordinateur classique pour l'entraînement&nbsp;: pour un système de cette taille, une carte graphique n'est pas indispensable.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="etapes-titre">
+            <h2 id="etapes-titre">Étapes prévues</h2>
+            <ol class="steps-list">
+              <li>
+                <h3>Modélisation</h3>
+                <p>Établir les équations du mouvement du pendule et construire une première simulation avec des paramètres nominaux.</p>
+              </li>
+              <li>
+                <h3>Construction et instrumentation</h3>
+                <p>Réaliser le système, vérifier les codeurs et la commande du moteur, et mettre en place les sécurités matérielles et logicielles.</p>
+              </li>
+              <li>
+                <h3>Identification et jumeau numérique</h3>
+                <p>Estimer frottements, inerties et constante de couple à partir d'essais, puis comparer trajectoires réelles et simulées jusqu'à obtenir un accord satisfaisant.</p>
+              </li>
+              <li>
+                <h3>Contrôleur de référence</h3>
+                <p>Concevoir un contrôleur classique sur le modèle identifié et le tester sur le système réel&nbsp;: il servira de point de comparaison.</p>
+              </li>
+              <li>
+                <h3>Entraînement en simulation</h3>
+                <p>Entraîner la politique avec randomisation de domaine, puis l'évaluer sur des simulations dont les paramètres sont volontairement décalés.</p>
+              </li>
+              <li>
+                <h3>Transfert et analyse de l'écart</h3>
+                <p>Exécuter la politique sur le système réel avec les sécurités actives, comparer les mêmes indicateurs en simulation et en réalité (réussite du redressement, temps de stabilisation, effort de commande), puis documenter.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="competences-titre">
+            <h2 id="competences-titre">Compétences mobilisées</h2>
+            <div class="skills-tags">
+              <span>Apprentissage par renforcement</span>
+              <span>Jumeau numérique</span>
+              <span>Simulation physique</span>
+              <span>Sim-to-real</span>
+            </div>
+            <p>Le projet fait aussi appel à des bases de mécanique (équations du mouvement), d'automatique (représentation d'état, commande LQR) et de programmation en Python et sur microcontrôleur.</p>
+          </section>
+
+          <section aria-labelledby="cours-titre">
+            <h2 id="cours-titre">Se former avec les cours WILLSIM</h2>
+            <p>Chacun de ces cours est accompagné d'une fiche PDF gratuite, rédigée par l'équipe pédagogique WILLSIM&nbsp;:</p>
+            <ul>
+              <li><a href="/cours/apprentissage-renforcement-sim2real.html">Apprentissage par renforcement et jumeau numérique</a>&nbsp;: pour les bases de l'apprentissage par renforcement et la démarche de la simulation vers le réel.</li>
+              <li><a href="/cours/commande-moteurs-pid.html">Commande de moteurs et régulation PID</a>&nbsp;: pour la commande du moteur et la conception d'un régulateur classique.</li>
+            </ul>
+            <p><a class="text-link" href="/cours/">Voir tous les cours</a></p>
+          </section>
+
+          <section aria-labelledby="contribuer-titre">
+            <h2 id="contribuer-titre">Envie de participer&#8239;?</h2>
+            <div class="page-note">
+              <p>Ce projet est en préparation&nbsp;: le cahier des charges et le matériel sont en cours de définition, aucune réalisation n'est encore engagée.</p>
+            </div>
+            <p>Le projet s'adresse aux étudiants, enseignants et passionnés qui souhaitent apprendre en construisant. Toutes les compétences sont utiles&nbsp;: mécanique et fabrication, électronique, automatique, apprentissage par renforcement, programmation, mais aussi rédaction de la documentation.</p>
+            <p>Pour proposer votre aide, du matériel ou une idée, <a class="text-link" href="/#contact">écrivez à l'équipe via le formulaire de contact</a>.</p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Participer et liens utiles">
+          <section class="cta-card" aria-labelledby="participer-titre">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Projet ouvert</p>
+            <h2 id="participer-titre">Participer au projet</h2>
+            <p>Étudiant, enseignant ou passionné&#8239;? Proposez vos compétences ou votre matériel&nbsp;: l'équipe vous répondra par e-mail.</p>
+            <a class="button button-lime button-full" href="/#contact">
+              <span>Proposer ma participation</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </section>
+
+          <section class="related-links" aria-labelledby="autres-projets-titre">
+            <h2 id="autres-projets-titre">Les autres projets</h2>
+            <ul>
+              <li><a href="/projets/bras-robotique-vision.html"><span class="related-kicker">Projet en préparation</span>Bras robotique guidé par vision</a></li>
+              <li><a href="/projets/maintenance-predictive-moteur.html"><span class="related-kicker">Projet en préparation</span>Maintenance prédictive d'un moteur</a></li>
+              <li><a href="/projets/robot-mobile-autonome.html"><span class="related-kicker">Projet en préparation</span>Robot mobile autonome</a></li>
+              <li><a href="/#projets"><span class="related-kicker">Projets</span>Tous les projets en préparation</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

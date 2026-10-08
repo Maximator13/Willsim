@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+  MODÈLE DE FICHE DE COURS PDF (source non publiée).
+  1. Copier en pdf-src/<slug>.html (slug du catalogue, ex. ros2-premiers-pas.html).
+  2. Remplacer les marqueurs {{...}}, supprimer ce commentaire et les blocs inutiles.
+  3. Générer : python pdf-src/build.py <slug>  → assets/pdf/willsim-<slug>.pdf
+  Composants : .box-objectifs, .box-retenir, .box-attention, .box-exercice (+ .solution),
+  <pre><code> (blocs de code), .code-title, table, figure (SVG en ligne), .formula ou MathML.
+  Les h2/h3 placés dans <main class="sections"> sont numérotés automatiquement (1., 1.1…) :
+  ne pas écrire les numéros à la main.
+  Typographie : &nbsp; avant « : » « ; » et dans « 2&nbsp;h », &#8239; avant « ? » « ! ».
+  Viser 4 à 8 pages. Auteur : équipe pédagogique WILLSIM. Licence CC BY-NC-SA 4.0.
+-->
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{TITRE_TEXTE_BRUT}} — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="{{DESCRIPTION_COURTE}}">
+    <meta name="keywords" content="{{MOTS_CLES}}">
+    <link rel="stylesheet" href="print.css">
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>{{TITRE}}</h1>
+      <p class="cover-lead">{{CHAPEAU}}</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>{{NIVEAU}}</dd></div>
+        <div><dt>Durée</dt><dd>{{DUREE}}</dd></div>
+        <div><dt>Prérequis</dt><dd>{{PREREQUIS}}</dd></div>
+        <div><dt>Outils</dt><dd>{{OUTILS}}</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>{{OBJECTIF_1}}</li>
+        <li>{{OBJECTIF_2}}</li>
+        <li>{{OBJECTIF_3}}</li>
+      </ul>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>{{TITRE_SECTION_1}}</h2>
+        <p>{{PARAGRAPHE}}</p>
+
+        <h3>{{TITRE_SOUS_SECTION}}</h3>
+        <p>{{PARAGRAPHE}}</p>
+
+        <!-- Exemple de formule (MathML, rendu natif par Chrome) -->
+        <math display="block">
+          <mrow>
+            <mover><mi>x</mi><mo>‾</mo></mover>
+            <mo>=</mo>
+            <mfrac><mn>1</mn><mi>N</mi></mfrac>
+            <munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>
+            <msub><mi>x</mi><mi>i</mi></msub>
+          </mrow>
+        </math>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <p>{{POINT_CLE}}</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>{{TITRE_SECTION_2}}</h2>
+        <p>{{PARAGRAPHE}}</p>
+
+        <p class="code-title">moyenne_glissante.py</p>
+        <pre><code>import numpy as np
+
+
+def moyenne_glissante(x, n=5):
+    """Lisse le signal x par une moyenne glissante sur n échantillons."""
+    noyau = np.ones(n) / n
+    return np.convolve(x, noyau, mode="valid")  <span class="c"># len(x) - n + 1 valeurs</span></code></pre>
+
+        <table>
+          <caption>{{LEGENDE_TABLEAU}}</caption>
+          <thead>
+            <tr><th scope="col">{{COLONNE_1}}</th><th scope="col">{{COLONNE_2}}</th><th scope="col">{{COLONNE_3}}</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>{{VALEUR}}</td><td>{{VALEUR}}</td><td>{{VALEUR}}</td></tr>
+            <tr><td>{{VALEUR}}</td><td>{{VALEUR}}</td><td>{{VALEUR}}</td></tr>
+          </tbody>
+        </table>
+
+        <div class="box box-attention">
+          <p class="box-title">Attention · sécurité</p>
+          <p>{{CONSIGNE_DE_SECURITE}}</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>{{TITRE_SECTION_3}}</h2>
+        <figure>
+          <!-- Schéma en SVG en ligne (couleurs de la charte : #16261e, #243c30, #566b14, #d2ec6c) -->
+          <svg width="420" height="90" viewBox="0 0 420 90" role="img" aria-label="{{DESCRIPTION_SCHEMA}}">
+            <rect x="1" y="25" width="110" height="40" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="56" y="50" text-anchor="middle" font-family="DM Sans" font-size="12" fill="#14221c">Capteur</text>
+            <line x1="111" y1="45" x2="154" y2="45" stroke="#243c30" stroke-width="2"/>
+            <polygon points="154,40 164,45 154,50" fill="#243c30"/>
+            <rect x="165" y="25" width="110" height="40" rx="6" fill="#16261e"/>
+            <text x="220" y="50" text-anchor="middle" font-family="DM Sans" font-size="12" fill="#ffffff">Modèle</text>
+            <line x1="275" y1="45" x2="298" y2="45" stroke="#243c30" stroke-width="2"/>
+            <polygon points="298,40 308,45 298,50" fill="#243c30"/>
+            <rect x="309" y="25" width="110" height="40" rx="6" fill="#d2ec6c" stroke="#566b14"/>
+            <text x="364" y="50" text-anchor="middle" font-family="DM Sans" font-size="12" fill="#14221c">Actionneur</text>
+          </svg>
+          <figcaption>Figure 1 — {{LEGENDE_FIGURE}}</figcaption>
+        </figure>
+
+        <div class="box box-exercice">
+          <p class="box-title">Exercice · {{TITRE_EXERCICE}}</p>
+          <p>{{ENONCE}}</p>
+          <ol>
+            <li>{{QUESTION_1}}</li>
+            <li>{{QUESTION_2}}</li>
+          </ol>
+          <div class="solution">
+            <p><strong>Indice&nbsp;:</strong> {{INDICE_OU_CORRIGE}}</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://{{URL_DOCUMENTATION_OFFICIELLE_1}}">{{NOM_RESSOURCE_1}}</a></li>
+        <li><a href="https://{{URL_DOCUMENTATION_OFFICIELLE_2}}">{{NOM_RESSOURCE_2}}</a></li>
+        <li><a href="https://willsim.fr/cours/{{SLUG}}.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

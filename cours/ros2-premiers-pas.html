@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>ROS 2 : premiers pas en robotique mobile — Cours WILLSIM</title>
+    <meta name="description" content="Cours gratuit sur ROS 2 Jazzy : turtlesim, nœuds Python (rclpy), colcon, tf2, arrêt d'urgence sur lidar, puis SLAM et Nav2 en simulation, avec fiche PDF.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/cours/ros2-premiers-pas.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/cours/ros2-premiers-pas.html">
+    <meta property="og:title" content="ROS 2 : premiers pas en robotique mobile — Cours WILLSIM">
+    <meta property="og:description" content="Cours gratuit sur ROS 2 Jazzy : turtlesim, nœuds Python (rclpy), colcon, tf2, arrêt d'urgence sur lidar, puis SLAM et Nav2 en simulation, avec fiche PDF.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ROS 2 : premiers pas en robotique mobile — Cours WILLSIM">
+    <meta name="twitter:description" content="Cours gratuit sur ROS 2 Jazzy : turtlesim, nœuds Python (rclpy), colcon, tf2, arrêt d'urgence sur lidar, puis SLAM et Nav2 en simulation, avec fiche PDF.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : cours gratuit + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Course",
+          "@id": "https://willsim.fr/cours/ros2-premiers-pas.html#cours",
+          "url": "https://willsim.fr/cours/ros2-premiers-pas.html",
+          "name": "ROS 2 : premiers pas en robotique mobile",
+          "description": "Cours gratuit sur ROS 2 Jazzy : turtlesim, nœuds Python (rclpy), colcon, tf2, arrêt d'urgence sur lidar, puis SLAM et Nav2 en simulation, avec fiche PDF.",
+          "inLanguage": "fr",
+          "educationalLevel": "Débutant à intermédiaire",
+          "timeRequired": "PT8H",
+          "coursePrerequisites": "Bases de Linux (terminal) et de Python",
+          "teaches": [
+            "Nœuds, topics, services, actions et paramètres de ROS 2",
+            "Programmation de nœuds Python avec rclpy et compilation avec colcon",
+            "Repères et transformations avec tf2",
+            "Nœud d'arrêt d'urgence à partir d'un LaserScan",
+            "Cartographie avec slam_toolbox et navigation avec Nav2"
+          ],
+          "isAccessibleForFree": true,
+          "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "provider": {
+            "@type": ["EducationalOrganization", "NGO"],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "associatedMedia": {
+            "@type": "MediaObject",
+            "name": "Fiche de cours (PDF) : ROS 2 : premiers pas en robotique mobile",
+            "contentUrl": "https://willsim.fr/assets/pdf/willsim-ros2-premiers-pas.pdf",
+            "encodingFormat": "application/pdf"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://willsim.fr/" },
+            { "@type": "ListItem", "position": 2, "name": "Cours", "item": "https://willsim.fr/cours/" },
+            { "@type": "ListItem", "position": 3, "name": "ROS 2 : premiers pas en robotique mobile", "item": "https://willsim.fr/cours/ros2-premiers-pas.html" }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/" aria-current="true">Cours</a>
+          <a href="/#projets">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/cours/">Cours</a></li>
+              <li><span aria-current="page">ROS&nbsp;2&nbsp;: premiers pas</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Fiche de cours · Robotique mobile</p>
+          <h1>ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</h1>
+          <p class="page-lead">Découvrir ROS&nbsp;2, le cadre logiciel de référence en robotique, du simulateur turtlesim jusqu’à un robot simulé qui cartographie une pièce et s’y déplace seul. Vous écrirez vos premiers nœuds Python, dont un nœud d’arrêt d’urgence fondé sur un lidar, et verrez où l’intelligence artificielle s’insère dans un robot mobile.</p>
+
+          <div class="page-badges">
+            <span class="status-badge status-badge-available">Fiche PDF disponible</span>
+            <span class="status-badge">Sessions en atelier à venir</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Niveau</dt><dd>Débutant à intermédiaire</dd></div>
+            <div><dt>Durée</dt><dd>8&nbsp;h (4 séances de 2&nbsp;h)</dd></div>
+            <div><dt>Prérequis</dt><dd>Bases de Linux (terminal) et de Python</dd></div>
+            <div><dt>Outils</dt><dd>ROS&nbsp;2 Jazzy (Ubuntu 24.04), rclpy, turtlesim, RViz2, Gazebo, Nav2, slam_toolbox</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectifs-titre">
+            <h2 id="objectifs-titre">Objectifs pédagogiques</h2>
+            <p>À l’issue de ce cours, vous serez capable de&nbsp;:</p>
+            <ul class="objectives">
+              <li>distinguer topics, services, actions et paramètres, choisir le mécanisme adapté à un besoin et observer un système en marche avec les commandes <code>ros2</code> et <code>rqt_graph</code>&nbsp;;</li>
+              <li>créer un paquet Python, le compiler avec colcon et lancer ses nœuds avec <code>ros2 run</code>&nbsp;;</li>
+              <li>écrire un nœud rclpy qui publie des consignes de vitesse, s’abonne à un topic et expose des paramètres&nbsp;;</li>
+              <li>expliquer la chaîne de repères <code>map</code> → <code>odom</code> → <code>base_link</code> et lire une transformation avec tf2&nbsp;;</li>
+              <li>programmer un nœud d’arrêt d’urgence à partir d’un <code>LaserScan</code> et le valider selon des critères mesurables&nbsp;;</li>
+              <li>lancer une cartographie avec slam_toolbox et une navigation avec Nav2 en simulation, et situer l’apport de l’IA dans un robot mobile.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="public-titre">
+            <h2 id="public-titre">À qui s’adresse ce cours&#8239;?</h2>
+            <p>Aux étudiants en mécatronique, robotique, électronique ou informatique, aux enseignants et aux passionnés qui veulent passer de programmes isolés à une architecture robotique modulaire. Aucune connaissance préalable de ROS n’est nécessaire&nbsp;: les deux premières séances partent de zéro, les deux suivantes visent un niveau intermédiaire.</p>
+            <p><strong>Prérequis&nbsp;:</strong> savoir se servir d’un terminal Linux (se déplacer dans les dossiers, éditer un fichier, installer un paquet avec <code>apt</code>) et écrire une petite classe en Python. Il faut un ordinateur sous Ubuntu 24.04 avec ROS&nbsp;2 Jazzy installé&nbsp;; une machine virtuelle convient aux premières séances, mais la simulation 3D de Gazebo y est souvent lente.</p>
+          </section>
+
+          <section aria-labelledby="plan-titre">
+            <h2 id="plan-titre">Plan du cours</h2>
+            <ol class="course-toc">
+              <li>
+                <p class="toc-meta">Séance 1 · 2&nbsp;h</p>
+                <h3>Les concepts de ROS&nbsp;2 avec turtlesim</h3>
+                <p>Nœuds, topics, services, actions et paramètres, expérimentés dans le simulateur turtlesim. Prise en main des commandes <code>ros2 node</code>, <code>topic</code>, <code>service</code>, <code>action</code> et <code>param</code>, et du graphe <code>rqt_graph</code>. Rôle du <code>ROS_DOMAIN_ID</code> et de la qualité de service (QoS).</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 2 · 2&nbsp;h</p>
+                <h3>Espace de travail et premier nœud Python</h3>
+                <p>Créer un espace de travail et un paquet <code>ament_python</code>, installer les dépendances avec rosdep, compiler avec colcon. Écrire un nœud rclpy qui publie des consignes <code>Twist</code>, s’abonne à la position de la tortue et expose des paramètres réglables en marche.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 3 · 2&nbsp;h</p>
+                <h3>Repères tf2 et nœud d’arrêt d’urgence</h3>
+                <p>Conventions REP&nbsp;103 et REP&nbsp;105, chaîne <code>map</code> → <code>odom</code> → <code>base_link</code>, transformations statiques et <code>tf2_echo</code>. Lecture d’un <code>LaserScan</code>, puis programmation et validation d’un nœud qui bloque la marche avant devant un obstacle, grâce à un scan fictif.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 4 · 2&nbsp;h</p>
+                <h3>Cartographie, navigation et place de l’IA</h3>
+                <p>Cartographier une pièce avec slam_toolbox puis y naviguer avec Nav2, sur un TurtleBot&nbsp;3 simulé dans Gazebo. Comprendre les cartes de coûts, le planificateur et le contrôleur, puis situer l’apport de l’IA&nbsp;: la perception, sans remplacer les barrières de sécurité déterministes.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="apercu-titre">
+            <h2 id="apercu-titre">Aperçu du contenu</h2>
+            <p>ROS&nbsp;2 découpe le logiciel d’un robot en <strong>nœuds</strong>, des programmes indépendants qui échangent des messages typés. Le pilote d’un lidar publie par exemple des messages <code>sensor_msgs/msg/LaserScan</code> sur le topic <code>/scan</code>, et tous les nœuds abonnés les reçoivent. Les autres mécanismes répondent à d’autres besoins&nbsp;:</p>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Tableau défilant&nbsp;: Les quatre mécanismes de communication de ROS&nbsp;2">
+              <table>
+                <caption>Les quatre mécanismes de communication de ROS&nbsp;2</caption>
+                <thead>
+                  <tr><th scope="col">Mécanisme</th><th scope="col">Principe</th><th scope="col">Exemple en robotique mobile</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Topic</td><td>Flux continu, sans réponse</td><td>mesures du lidar, consignes de vitesse <code>/cmd_vel</code></td></tr>
+                  <tr><td>Service</td><td>Requête puis réponse, pour une opération courte</td><td>enregistrer une carte</td></tr>
+                  <tr><td>Action</td><td>Tâche longue, avec retours intermédiaires et annulation possible</td><td>«&nbsp;rejoindre le point (x, y)&nbsp;» avec Nav2</td></tr>
+                  <tr><td>Paramètre</td><td>Réglage d’un nœud, modifiable en marche</td><td>distance d’arrêt, vitesse maximale</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Un robot mobile manipule aussi plusieurs <strong>repères</strong>&nbsp;: le monde (<code>map</code>), un repère d’odométrie continu mais qui dérive (<code>odom</code>), le châssis (<code>base_link</code>) et chaque capteur. La bibliothèque tf2 calcule à tout instant la transformation entre deux repères&nbsp;; la localisation corrige la dérive de l’odométrie en publiant la transformation <code>map</code> → <code>odom</code>.</p>
+            <p>Le cœur pratique du cours est un <strong>nœud d’arrêt d’urgence</strong>. Il s’intercale entre la source des consignes et le robot&nbsp;: il annule la marche avant si le lidar voit un obstacle à moins de 0,5&nbsp;m dans un cône de ±30° devant le robot, ou si le dernier scan date de plus de 0,5&nbsp;s, car un capteur muet est traité comme un danger. Le seuil se justifie par la distance d’arrêt <var>d</var>&nbsp;=&nbsp;<var>v</var>&nbsp;<var>t</var><sub>r</sub>&nbsp;+&nbsp;<var>v</var>²&nbsp;/&nbsp;(2<var>a</var>)&nbsp;: 0,225&nbsp;m à 0,5&nbsp;m/s, avec 0,2&nbsp;s de temps de réaction et une décélération de 1&nbsp;m/s². Ce nœud reste une aide&nbsp;: un robot réel exige un arrêt d’urgence matériel qui coupe l’alimentation des moteurs.</p>
+            <p>Enfin, l’IA intervient surtout dans la <strong>perception</strong>&nbsp;: un réseau de détection sur les images d’une caméra repère des obstacles hors du plan du lidar ou distingue une personne d’un meuble, et ces détections alimentent la carte de coûts de Nav2. La localisation, la cartographie et la planification restent confiées à des algorithmes classiques, éprouvés et explicables.</p>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel et logiciels</h2>
+            <ul>
+              <li>Un ordinateur sous Ubuntu 24.04, de préférence en installation native, avec ROS&nbsp;2 Jazzy Jalisco (version à support long)&nbsp;; les commandes restent valables sur les distributions plus récentes, en remplaçant <code>jazzy</code> par leur nom.</li>
+              <li>Le paquet <code>ros-jazzy-desktop</code>, qui fournit rclpy, turtlesim, RViz2 et rqt, et les outils de développement <code>ros-dev-tools</code> (colcon, rosdep), complétés par Nav2, slam_toolbox et la simulation Gazebo du TurtleBot&nbsp;3 (paquets <code>ros-jazzy-navigation2</code>, <code>ros-jazzy-nav2-bringup</code> et <code>ros-jazzy-nav2-minimal-tb*</code>).</li>
+              <li>Aucun robot réel&nbsp;: tout le cours se déroule en simulation. La fiche détaille les précautions à prendre avant de passer à un robot réel (arrêt d’urgence matériel, vitesse réduite, batteries au lithium).</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="sessions-titre">
+            <h2 id="sessions-titre">Sessions en atelier</h2>
+            <div class="page-note">
+              <p>Les sessions en atelier de ce cours sont en préparation&nbsp;: aucune date n’est encore fixée. La fiche de cours au format PDF est, elle, disponible gratuitement dès maintenant.</p>
+            </div>
+            <p><strong>Sessions en atelier&nbsp;: à venir</strong> — <a class="text-link" href="/#contact">écrivez-nous pour être informé <span aria-hidden="true">↗</span></a></p>
+            <p><a class="text-link" href="/cours/"><span aria-hidden="true">←</span> Retour au catalogue des cours</a></p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Fiche PDF et liens utiles">
+          <section class="download-card" aria-labelledby="telechargement-titre">
+            <span class="download-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            </span>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Ressource gratuite</p>
+            <h2 id="telechargement-titre">Fiche de cours</h2>
+            <p>L’essentiel de ROS&nbsp;2 en pratique&nbsp;: concepts, premier nœud Python, repères tf2, nœud d’arrêt d’urgence avec exercice corrigé, cartographie et navigation en simulation.</p>
+            <a class="button button-lime button-full" href="/assets/pdf/willsim-ros2-premiers-pas.pdf" type="application/pdf" aria-describedby="telechargement-meta">
+              <span>Télécharger la fiche PDF</span>
+              <span aria-hidden="true">↓</span>
+            </a>
+            <p class="download-meta" id="telechargement-meta">PDF · 7 pages · 327 Ko</p>
+            <p class="download-licence">© 2026 WILLSIM — Licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" rel="license noopener">CC BY-NC-SA 4.0</a>. Rédaction&nbsp;: équipe pédagogique WILLSIM.</p>
+          </section>
+
+          <section class="related-links" aria-labelledby="liens-titre">
+            <h2 id="liens-titre">Pour aller plus loin</h2>
+            <ul>
+              <li><a href="/projets/robot-mobile-autonome.html"><span class="related-kicker">Projet lié</span>Robot mobile autonome</a></li>
+              <li><a href="/cours/vision-robotique-opencv.html"><span class="related-kicker">Cours complémentaire</span>Vision par ordinateur pour la robotique</a></li>
+              <li><a href="/cours/commande-moteurs-pid.html"><span class="related-kicker">Cours complémentaire</span>Commande de moteurs et régulation PID</a></li>
+              <li><a href="/cours/"><span class="related-kicker">Catalogue</span>Tous les cours gratuits</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

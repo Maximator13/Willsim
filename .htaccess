@@ -16,10 +16,13 @@
 
   # Fichiers et dossiers cachés (.git, .env...) interdits, sauf .well-known (Let's Encrypt)
   RewriteRule "(^|/)\.(?!well-known/)" - [F]
+
+  # Sources non publiées : dossier pdf-src/ (fiches PDF) et gabarits « _template* »
+  RewriteRule "^pdf-src(/|$)|(^|/)_template" - [F]
 </IfModule>
 
 # Fichiers du dépôt qui n'ont rien à faire en ligne
-<FilesMatch "^(README\.md|.*\.py)$">
+<FilesMatch "^(README\.md|.*\.py|_template.*)$">
   Require all denied
 </FilesMatch>
 
@@ -41,9 +44,11 @@ ErrorDocument 404 /404.html
 # 4. Cache navigateur via Cache-Control (mod_expires est sans effet sur
 #    l'offre Starter, constaté à l'audit ; mod_headers fonctionne).
 #    CSS/JS sont versionnés (?v=) dans le HTML : incrémenter à chaque mise en ligne.
+#    Les fiches PDF ne sont pas versionnées : après une mise à jour, les
+#    visiteurs déjà venus peuvent garder l'ancienne version jusqu'à 30 jours.
 # ----------------------------------------------------------------------
 <IfModule mod_headers.c>
-  <FilesMatch "\.(webp|png|jpe?g|ico|svg|woff2|css|js)$">
+  <FilesMatch "\.(webp|png|jpe?g|ico|svg|woff2|css|js|pdf)$">
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
   <FilesMatch "\.(html|xml|txt)$">
@@ -64,4 +69,12 @@ ErrorDocument 404 /404.html
   # Remplacer willsim.matomo.cloud par l'adresse réelle de l'instance Matomo
   # (même valeur que MATOMO_URL dans script.js).
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://willsim.matomo.cloud https://cdn.matomo.cloud; connect-src 'self' https://willsim.matomo.cloud; img-src 'self' data: https://willsim.matomo.cloud; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+
+  # Fiches PDF : pas de CSP. Appliquée à un PDF ouvert directement, la CSP
+  # (object-src 'none', script-src) peut empêcher la visionneuse PDF intégrée
+  # de Chrome d'afficher le fichier. Un PDF statique n'exécute aucun script du
+  # site : retirer l'en-tête ne réduit pas la protection des pages HTML.
+  <FilesMatch "\.pdf$">
+    Header always unset Content-Security-Policy
+  </FilesMatch>
 </IfModule>

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Vision par ordinateur pour la robotique — Cours WILLSIM</title>
+    <meta name="description" content="Cours gratuit : seuillage HSV, moments, calibration de caméra et homographie avec Python et OpenCV pour guider un bras robotisé. Fiche PDF de 7 pages.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/cours/vision-robotique-opencv.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/cours/vision-robotique-opencv.html">
+    <meta property="og:title" content="Vision par ordinateur pour la robotique — Cours WILLSIM">
+    <meta property="og:description" content="Cours gratuit : seuillage HSV, moments, calibration de caméra et homographie avec Python et OpenCV pour guider un bras robotisé. Fiche PDF de 7 pages.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vision par ordinateur pour la robotique — Cours WILLSIM">
+    <meta name="twitter:description" content="Cours gratuit : seuillage HSV, moments, calibration de caméra et homographie avec Python et OpenCV pour guider un bras robotisé. Fiche PDF de 7 pages.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : cours gratuit + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Course",
+          "@id": "https://willsim.fr/cours/vision-robotique-opencv.html#cours",
+          "url": "https://willsim.fr/cours/vision-robotique-opencv.html",
+          "name": "Vision par ordinateur pour la robotique",
+          "description": "Cours gratuit : seuillage HSV, moments, calibration de caméra et homographie avec Python et OpenCV pour guider un bras robotisé. Fiche PDF de 7 pages.",
+          "inLanguage": "fr",
+          "educationalLevel": "Intermédiaire",
+          "timeRequired": "PT8H",
+          "coursePrerequisites": "Python et notions de NumPy",
+          "teaches": [
+            "Seuillage dans l'espace HSV et nettoyage morphologique d'un masque",
+            "Centroïde et orientation d'un objet par les moments d'un contour",
+            "Calibration d'une caméra avec un damier",
+            "Conversion de pixels en millimètres par homographie",
+            "Chaîne de pick-and-place guidée par caméra",
+            "Principes de la détection d'objets par apprentissage profond (famille YOLO)"
+          ],
+          "isAccessibleForFree": true,
+          "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "provider": {
+            "@type": ["EducationalOrganization", "NGO"],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "associatedMedia": {
+            "@type": "MediaObject",
+            "name": "Fiche de cours (PDF) : Vision par ordinateur pour la robotique",
+            "contentUrl": "https://willsim.fr/assets/pdf/willsim-vision-robotique-opencv.pdf",
+            "encodingFormat": "application/pdf"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://willsim.fr/" },
+            { "@type": "ListItem", "position": 2, "name": "Cours", "item": "https://willsim.fr/cours/" },
+            { "@type": "ListItem", "position": 3, "name": "Vision par ordinateur pour la robotique", "item": "https://willsim.fr/cours/vision-robotique-opencv.html" }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/" aria-current="true">Cours</a>
+          <a href="/#projets">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/cours/">Cours</a></li>
+              <li><span aria-current="page">Vision par ordinateur pour la robotique</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Fiche de cours · Vision et robotique</p>
+          <h1>Vision par ordinateur pour la robotique</h1>
+          <p class="page-lead">Repérer une pièce avec une caméra USB, mesurer sa position et son orientation, puis convertir ces pixels en coordonnées utilisables par un bras robotisé. En quatre séances, vous posez les bases de la vision industrielle avec Python et OpenCV, jusqu'à une ouverture vers la détection d'objets par réseau de neurones.</p>
+
+          <div class="page-badges">
+            <span class="status-badge status-badge-available">Fiche PDF disponible</span>
+            <span class="status-badge">Sessions en atelier à venir</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Niveau</dt><dd>Intermédiaire</dd></div>
+            <div><dt>Durée</dt><dd>8&nbsp;h (4 séances de 2&nbsp;h)</dd></div>
+            <div><dt>Prérequis</dt><dd>Python et notions de NumPy</dd></div>
+            <div><dt>Outils</dt><dd>Python, OpenCV, NumPy, caméra USB</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectifs-titre">
+            <h2 id="objectifs-titre">Objectifs pédagogiques</h2>
+            <p>À l'issue de ce cours, vous serez capable de&nbsp;:</p>
+            <ul class="objectives">
+              <li>isoler un objet coloré par seuillage dans l'espace HSV et nettoyer le masque obtenu par une opération morphologique&nbsp;;</li>
+              <li>calculer le centroïde et l'orientation d'une pièce à partir des moments de son contour, à 1&nbsp;pixel et 1&nbsp;degré près sur une image de test&nbsp;;</li>
+              <li>calibrer une caméra avec un damier, puis interpréter la matrice intrinsèque et l'erreur de reprojection&nbsp;;</li>
+              <li>convertir des pixels en millimètres sur le plan de travail par homographie, et contrôler le résultat sur un repère indépendant&nbsp;;</li>
+              <li>décrire la chaîne «&nbsp;détecter, localiser, transmettre&nbsp;» d'un pick-and-place, en citer les principales sources d'erreur et situer les détecteurs neuronaux de la famille YOLO.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="public-titre">
+            <h2 id="public-titre">À qui s'adresse ce cours&#8239;?</h2>
+            <p>Aux étudiants en mécatronique, robotique ou électronique (BUT, BTS, écoles d'ingénieurs), aux techniciens et aux passionnés qui veulent donner des «&nbsp;yeux&nbsp;» à un robot&nbsp;: trier des pièces, guider une pince, contrôler la présence d'un objet. Le cours privilégie les méthodes classiques, rapides et explicables, avant d'ouvrir sur l'apprentissage profond.</p>
+            <p><strong>Prérequis&nbsp;:</strong> écrire en Python une fonction, une boucle et une chaîne formatée (f-string)&nbsp;; manipuler un tableau NumPy (forme, indexation, opérations élément par élément). Savoir multiplier une matrice par un vecteur aide à suivre la séance&nbsp;2.</p>
+          </section>
+
+          <section aria-labelledby="plan-titre">
+            <h2 id="plan-titre">Plan du cours</h2>
+            <ol class="course-toc">
+              <li>
+                <p class="toc-meta">Séance 1 · 2&nbsp;h</p>
+                <h3>De l'image à la pose d'une pièce</h3>
+                <p>Une image est un tableau NumPy&nbsp;: ordre des canaux BGR, repère pixel, résolution. Passage dans l'espace HSV, seuillage avec <code>cv2.inRange</code> et nettoyage par ouverture et fermeture morphologiques. Extraction des contours, puis calcul du centroïde et de l'orientation de l'axe principal à partir des moments.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 2 · 2&nbsp;h</p>
+                <h3>Calibrer la caméra et passer aux millimètres</h3>
+                <p>Modèle sténopé, matrice intrinsèque et distorsion de l'objectif. Calibration avec un damier (<code>cv2.findChessboardCorners</code>, <code>cv2.calibrateCamera</code>) et lecture de l'erreur de reprojection. Homographie entre l'image et le plan de travail, relevée directement dans le repère du robot, et limite due à la hauteur des objets.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 3 · 2&nbsp;h</p>
+                <h3>La chaîne pick-and-place</h3>
+                <p>Détecter, localiser, transmettre&nbsp;: conversion de l'orientation dans le repère du robot, validation de la cible, format de message sur liaison série ou ROS&nbsp;2, séquence de prise et consignes de sécurité. Exercice guidé&nbsp;: de l'image à la consigne du bras, avec critères de réussite chiffrés.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 4 · 2&nbsp;h</p>
+                <h3>Apprentissage profond et pièges du terrain</h3>
+                <p>Principe des détecteurs d'objets par réseau de neurones (famille YOLO)&nbsp;: boîtes englobantes, classes, scores de confiance, suppression des non-maxima, segmentation et boîtes orientées. Pièges courants&nbsp;: éclairage, reflets, ombres, flou de bougé et latence de la chaîne. Bilan du cours.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="apercu-titre">
+            <h2 id="apercu-titre">Aperçu du contenu</h2>
+            <p>Pour OpenCV, une image couleur est un tableau NumPy de forme <code>(hauteur, largeur, 3)</code> dont les canaux sont rangés dans l'ordre bleu, vert, rouge, avec l'origine en haut à gauche et l'axe vertical orienté vers le bas. Pour isoler une pièce colorée, on passe dans l'espace HSV, qui sépare la teinte de la luminosité&nbsp;: une même pièce garde à peu près la même teinte à l'ombre et en pleine lumière. Un seuillage sur la teinte, la saturation et la valeur produit un masque binaire, qu'une ouverture morphologique débarrasse des pixels isolés.</p>
+            <p>Les moments du contour de la pièce donnent son centroïde et l'angle de son axe principal. Sur l'image de test de la fiche, une pièce dessinée en (400,&nbsp;220) à 30° est retrouvée en (399,5&nbsp;;&nbsp;219,5) à 29,8°. Cet angle n'est connu qu'à 180° près et perd son sens pour une pièce carrée ou ronde&nbsp;: autant de détails qui comptent au moment de refermer une pince.</p>
+            <p>Reste à passer des pixels aux millimètres. La calibration estime la focale, le centre optique et la distorsion de la caméra, une fois pour une résolution et une mise au point données&nbsp;; ensuite, quand les pièces reposent sur une table, une homographie calculée à partir de quatre repères suffit à convertir un pixel en coordonnées du robot. Elle n'est exacte que dans le plan qui a servi à la calculer&nbsp;: avec une caméra placée à 800&nbsp;mm, le dessus d'une pièce de 30&nbsp;mm de haut, situé à 200&nbsp;mm de l'aplomb de la caméra, est localisé avec près de 8&nbsp;mm d'erreur si l'on n'en tient pas compte.</p>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Tableau défilant&nbsp;: Étapes et fonctions OpenCV">
+              <table>
+                <caption>Étapes et fonctions OpenCV</caption>
+                <thead>
+                  <tr><th scope="col">Étape</th><th scope="col">Fonctions OpenCV</th><th scope="col">Résultat</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Seuillage</td><td><code>cv2.cvtColor</code>, <code>cv2.inRange</code>, <code>cv2.morphologyEx</code></td><td>Masque binaire de la pièce</td></tr>
+                  <tr><td>Pose dans l'image</td><td><code>cv2.findContours</code>, <code>cv2.moments</code></td><td>Centroïde et orientation, en pixels</td></tr>
+                  <tr><td>Calibration</td><td><code>cv2.findChessboardCorners</code>, <code>cv2.calibrateCamera</code></td><td>Matrice intrinsèque et distorsion</td></tr>
+                  <tr><td>Pixels vers millimètres</td><td><code>cv2.findHomography</code>, <code>cv2.perspectiveTransform</code></td><td>Cible (X,&nbsp;Y,&nbsp;θ) dans le repère du robot</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel et logiciels</h2>
+            <ul>
+              <li>Un ordinateur sous Windows, macOS ou Linux avec Python&nbsp;3, NumPy et OpenCV&nbsp;: <code>pip install numpy opencv-python</code>. Les programmes de la fiche ont été testés avec OpenCV&nbsp;4.5 et 4.13.</li>
+              <li>Aucune caméra n'est nécessaire pour suivre la fiche&nbsp;: chaque programme fabrique ses propres images de test. Pour passer à la pratique, une caméra USB, de préférence à mise au point fixe, et un damier imprimé collé sur un support rigide.</li>
+              <li>Pour la séance&nbsp;3, un petit bras robotisé piloté par microcontrôleur, avec une alimentation dédiée à ses servomoteurs, est un plus, mais pas une obligation.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="sessions-titre">
+            <h2 id="sessions-titre">Sessions en atelier</h2>
+            <div class="page-note">
+              <p><strong>Sessions en atelier&nbsp;: à venir.</strong> Aucune date n'est encore fixée. La fiche de cours au format PDF est, elle, disponible gratuitement dès maintenant.</p>
+            </div>
+            <p>Vous souhaitez participer à une première session ou proposer un lieu d'accueil&#8239;? <a class="text-link" href="/#contact">Écrivez-nous pour être informé <span aria-hidden="true">↗</span></a></p>
+            <p><a class="text-link" href="/cours/"><span aria-hidden="true">←</span> Retour au catalogue des cours</a></p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Fiche PDF et liens utiles">
+          <section class="download-card" aria-labelledby="telechargement-titre">
+            <span class="download-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            </span>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Ressource gratuite</p>
+            <h2 id="telechargement-titre">Fiche de cours</h2>
+            <p>Huit sections, trois programmes Python commentés et testés, un schéma de la chaîne pick-and-place, un encadré «&nbsp;À retenir&nbsp;», des consignes de sécurité et un exercice guidé avec critères de réussite.</p>
+            <a class="button button-lime button-full" href="/assets/pdf/willsim-vision-robotique-opencv.pdf" type="application/pdf" aria-describedby="telechargement-meta">
+              <span>Télécharger la fiche PDF</span>
+              <span aria-hidden="true">↓</span>
+            </a>
+            <p class="download-meta" id="telechargement-meta">PDF · 7 pages · 383 Ko</p>
+            <p class="download-licence">© 2026 WILLSIM — Licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" rel="license noopener">CC BY-NC-SA 4.0</a>. Rédaction&nbsp;: équipe pédagogique WILLSIM.</p>
+          </section>
+
+          <section class="related-links" aria-labelledby="liens-titre">
+            <h2 id="liens-titre">Pour aller plus loin</h2>
+            <ul>
+              <li><a href="/projets/bras-robotique-vision.html"><span class="related-kicker">Projet lié</span>Bras robotique guidé par vision</a></li>
+              <li><a href="/cours/commande-moteurs-pid.html"><span class="related-kicker">Cours complémentaire</span>Commande de moteurs et régulation PID</a></li>
+              <li><a href="/cours/ros2-premiers-pas.html"><span class="related-kicker">Cours complémentaire</span>ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</a></li>
+              <li><a href="/cours/"><span class="related-kicker">Catalogue</span>Tous les cours gratuits</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

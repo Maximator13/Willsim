@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Apprentissage par renforcement et jumeau numérique — Cours WILLSIM</title>
+    <meta name="description" content="Cours gratuit : bases de l’apprentissage par renforcement, Gymnasium, PPO avec Stable-Baselines3, jumeau numérique et passage du simulateur au robot réel.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/cours/apprentissage-renforcement-sim2real.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/cours/apprentissage-renforcement-sim2real.html">
+    <meta property="og:title" content="Apprentissage par renforcement et jumeau numérique — Cours WILLSIM">
+    <meta property="og:description" content="Cours gratuit : bases de l’apprentissage par renforcement, Gymnasium, PPO avec Stable-Baselines3, jumeau numérique et passage du simulateur au robot réel.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Apprentissage par renforcement et jumeau numérique — Cours WILLSIM">
+    <meta name="twitter:description" content="Cours gratuit : bases de l’apprentissage par renforcement, Gymnasium, PPO avec Stable-Baselines3, jumeau numérique et passage du simulateur au robot réel.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : cours gratuit + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Course",
+          "@id": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html#cours",
+          "url": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html",
+          "name": "Apprentissage par renforcement et jumeau numérique",
+          "description": "Cours gratuit : bases de l’apprentissage par renforcement, Gymnasium, PPO avec Stable-Baselines3, jumeau numérique et passage du simulateur au robot réel.",
+          "inLanguage": "fr",
+          "educationalLevel": "Avancé",
+          "timeRequired": "PT10H",
+          "coursePrerequisites": "Cours « Initiation à l’IA pour l’ingénierie » et bonne pratique de Python",
+          "teaches": [
+            "Agent, environnement, récompense, politique et processus de décision markovien",
+            "Interface Gymnasium : reset, step, fin d’épisode et troncature",
+            "Entraînement et évaluation d’un agent PPO avec Stable-Baselines3",
+            "Conception d’une récompense et pièges classiques",
+            "Jumeau numérique, simulateurs PyBullet et MuJoCo, randomisation de domaine",
+            "Passage de la simulation au robot réel : écart simulation-réalité, sécurité et évaluation"
+          ],
+          "isAccessibleForFree": true,
+          "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "provider": {
+            "@type": ["EducationalOrganization", "NGO"],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "associatedMedia": {
+            "@type": "MediaObject",
+            "name": "Fiche de cours (PDF) : Apprentissage par renforcement et jumeau numérique",
+            "contentUrl": "https://willsim.fr/assets/pdf/willsim-apprentissage-renforcement-sim2real.pdf",
+            "encodingFormat": "application/pdf"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://willsim.fr/" },
+            { "@type": "ListItem", "position": 2, "name": "Cours", "item": "https://willsim.fr/cours/" },
+            { "@type": "ListItem", "position": 3, "name": "Apprentissage par renforcement et jumeau numérique", "item": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html" }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/" aria-current="true">Cours</a>
+          <a href="/#projets">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/cours/">Cours</a></li>
+              <li><span aria-current="page">Apprentissage par renforcement</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Fiche de cours · Simulation et commande</p>
+          <h1>Apprentissage par renforcement et jumeau numérique</h1>
+          <p class="page-lead">Un agent qui apprend par essais et erreurs peut découvrir seul une loi de commande, à condition de s’entraîner dans une simulation fidèle et de passer prudemment au système réel. Ce cours pose les bases de l’apprentissage par renforcement, entraîne un premier agent PPO avec Stable-Baselines3, puis détaille le chemin qui mène du jumeau numérique au robot&nbsp;: randomisation de domaine, sécurité et évaluation.</p>
+
+          <div class="page-badges">
+            <span class="status-badge status-badge-available">Fiche PDF disponible</span>
+            <span class="status-badge">Sessions en atelier à venir</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Niveau</dt><dd>Avancé</dd></div>
+            <div><dt>Durée</dt><dd>10&nbsp;h (5 séances de 2&nbsp;h)</dd></div>
+            <div><dt>Prérequis</dt><dd>Le cours «&nbsp;Initiation à l’IA pour l’ingénierie&nbsp;» et une bonne pratique de Python</dd></div>
+            <div><dt>Outils</dt><dd>Python, Gymnasium, Stable-Baselines3 (PPO), PyTorch, PyBullet ou MuJoCo</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectifs-titre">
+            <h2 id="objectifs-titre">Objectifs pédagogiques</h2>
+            <p>À l’issue de ce cours, vous serez capable de&nbsp;:</p>
+            <ul class="objectives">
+              <li>définir agent, environnement, état, action, récompense et politique, et formuler une tâche de commande comme un processus de décision markovien&nbsp;;</li>
+              <li>écrire une boucle d’interaction avec l’API Gymnasium et distinguer la fin d’un épisode (<code>terminated</code>) de sa troncature (<code>truncated</code>)&nbsp;;</li>
+              <li>entraîner un agent PPO sur CartPole avec Stable-Baselines3 jusqu’à un retour moyen d’au moins 475 sur 20 épisodes d’évaluation, et lire les indicateurs d’entraînement&nbsp;;</li>
+              <li>concevoir une récompense et repérer les comportements indésirables qu’elle encourage&nbsp;;</li>
+              <li>expliquer le rôle d’un jumeau numérique, choisir un simulateur et programmer une randomisation de domaine&nbsp;;</li>
+              <li>préparer le passage sur un système réel&nbsp;: sources d’écart, sécurités indépendantes de la politique, protocole d’évaluation sur plusieurs graines.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="public-titre">
+            <h2 id="public-titre">À qui s’adresse ce cours&#8239;?</h2>
+            <p>Aux étudiants en mécatronique, en robotique, en automatique ou en informatique, aux ingénieurs et techniciens qui veulent comprendre ce qu’une commande apprise peut apporter à un système réel, et ce qu’elle exige comme précautions avant de toucher un moteur.</p>
+            <p><strong>Prérequis&nbsp;:</strong> les notions vues dans le cours <a href="/cours/ia-ingenierie-initiation.html">Initiation à l’IA pour l’ingénierie</a> (données, modèle, évaluation) et une bonne pratique de Python (fonctions, classes, NumPy). Des notions d’automatique, comme la boucle de régulation et le PID, aident à comparer la politique apprise à une commande classique, sans être indispensables.</p>
+          </section>
+
+          <section aria-labelledby="plan-titre">
+            <h2 id="plan-titre">Plan du cours</h2>
+            <ol class="course-toc">
+              <li>
+                <p class="toc-meta">Séance 1 · 2&nbsp;h</p>
+                <h3>Notions de base et interface Gymnasium</h3>
+                <p>Agent, environnement, état, action, récompense et politique. Retour actualisé, facteur γ et fonction de valeur. Processus de décision markovien et observabilité partielle. Fonctions <code>reset</code> et <code>step</code>, fin d’épisode et troncature, première boucle sur CartPole avec une politique aléatoire puis une règle écrite à la main.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 2 · 2&nbsp;h</p>
+                <h3>Entraîner PPO avec Stable-Baselines3</h3>
+                <p>Principe acteur-critique, avantage et objectif écrêté de PPO. Entraînement sur CartPole, réglages par défaut, lecture des indicateurs (retour moyen, divergence KL, variance expliquée, entropie), évaluation déterministe et rôle des graines.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 3 · 2&nbsp;h</p>
+                <h3>Concevoir la récompense</h3>
+                <p>Termes d’objectif, d’effort, de douceur et d’échec, et risques liés à leurs poids. Pièges classiques&nbsp;: l’agent qui préfère échouer vite, le détournement de récompense, récompense creuse ou dense, façonnage par potentiel.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 4 · 2&nbsp;h</p>
+                <h3>Jumeau numérique et randomisation de domaine</h3>
+                <p>Du modèle générique au jumeau d’un système précis&nbsp;: identification, recalage, boucle simulation-réel. Choix entre PyBullet et MuJoCo. Écriture d’un wrapper Gymnasium qui tire au hasard masse, longueur et force à chaque épisode et ajoute un bruit de mesure.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 5 · 2&nbsp;h</p>
+                <h3>Du simulateur au robot réel</h3>
+                <p>Sources de l’écart simulation-réalité et remèdes. Sécurités matérielles et logicielles indépendantes du réseau de neurones. Protocole d’évaluation, puis exercice guidé&nbsp;: mesurer, sur plusieurs graines, si la randomisation rend une politique plus robuste.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="apercu-titre">
+            <h2 id="apercu-titre">Aperçu du cours</h2>
+            <h3>Un banc d’essai dont on connaît la solution</h3>
+            <p>Le cours s’appuie sur CartPole, l’environnement classique de Gymnasium&nbsp;: un chariot porte un pendule, et l’agent pousse à gauche ou à droite toutes les 0,02&nbsp;s pour le garder debout, au plus 500 pas. Sur 20 épisodes, une politique au hasard tient en moyenne 23 pas. Une règle écrite à la main, qui pousse du côté où le pendule penche en tenant compte de sa vitesse angulaire, tient les 500 pas à chaque fois. CartPole ne sert donc pas à prouver l’intérêt de l’apprentissage par renforcement, mais à valider une chaîne d’entraînement sur un problème dont on connaît la réponse.</p>
+
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Tableau défilant&nbsp;: Ce que mesure la fiche sur CartPole (20 épisodes d’évaluation)">
+              <table>
+                <caption>Ce que mesure la fiche sur CartPole (20 épisodes d’évaluation)</caption>
+                <thead>
+                  <tr><th scope="col">Politique</th><th scope="col">Retour moyen</th><th scope="col">Remarque</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Actions au hasard</td><td>23 ± 13</td><td>Le pendule tombe très vite</td></tr>
+                  <tr><td>Règle écrite à la main</td><td>500 ± 0</td><td>Quatre lignes de Python suffisent</td></tr>
+                  <tr><td>PPO, 106&nbsp;496 pas d’entraînement</td><td>500,0 ± 0,0</td><td>Réglages par défaut de Stable-Baselines3, graine 0</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>PPO en quelques minutes, indicateurs compris</h3>
+            <p>Avec ses réglages par défaut, PPO effectue 13 itérations de 8192 pas (4 copies de l’environnement × 2048 pas). Le retour moyen des épisodes d’entraînement passe de 22 à 498, et l’évaluation déterministe atteint 500 sur les 20 épisodes. La fiche apprend aussi à lire les indicateurs avec recul&nbsp;: la variance expliquée du critique monte à 0,97, puis retombe près de 0 une fois la tâche résolue, parce que les retours à prédire deviennent presque identiques. Un indicateur se lit toujours dans son contexte.</p>
+
+            <h3>La robustesse se mesure, elle ne se suppose pas</h3>
+            <p>La randomisation de domaine entraîne la politique sur des pendules dont la masse, la longueur et la force du moteur varient de ±30&nbsp;% d’un épisode à l’autre. Rend-elle la politique plus robuste&#8239;? Lors de nos essais, avec la graine 0, la politique nominale et la politique randomisée tenaient toutes deux les 500 pas pour une longueur de pendule allant de 0,5 à 2 fois la valeur nominale&nbsp;; à 2,5 fois, la politique nominale tenait encore presque toujours, la randomisée une centaine de pas seulement. Avec la graine 1, c’est l’inverse&nbsp;: la politique nominale échouait dès 2 fois, la randomisée tenait encore les 500 pas à 2,5 fois. D’une graine à l’autre, la même méthode mène donc à des conclusions opposées&nbsp;: l’exercice guidé apprend à conclure sur plusieurs graines, avant tout passage sur un système réel.</p>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel et logiciels</h2>
+            <ul>
+              <li>Un ordinateur suffit pour l’essentiel du cours&nbsp;: les scripts tournent sur le processeur, sans carte graphique. Ils ont été testés avec Python&nbsp;3.11, Gymnasium&nbsp;1.4, Stable-Baselines3&nbsp;2.9 et PyTorch&nbsp;2.14 (installation&nbsp;: <code>pip install gymnasium stable-baselines3</code>).</li>
+              <li>Pour la simulation physique&nbsp;: MuJoCo (<code>pip install mujoco</code>) ou PyBullet. PyBullet n’est précompilé que pour Linux x86-64 et Python&nbsp;3.11 au plus&nbsp;: ailleurs, son installation compile les sources et demande un compilateur C++.</li>
+              <li>Pour un passage sur matériel réel, facultatif&nbsp;: un banc simple à un axe motorisé, un microcontrôleur doté d’un chien de garde, un arrêt d’urgence qui coupe la puissance des moteurs et une alimentation de laboratoire limitée en courant.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="sessions-titre">
+            <h2 id="sessions-titre">Sessions en atelier</h2>
+            <div class="page-note">
+              <p>Les sessions en atelier de ce cours sont en préparation&nbsp;: aucune date n’est encore fixée. La fiche de cours au format PDF est, elle, disponible gratuitement dès maintenant.</p>
+            </div>
+            <p><strong>Sessions en atelier&nbsp;: à venir</strong> — <a class="text-link" href="/#contact">écrivez-nous pour être informé <span aria-hidden="true">↗</span></a></p>
+            <p><a class="text-link" href="/cours/"><span aria-hidden="true">←</span> Retour au catalogue des cours</a></p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Fiche PDF et liens utiles">
+          <section class="download-card" aria-labelledby="telechargement-titre">
+            <span class="download-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            </span>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Ressource gratuite</p>
+            <h2 id="telechargement-titre">Fiche de cours</h2>
+            <p>Notions clés, trois scripts Python testés (boucle Gymnasium, entraînement PPO, randomisation de domaine), encadré sécurité, exercice guidé avec critères de réussite et références.</p>
+            <a class="button button-lime button-full" href="/assets/pdf/willsim-apprentissage-renforcement-sim2real.pdf" type="application/pdf" aria-describedby="telechargement-meta">
+              <span>Télécharger la fiche PDF</span>
+              <span aria-hidden="true">↓</span>
+            </a>
+            <p class="download-meta" id="telechargement-meta">PDF · 7 pages · 341 Ko</p>
+            <p class="download-licence">© 2026 WILLSIM — Licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" rel="license noopener">CC BY-NC-SA 4.0</a>. Rédaction&nbsp;: équipe pédagogique WILLSIM.</p>
+          </section>
+
+          <section class="related-links" aria-labelledby="liens-titre">
+            <h2 id="liens-titre">Pour aller plus loin</h2>
+            <ul>
+              <li><a href="/projets/jumeau-numerique-sim2real.html"><span class="related-kicker">Projet lié</span>Du jumeau numérique au robot réel</a></li>
+              <li><a href="/cours/ia-ingenierie-initiation.html"><span class="related-kicker">Cours prérequis</span>Initiation à l’IA pour l’ingénierie</a></li>
+              <li><a href="/cours/ros2-premiers-pas.html"><span class="related-kicker">Cours complémentaire</span>ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</a></li>
+              <li><a href="/cours/"><span class="related-kicker">Catalogue</span>Tous les cours gratuits</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Maintenance prédictive : capteurs et détection d’anomalies — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : stratégies de maintenance, signatures vibratoires, échantillonnage, FFT, indicateurs RMS, facteur de crête et kurtosis, détection d’anomalies par Isolation Forest, seuils et alertes.">
+    <meta name="keywords" content="maintenance prédictive, analyse vibratoire, FFT, Nyquist, kurtosis, Isolation Forest, scikit-learn, accéléromètre, ACS712, INA219">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Styles propres à cette fiche */
+      pre { font-size: 8pt; line-height: 1.4; }
+      pre.output { padding-block: 2mm; border-left-color: #8aa32e; background: #fbfcf6; }
+      .fig-wide svg { width: 72%; }
+      table { break-inside: avoid; }
+      table.compact th, table.compact td { padding: 1.3mm 2.2mm; }
+      .sections h2 { margin-top: 6mm; }
+      .colophon { margin-top: 5mm; }
+      math[display="block"] { margin: 1mm 0 2.2mm; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>Maintenance prédictive&nbsp;: capteurs et détection d’anomalies</h1>
+      <p class="cover-lead">Écouter une machine tournante avant qu’elle ne tombe en panne&nbsp;: mesurer ses vibrations et son courant, en extraire des indicateurs fiables, puis détecter automatiquement un comportement anormal grâce à un modèle appris sur un fonctionnement sain.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Intermédiaire</dd></div>
+        <div><dt>Durée</dt><dd>6&nbsp;h (3 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Le cours «&nbsp;Initiation à l’IA pour l’ingénierie&nbsp;»</dd></div>
+        <div><dt>Outils</dt><dd>Accéléromètre, capteur de courant (INA219, ACS712…), Python, NumPy, SciPy, scikit-learn</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>choisir et justifier une stratégie de maintenance (corrective, préventive ou prédictive)&nbsp;;</li>
+        <li>dimensionner une acquisition&nbsp;: fréquence d’échantillonnage (critère de Nyquist), durée de fenêtre, résolution&nbsp;;</li>
+        <li>calculer un spectre par FFT et y reconnaître un balourd (1×), un désalignement (2×), un défaut de roulement&nbsp;;</li>
+        <li>calculer et interpréter la valeur efficace (RMS), le facteur de crête et le kurtosis d’un signal&nbsp;;</li>
+        <li>entraîner une Isolation Forest sur un fonctionnement sain, régler son seuil d’après un taux de fausses alertes visé et confirmer les alertes par persistance.</li>
+      </ul>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>Trois stratégies de maintenance</h2>
+        <p>Une machine se dégrade progressivement&nbsp;: un roulement s’use, un accouplement se désaligne, un dépôt déséquilibre un ventilateur. La question n’est pas de savoir <em>si</em> il faudra intervenir, mais <em>quand</em>. Trois stratégies coexistent.</p>
+
+        <ul>
+          <li><strong>Corrective</strong>&nbsp;: on répare après la panne. Pas de surveillance, mais des arrêts imprévus et des dégâts en cascade.</li>
+          <li><strong>Préventive systématique</strong>&nbsp;: on intervient selon un échéancier (heures, cycles, calendrier). Simple, mais des pièces saines sont changées trop tôt.</li>
+          <li><strong>Prédictive</strong>&nbsp;: on intervient selon l’état mesuré et son évolution prévue. Au bon moment, au prix de capteurs, de données et de compétences.</li>
+        </ul>
+
+        <p>La norme NF EN 13306 range la maintenance systématique et la maintenance <strong>conditionnelle</strong>, déclenchée par l’état mesuré, dans la maintenance préventive&nbsp;; elle appelle maintenance <strong>prévisionnelle</strong> (le terme français pour «&nbsp;prédictive&nbsp;») la maintenance conditionnelle qui s’appuie en plus sur une prévision de la dégradation. Cette fiche suit la chaîne capteur → acquisition → indicateurs → modèle → alerte.</p>
+
+      </section>
+
+      <section>
+        <h2>Capteurs et signatures de défauts</h2>
+        <h3>Choisir le capteur</h3>
+        <table class="compact">
+          <caption>Tableau 1 — Capteurs courants en atelier</caption>
+          <thead>
+            <tr><th scope="col">Capteur</th><th scope="col">Grandeur mesurée</th><th scope="col">Rapidité</th><th scope="col">Usage typique</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Accéléromètre MEMS (ADXL345, MPU-6050)</td><td>Accélération 3 axes</td><td>1000 mesures/s (MPU-6050) à 3200 mesures/s (ADXL345)</td><td>Vibrations jusqu’à quelques centaines de Hz</td></tr>
+            <tr><td>Accéléromètre piézoélectrique industriel</td><td>Accélération (souvent 1 axe)</td><td>Bande de plusieurs kHz</td><td>Roulements, engrenages</td></tr>
+            <tr><td>INA219</td><td>Courant (par shunt) et tension, liaison I²C</td><td>Conversion 12 bits en 532&nbsp;µs</td><td>Tendance de consommation</td></tr>
+            <tr><td>ACS712</td><td>Courant (effet Hall), sortie analogique</td><td>Capteur rapide (80&nbsp;kHz), limité par le CAN</td><td>Courant moteur, analyse spectrale</td></tr>
+          </tbody>
+        </table>
+        <p>Un accéléromètre se fixe <strong>rigidement</strong> (vis, colle ou embase magnétique) près du palier, toujours au même endroit et dans la même orientation, radiale ou axiale&nbsp;: une mesure n’a de valeur que comparée aux précédentes.</p>
+
+        <h3>Signatures vibratoires</h3>
+        <p>Un arbre qui tourne à <var>N</var> tr/min a pour fréquence de rotation <var>f</var><sub>r</sub>&nbsp;=&nbsp;<var>N</var>/60, soit 25&nbsp;Hz à 1500&nbsp;tr/min. On repère les raies du spectre en <strong>ordres</strong>, c’est-à-dire en multiples de <var>f</var><sub>r</sub>&nbsp;: 1×, 2×, 3×…</p>
+        <table class="compact">
+          <caption>Tableau 2 — Signatures typiques de trois défauts</caption>
+          <thead>
+            <tr><th scope="col">Défaut</th><th scope="col">Signature spectrale</th><th scope="col">Indices complémentaires</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Balourd</strong></td><td>Raie dominante à 1×, surtout radiale</td><td>Force centrifuge proportionnelle au carré de la vitesse</td></tr>
+            <tr><td><strong>Désalignement</strong></td><td>Raie marquée à 2×, souvent avec 1× et 3×</td><td>Vibration axiale élevée (désalignement angulaire)</td></tr>
+            <tr><td><strong>Défaut de roulement</strong></td><td>Raies non entières (BPFO, BPFI, BSF, FTF) et harmoniques</td><td>Chocs répétés&nbsp;: facteur de crête et kurtosis en hausse</td></tr>
+          </tbody>
+        </table>
+        <p>Les fréquences de défaut d’un roulement dépendent de sa géométrie&nbsp;: nombre d’éléments roulants <var>n</var>, diamètre des billes <var>d</var>, diamètre primitif <var>D</var>, angle de contact <var>φ</var>. Pour un défaut de bague extérieure (BPFO, <em>Ball Pass Frequency Outer race</em>) ou de bague intérieure (BPFI)&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>BPFO</mi><mo>=</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><msub><mi>f</mi><mi>r</mi></msub>
+            <mrow><mo>(</mo><mn>1</mn><mo>−</mo><mfrac><mi>d</mi><mi>D</mi></mfrac><mi>cos</mi><mi>φ</mi><mo>)</mo></mrow>
+            <mspace width="2em"/>
+            <mi>BPFI</mi><mo>=</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><msub><mi>f</mi><mi>r</mi></msub>
+            <mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>d</mi><mi>D</mi></mfrac><mi>cos</mi><mi>φ</mi><mo>)</mo></mrow>
+          </mrow>
+        </math>
+        <p>BSF et FTF, elles, concernent les billes et la cage. Exemple&nbsp;: un roulement 6205 (9 billes, <var>d</var>&nbsp;=&nbsp;7,94&nbsp;mm, <var>D</var>&nbsp;=&nbsp;39,04&nbsp;mm, <var>φ</var>&nbsp;=&nbsp;0) donne BPFO&nbsp;=&nbsp;3,585&nbsp;<var>f</var><sub>r</sub> et BPFI&nbsp;=&nbsp;5,415&nbsp;<var>f</var><sub>r</sub>, soit 89,6&nbsp;Hz et 135,4&nbsp;Hz à 1500&nbsp;tr/min. Ces raies ne tombent pas sur un ordre entier&nbsp;: c’est ce qui les distingue des défauts liés à la rotation (figure&nbsp;1). Sur un roulement peu dégradé, elles émergent toutefois mal du spectre brut&nbsp;: on les cherche alors dans le spectre de l’<strong>enveloppe</strong> du signal (démodulation), technique hors du cadre de cette fiche.</p>
+
+        <figure class="fig-wide">
+          <svg width="600" height="160" viewBox="0 0 600 160" role="img" aria-label="Spectre schématique : raies à 1x, 2x et 3x de la rotation, raies de roulement BPFO et 2 BPFO">
+            <g font-family="DM Sans" font-size="10" fill="#47544d" text-anchor="middle">
+              <line x1="40" y1="124" x2="560" y2="124" stroke="#47544d" stroke-width="1"/>
+              <line x1="40" y1="10" x2="40" y2="124" stroke="#47544d" stroke-width="1"/>
+              <text x="40" y="138">0</text><text x="123" y="138">50</text><text x="207" y="138">100</text>
+              <text x="290" y="138">150</text><text x="373" y="138">200</text><text x="457" y="138">250</text><text x="540" y="138">300</text>
+              <text x="300" y="155">Fréquence (Hz)</text>
+              <text x="14" y="68" transform="rotate(-90 14 68)">Amplitude</text>
+              <polyline points="40,121 120,120 200,121 280,120 360,121 440,120 540,121" fill="none" stroke="#c9ccc0" stroke-width="1"/>
+            </g>
+            <g fill="#243c30">
+              <rect x="79" y="24" width="6" height="100"/>
+              <rect x="120" y="76" width="6" height="48"/>
+              <rect x="162" y="106" width="6" height="18"/>
+            </g>
+            <g fill="#d2ec6c" stroke="#566b14" stroke-width="1">
+              <rect x="186" y="84" width="6" height="40"/>
+              <rect x="336" y="102" width="6" height="22"/>
+            </g>
+            <g font-family="DM Sans" font-size="10.5" font-weight="700" fill="#14221c" text-anchor="middle">
+              <text x="82" y="18">1×</text><text x="123" y="70">2×</text><text x="165" y="100">3×</text>
+              <text x="190" y="78">BPFO</text><text x="339" y="96">2×BPFO</text>
+            </g>
+            <g font-family="DM Sans" font-size="10">
+              <rect x="360" y="16" width="10" height="10" fill="#243c30"/>
+              <text x="376" y="25" fill="#14221c">raies de rotation (ordres entiers)</text>
+              <rect x="360" y="34" width="10" height="10" fill="#d2ec6c" stroke="#566b14"/>
+              <text x="376" y="43" fill="#14221c">raies de roulement (non entières)</text>
+            </g>
+          </svg>
+          <figcaption>Figure 1 — Spectre schématique d’un moteur à 1500&nbsp;tr/min (<var>f</var><sub>r</sub>&nbsp;=&nbsp;25&nbsp;Hz)&nbsp;: balourd, léger désalignement et défaut de bague extérieure d’un roulement 6205.</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>Échantillonnage et critère de Nyquist</h2>
+        <p>D’après le théorème de Shannon-Nyquist, un signal dont le contenu ne dépasse pas <var>f</var><sub>max</sub> est entièrement décrit par ses échantillons si la fréquence d’échantillonnage <var>f</var><sub>e</sub> vérifie&nbsp;:</p>
+        <math display="block">
+          <mrow><msub><mi>f</mi><mi>e</mi></msub><mo>&gt;</mo><mn>2</mn><msub><mi>f</mi><mi>max</mi></msub></mrow>
+        </math>
+        <p>Sinon, une composante de fréquence <var>f</var> supérieure à <var>f</var><sub>e</sub>/2 se <strong>replie</strong>&nbsp;: elle apparaît à la plus petite des fréquences |<var>f</var>&nbsp;−&nbsp;<var>k</var>&nbsp;<var>f</var><sub>e</sub>|. Échantillonnée à 1000&nbsp;Hz, une vibration à 900&nbsp;Hz se lit à 100&nbsp;Hz, sans moyen de la reconnaître après coup. On prévient donc le repliement <em>avant</em> la conversion&nbsp;: filtre passe-bas analogique devant le CAN, ou capteur à bande passante limitée en interne, comme beaucoup d’accéléromètres MEMS. En pratique, on échantillonne au moins 2,5 fois plus vite que la plus haute fréquence utile.</p>
+        <p>La durée d’observation <var>T</var>&nbsp;=&nbsp;<var>N</var>/<var>f</var><sub>e</sub> fixe la <strong>résolution fréquentielle</strong>, l’écart entre deux points du spectre&nbsp;: Δ<var>f</var>&nbsp;=&nbsp;<var>f</var><sub>e</sub>/<var>N</var>&nbsp;=&nbsp;1/<var>T</var>. Pour notre moteur, les raies utiles (rotation, BPFO, BPFI et leurs premières harmoniques) restent sous 600&nbsp;Hz. On retient <var>f</var><sub>e</sub>&nbsp;=&nbsp;1600&nbsp;Hz, l’un des débits de l’ADXL345 (qui exige alors une liaison SPI rapide), et des fenêtres de <var>N</var>&nbsp;=&nbsp;1600 échantillons&nbsp;: <var>T</var>&nbsp;=&nbsp;1&nbsp;s et Δ<var>f</var>&nbsp;=&nbsp;1&nbsp;Hz.</p>
+      </section>
+
+      <section>
+        <h2>Lire un spectre avec la FFT</h2>
+        <p>La transformée de Fourier discrète décompose une fenêtre de <var>N</var> échantillons en raies de fréquences <var>f</var><sub>k</sub>&nbsp;=&nbsp;<var>k</var>&nbsp;<var>f</var><sub>e</sub>/<var>N</var>&nbsp;; la FFT (<em>Fast Fourier Transform</em>) la calcule rapidement. Pour un signal réel, <code>np.fft.rfft</code> renvoie les <var>N</var>/2&nbsp;+&nbsp;1 raies de 0 à <var>f</var><sub>e</sub>/2 (pour <var>N</var> pair).</p>
+        <p class="code-title">spectre.py</p>
+        <pre><code>import numpy as np
+from scipy.signal import find_peaks
+
+fe, N, fr = 1600, 1600, 25.0          <span class="c"># 1600 Hz, 1 s de signal, rotation à 1500 tr/min</span>
+t = np.arange(N) / fe
+rng = np.random.default_rng(0)
+<span class="c"># Signal synthétique (m/s²) : balourd (1x) + léger désalignement (2x) + bruit</span>
+x = 0.8 * np.sin(2 * np.pi * fr * t) + 0.3 * np.sin(2 * np.pi * 2 * fr * t)
+x += 0.1 * rng.standard_normal(N)
+w = np.hanning(N)                     <span class="c"># fenêtre de Hann : limite la fuite spectrale</span>
+A = 2 * np.abs(np.fft.rfft(x * w)) / w.sum()   <span class="c"># amplitude crête de chaque raie</span>
+f = np.fft.rfftfreq(N, d=1 / fe)      <span class="c"># de 0 à fe/2 par pas de fe/N = 1 Hz</span>
+pics, _ = find_peaks(A, height=0.1)   <span class="c"># raies qui dépassent 0,1 m/s²</span>
+for k in pics:
+    print(f"{f[k]:5.1f} Hz   amplitude {A[k]:.2f}   ({f[k] / fr:.0f}x)")</code></pre>
+        <p class="code-title">Sortie</p>
+        <pre class="output"><code> 25.0 Hz   amplitude 0.80   (1x)
+ 50.0 Hz   amplitude 0.30   (2x)</code></pre>
+        <p>Deux précautions dans ce code&nbsp;: la <strong>fenêtre de Hann</strong> limite l’étalement d’une raie sur ses voisines (fuite spectrale)&nbsp;; la <strong>normalisation</strong> par la somme de ses poids donne directement l’amplitude crête de chaque sinusoïde. On retrouve ainsi les amplitudes simulées. Sur une vraie machine, on moyenne les spectres de plusieurs fenêtres pour lisser le fond de bruit (méthode de Welch, <code>scipy.signal.welch</code>).</p>
+      </section>
+
+      <section>
+        <h2>Indicateurs temporels</h2>
+        <p>Trois nombres résument une fenêtre <var>x</var><sub>1</sub>…<var>x</var><sub>N</sub> centrée (moyenne retirée), d’écart-type <var>σ</var>&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>RMS</mi><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup></mrow></msqrt>
+            <mspace width="1.6em"/>
+            <mi>FC</mi><mo>=</mo><mfrac><mrow><mo>max</mo><mrow><mo>|</mo><msub><mi>x</mi><mi>i</mi></msub><mo>|</mo></mrow></mrow><mi>RMS</mi></mfrac>
+            <mspace width="1.6em"/>
+            <mi>K</mi><mo>=</mo><mfrac><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msubsup><mi>x</mi><mi>i</mi><mn>4</mn></msubsup></mstyle><msup><mi>σ</mi><mn>4</mn></msup></mfrac>
+          </mrow>
+        </math>
+        <ul>
+          <li>La <strong>valeur efficace (RMS)</strong> mesure l’énergie vibratoire globale et réagit bien au balourd et au désalignement. Dans l’industrie, la sévérité vibratoire s’évalue en vitesse efficace (mm/s) selon la série de normes ISO 20816.</li>
+          <li>Le <strong>facteur de crête</strong> (FC) compare la valeur de crête à la valeur efficace&nbsp;: √2&nbsp;≈&nbsp;1,41 pour une sinusoïde, davantage avec des chocs.</li>
+          <li>Le <strong>kurtosis</strong> (K) mesure le caractère impulsif&nbsp;: 1,5 pour une sinusoïde, 3 pour un bruit gaussien, plus avec des chocs. Il signale tôt un roulement qui s’abîme, mais redescend quand les chocs deviennent permanents&nbsp;: suivez-le dans le temps.</li>
+        </ul>
+        <table class="compact">
+          <caption>Tableau 3 — Indicateurs calculés sur 1&nbsp;s de signal échantillonné à 1600&nbsp;Hz</caption>
+          <thead>
+            <tr><th scope="col">Signal</th><th scope="col">RMS</th><th scope="col">FC</th><th scope="col">K</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Sinusoïde d’amplitude 1 à 25&nbsp;Hz</td><td>0,707</td><td>1,41</td><td>1,50</td></tr>
+            <tr><td>Même sinusoïde + un choc d’amplitude 3 tous les 18 échantillons (≈&nbsp;89&nbsp;Hz)</td><td>0,986</td><td>3,89</td><td>5,68</td></tr>
+            <tr><td>Bruit gaussien d’écart-type 1 (un tirage)</td><td>0,987</td><td>3,94</td><td>3,12</td></tr>
+          </tbody>
+        </table>
+        <p>Le bruit et le signal à chocs ont presque le même facteur de crête, mais pas le même kurtosis&nbsp;: aucun indicateur ne suffit seul. La fonction <code>caracteristiques</code> de <code>detection.py</code> (paragraphe 6.2) calcule ces trois indicateurs. Attention à <code>fisher=False</code>&nbsp;: par défaut, <code>scipy.stats.kurtosis</code> renvoie le kurtosis <em>en excès</em> (K&nbsp;−&nbsp;3, nul pour un bruit gaussien).</p>
+      </section>
+
+      <section>
+        <h2>Détecter les anomalies avec une Isolation Forest</h2>
+        <h3>Apprendre le fonctionnement sain</h3>
+        <p>Les pannes sont rares et variées&nbsp;: on manque d’exemples de chaque défaut pour entraîner un classifieur. On apprend donc le fonctionnement <strong>normal</strong>, puis on signale tout ce qui s’en écarte&nbsp;: c’est la <strong>détection de nouveautés</strong>.</p>
+        <p>L’Isolation Forest construit de nombreux arbres aléatoires&nbsp;: à chaque nœud, une caractéristique est tirée au hasard, puis un seuil entre le minimum et le maximum de cette caractéristique sur les données du nœud. Un point éloigné des autres est isolé après peu de découpes&nbsp;; avec scikit-learn, <code>score_samples</code> renvoie donc une valeur d’autant plus <strong>basse</strong> que le point est anormal. Inutile de normaliser&nbsp;: les seuils sont tirés dans l’intervalle propre à chaque caractéristique.</p>
+        <h3>Mise en œuvre sur des données synthétiques</h3>
+        <p>Chaque fenêtre de 1&nbsp;s est résumée par cinq caractéristiques&nbsp;: RMS, facteur de crête, kurtosis, raies 1× et 2×. Le modèle n’apprend que des fenêtres saines&nbsp;; le seuil est le 1<sup>er</sup> centile des scores d’autres fenêtres saines, gardées pour la validation.</p>
+        <p class="code-title">detection.py</p>
+        <pre><code>import numpy as np
+from scipy.stats import kurtosis
+from sklearn.ensemble import IsolationForest
+
+fe, N, fr = 1600, 1600, 25.0           <span class="c"># fenêtres de 1 s, résolution de 1 Hz</span>
+t = np.arange(N) / fe
+w = np.hanning(N)
+rng = np.random.default_rng(1)
+choc = np.exp(-300 * t[:40]) * np.sin(2 * np.pi * 500 * t[:40])  <span class="c"># résonance amortie</span>
+
+def fenetre(a1=0.5, a2=0.1, chocs=0.0):  <span class="c"># 1 s d'accélération synthétique (m/s²)</span>
+    a1 *= rng.uniform(0.9, 1.1)        <span class="c"># dispersion normale d'une mesure à l'autre</span>
+    p = rng.uniform(0, 2 * np.pi, 2)
+    x = a1 * np.sin(2 * np.pi * fr * t + p[0]) + a2 * np.sin(4 * np.pi * fr * t + p[1])
+    impacts = np.zeros(N)
+    impacts[(np.arange(0, 1, 1 / 89.6) * fe).astype(int)] = chocs  <span class="c"># BPFO = 89,6 Hz</span>
+    x += np.convolve(impacts, choc)[:N]
+    return x + 0.1 * rng.standard_normal(N)
+
+def caracteristiques(x):               <span class="c"># RMS, facteur de crête, kurtosis, raies 1x et 2x</span>
+    x = x - x.mean()
+    rms = np.sqrt(np.mean(x ** 2))
+    A = 2 * np.abs(np.fft.rfft(x * w)) / w.sum()   <span class="c"># ici A[k] = raie à k Hz</span>
+    return [rms, np.max(np.abs(x)) / rms, kurtosis(x, fisher=False), A[25], A[50]]
+
+sain = np.array([caracteristiques(fenetre()) for _ in range(500)])
+modele = IsolationForest(n_estimators=200, random_state=0).fit(sain[:300])  <span class="c"># sain seul</span>
+seuil = np.percentile(modele.score_samples(sain[300:]), 1)  <span class="c"># vise 1 % de fausses alertes</span>
+
+cas = {"sain": {}, "balourd": {"a1": 0.8}, "désalignement": {"a2": 0.3}, "roulement": {"chocs": 0.5}}
+for nom, params in cas.items():
+    X = np.array([caracteristiques(fenetre(**params)) for _ in range(100)])
+    taux = np.mean(modele.score_samples(X) &lt; seuil)   <span class="c"># score bas = anormal</span>
+    print(f"{nom:14s} fenêtres signalées : {taux:4.0%}")</code></pre>
+        <p class="code-title">Sortie</p>
+        <pre class="output"><code>sain           fenêtres signalées :   1%
+balourd        fenêtres signalées : 100%
+désalignement  fenêtres signalées : 100%
+roulement      fenêtres signalées :  86%</code></pre>
+        <h3>Limites à connaître</h3>
+        <ul>
+          <li>Le modèle dit «&nbsp;différent&nbsp;», pas «&nbsp;quel défaut&nbsp;»&nbsp;: le diagnostic se fait avec le spectre et le tableau&nbsp;2.</li>
+          <li>Le score <strong>sature</strong> hors du domaine appris&nbsp;: un point très éloigné n’est pas jugé plus anormal qu’un point situé juste au-delà des données saines. Gardez des seuils absolus (RMS maximale, par exemple).</li>
+          <li>Vitesse et charge modifient les signaux sans qu’il y ait de défaut&nbsp;: apprenez sur tous les régimes normaux ou ajoutez la vitesse aux caractéristiques. Après une intervention, réapprenez la référence saine.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Seuils et alertes</h2>
+        <p>Avec un seuil au 1<sup>er</sup> centile, une fenêtre saine sur cent environ est signalée&nbsp;: une anomalie isolée ne suffit pas à alerter.</p>
+        <ul>
+          <li><strong>Persistance</strong>&nbsp;: alerter après <var>k</var> fenêtres anormales consécutives (ou <var>k</var> parmi les <var>n</var> dernières). Si 1&nbsp;% des fenêtres saines sont signalées, de façon indépendante, trois de suite n’arrivent qu’avec une probabilité de 10<sup>−6</sup>&nbsp;; à raison d’une fenêtre par seconde, cela fait encore une fausse alerte tous les 12 jours environ.</li>
+          <li><strong>Deux niveaux et hystérésis</strong>&nbsp;: «&nbsp;vigilance&nbsp;» si l’anomalie est isolée, «&nbsp;alerte&nbsp;» si elle persiste&nbsp;; on ne lève l’alerte qu’après plusieurs fenêtres normales.</li>
+          <li><strong>Traçabilité</strong>&nbsp;: enregistrer les signaux bruts autour de chaque alerte pour le diagnostic.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Du PC vers le microcontrôleur</h2>
+        <p>Le PC sert à collecter les données, choisir les caractéristiques, entraîner le modèle et régler le seuil. Le microcontrôleur acquiert le signal et ne transmet que les indicateurs de chaque fenêtre, ce qui soulage la liaison, le stockage et la batterie. Exemple&nbsp;: le courant d’un petit moteur à courant continu, mesuré par un module ACS712 (185&nbsp;mV/A en version 5&nbsp;A, sortie à mi-tension à courant nul) relié à un Arduino Uno. À vitesse égale, une hausse du courant moyen traduit un couple résistant plus élevé&nbsp;: frottements, grippage, roulement qui se dégrade.</p>
+        <ul>
+          <li><strong>Cadence fixe</strong>&nbsp;: déclenchez chaque mesure sur une horloge (<code>micros()</code> ou, mieux, un timer matériel), jamais «&nbsp;aussi vite que possible&nbsp;»&nbsp;: la FFT suppose des échantillons régulièrement espacés.</li>
+          <li><strong>Calibration et résolution</strong>&nbsp;: mesurez la sortie à courant nul au démarrage, moteur à l’arrêt (elle s’écarte un peu de 2,5&nbsp;V d’un module à l’autre). Avec le CAN 10 bits sous 5&nbsp;V, un pas vaut 4,9&nbsp;mV, soit environ 26&nbsp;mA.</li>
+          <li><strong>Mémoire</strong>&nbsp;: l’Uno n’a que 2&nbsp;Ko de RAM. Cumulez au fil de l’eau les sommes de <var>i</var> et de <var>i</var><sup>2</sup>&nbsp;: elles donnent moyenne et valeur efficace sans stocker la fenêtre.</li>
+          <li><strong>Repliement</strong>&nbsp;: si le moteur est piloté en MLI (PWM), l’ondulation à la fréquence de découpage peut se replier dans la bande mesurée&nbsp;: filtre RC passe-bas devant l’entrée analogique.</li>
+        </ul>
+        <p>Pour calculer un spectre sur la carte, un microcontrôleur ARM Cortex-M et la bibliothèque CMSIS-DSP (FFT optimisées) conviennent mieux. Exécuter le modèle de détection sur la carte elle-même est l’objet du cours «&nbsp;IA embarquée sur microcontrôleur (TinyML)&nbsp;».</p>
+        <div class="box box-attention">
+          <p class="box-title">Attention · sécurité</p>
+          <ul>
+            <li>Machine tournante&nbsp;: carter de protection en place, ni vêtements amples, ni cheveux longs détachés, ni bijoux. Fixez ou déplacez un capteur uniquement machine <strong>à l’arrêt et consignée</strong> (alimentation coupée et condamnée).</li>
+            <li>Balourd volontaire&nbsp;: masse vissée et freinée, vitesse limitée, personne dans le plan de rotation.</li>
+            <li>Très basse tension uniquement (moteurs de 24&nbsp;V au plus), alimentation de laboratoire limitée en courant, fusible. Jamais de montage de prototypage (platine d’essai, module à bornier) sur le secteur 230&nbsp;V.</li>
+            <li>Choisissez la version de l’ACS712 d’après le courant de démarrage et de blocage du moteur, bien supérieur au courant nominal.</li>
+          </ul>
+        </div>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>Maintenance prédictive&nbsp;: intervenir au bon moment, d’après l’état mesuré.</li>
+            <li>Balourd&nbsp;: 1×. Désalignement&nbsp;: 2×. Roulement&nbsp;: raies non entières et chocs (kurtosis).</li>
+            <li><var>f</var><sub>e</sub>&nbsp;&gt;&nbsp;2&nbsp;<var>f</var><sub>max</sub>, filtre anti-repliement avant le CAN, Δ<var>f</var>&nbsp;=&nbsp;1/<var>T</var>.</li>
+            <li>Isolation Forest apprise sur du sain, seuil fixé par le taux de fausses alertes, persistance, seuils absolus.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Exercice guidé</h2>
+        <div class="box box-exercice breakable">
+          <p class="box-title">Exercice · Surveiller une dérive de balourd</p>
+          <p>À partir de <code>spectre.py</code> et de <code>detection.py</code> (environ 1&nbsp;h, en fin de séance&nbsp;3)&nbsp;:</p>
+          <ol>
+            <li>Calculez le spectre de <code>fenetre(a2=0.3)</code> et relevez les amplitudes des raies à 25&nbsp;Hz et 50&nbsp;Hz.</li>
+            <li>Générez 200 nouvelles fenêtres saines et calculez la proportion signalée par le modèle.</li>
+            <li>Programmez une alerte déclenchée après 3 fenêtres anormales consécutives.</li>
+            <li>Simulez une dégradation&nbsp;: <code>fenetre(a1=0.5 * (1 + i / 100))</code> pour <var>i</var> de 0 à 99. Quand l’alerte se déclenche-t-elle, et de combien l’amplitude 1× a-t-elle augmenté&#8239;?</li>
+            <li>Bonus&nbsp;: ajoutez un seuil absolu (1,5 fois la RMS saine maximale). Pourquoi complète-t-il le modèle&#8239;?</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong></p>
+          <ul>
+            <li>raie à 50&nbsp;Hz proche de 0,3&nbsp;; raie à 25&nbsp;Hz entre 0,45 et 0,55 environ (dispersion de ±10&nbsp;%)&nbsp;;</li>
+            <li>au plus 5&nbsp;% de fenêtres saines signalées et aucune alerte sur les 200&nbsp;;</li>
+            <li>alerte avant +50&nbsp;% sur l’amplitude 1× (typiquement +15 à +35&nbsp;%), et persistance expliquée.</li>
+          </ul>
+          <div class="solution">
+            <p><strong>Indice&nbsp;:</strong> un compteur suffit. Pour chaque fenêtre, <code>compteur = compteur + 1 if anomalie else 0</code>, puis alerte dès que <code>compteur &gt;= 3</code>. Pour le bonus, relisez la saturation du score décrite au paragraphe 6.3.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://numpy.org/doc/stable/reference/routines.fft.html">NumPy&nbsp;: transformée de Fourier discrète (numpy.fft)</a></li>
+        <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html">SciPy&nbsp;: méthode de Welch</a></li>
+        <li><a href="https://scikit-learn.org/stable/modules/outlier_detection.html">scikit-learn&nbsp;: détection de nouveautés et d’anomalies</a></li>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html">scikit-learn&nbsp;: IsolationForest</a></li>
+        <li><a href="https://www.allegromicro.com/en/products/sense/current-sensor-ics/integrated-current-sensors/acs712">Allegro MicroSystems&nbsp;: ACS712</a></li>
+        <li><a href="https://willsim.fr/cours/maintenance-predictive.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

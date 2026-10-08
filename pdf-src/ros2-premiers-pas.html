@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>ROS 2 : premiers pas en robotique mobile — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : nœuds, topics, services, actions et paramètres de ROS 2, colcon, rclpy, tf2, nœud d'arrêt d'urgence sur LaserScan, aperçu de slam_toolbox et Nav2, place de l'IA.">
+    <meta name="keywords" content="ROS 2, Jazzy, rclpy, turtlesim, colcon, tf2, LaserScan, RViz2, Gazebo, Nav2, slam_toolbox, robotique mobile, IA">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Styles propres à cette fiche */
+      body { font-size: 9.6pt; line-height: 1.45; }
+      pre { font-size: 7.6pt; line-height: 1.36; }
+      .mecanismes th:first-child { width: 19mm; }
+      .mecanismes td:last-child { width: 36mm; }
+      .ia th:first-child { width: 30mm; }
+      table.ia, table.mecanismes { break-inside: avoid; }
+      figure svg { width: 100%; }
+      .cmds code { overflow-wrap: anywhere; }
+      .nw { white-space: nowrap; }
+      .box-exercice > .box-title, .box-exercice > p:first-of-type { break-after: avoid; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</h1>
+      <p class="cover-lead">Découvrir ROS&nbsp;2, le cadre logiciel de référence en robotique, du simulateur turtlesim jusqu’à un robot simulé qui cartographie une pièce et s’y déplace seul. Vous écrirez vos premiers nœuds Python, dont un arrêt d’urgence fondé sur un lidar, et verrez où l’IA s’insère.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Débutant à intermédiaire</dd></div>
+        <div><dt>Durée</dt><dd>8&nbsp;h (4 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Bases de Linux (terminal) et de Python</dd></div>
+        <div><dt>Outils</dt><dd>ROS&nbsp;2 Jazzy (Ubuntu 24.04), rclpy, turtlesim, RViz2, Gazebo, Nav2, slam_toolbox</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>distinguer topics, services, actions et paramètres, et les observer avec les commandes <code>ros2</code>&nbsp;;</li>
+        <li>créer un paquet Python, le compiler avec colcon et lancer ses nœuds&nbsp;;</li>
+        <li>écrire un nœud rclpy qui publie, s’abonne et expose des paramètres&nbsp;;</li>
+        <li>expliquer la chaîne <code>map</code> → <code>odom</code> → <code>base_link</code> et lire une transformation avec tf2&nbsp;;</li>
+        <li>programmer un nœud d’arrêt d’urgence sur <code>LaserScan</code> et le valider par des critères mesurables&nbsp;;</li>
+        <li>lancer cartographie (slam_toolbox) et navigation (Nav2) en simulation, et situer l’apport de l’IA.</li>
+      </ul>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>ROS&nbsp;2 en cinq notions</h2>
+        <p>ROS&nbsp;2 (<em>Robot Operating System</em>) n’est pas un système d’exploitation&nbsp;: c’est un ensemble de bibliothèques, d’outils et de conventions qui permet de découper le logiciel d’un robot en programmes indépendants qui communiquent. Cette fiche utilise la distribution <strong>Jazzy Jalisco</strong>, version à support long (LTS) publiée en mai 2024 et maintenue jusqu’en mai 2029, sous Ubuntu 24.04&nbsp;; les commandes restent valables sur les distributions plus récentes, en remplaçant <code>jazzy</code> par leur nom.</p>
+
+        <h3>Nœuds et topics</h3>
+        <p>Un <strong>nœud</strong> est un programme qui remplit une fonction précise&nbsp;: piloter les moteurs, lire le lidar, planifier une trajectoire. Les nœuds échangent des <strong>messages typés</strong> sur des <strong>topics</strong>, selon le modèle publication-abonnement&nbsp;: le pilote du lidar publie sur <code>/scan</code> des messages <code>sensor_msgs/msg/LaserScan</code>, et tous les nœuds abonnés à <code>/scan</code> les reçoivent, sans que l’émetteur connaisse ses destinataires.</p>
+        <p>Les nœuds se découvrent automatiquement grâce au middleware DDS s’ils partagent le même <code>ROS_DOMAIN_ID</code>&nbsp;: en atelier, chaque binôme choisit une valeur différente entre 0 et 101 (<code>export ROS_DOMAIN_ID=12</code>). Chaque éditeur et chaque abonné déclare aussi une <strong>qualité de service</strong> (QoS), par exemple fiable (<em>reliable</em>) ou au mieux (<em>best effort</em>)&nbsp;: nous y reviendrons en section 5.</p>
+
+        <h3>Services, actions et paramètres</h3>
+        <table class="mecanismes">
+          <caption>Les quatre mécanismes de communication de ROS&nbsp;2</caption>
+          <thead>
+            <tr><th scope="col">Mécanisme</th><th scope="col">Principe</th><th scope="col">Exemple en robotique mobile</th><th scope="col">Outil</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Topic</td><td>Flux continu, sans réponse, de N éditeurs vers M abonnés</td><td><code>/scan</code>, <code>/cmd_vel</code>, <code>/odom</code></td><td><code>ros2 topic echo</code></td></tr>
+            <tr><td>Service</td><td>Requête puis réponse, pour une opération courte</td><td>créer une tortue, enregistrer une carte</td><td><code>ros2 service call</code></td></tr>
+            <tr><td>Action</td><td>Tâche longue&nbsp;: retours intermédiaires, résultat, annulation</td><td>«&nbsp;rejoindre (x, y)&nbsp;» avec Nav2</td><td><code>ros2 action send_goal</code></td></tr>
+            <tr><td>Paramètre</td><td>Réglage d’un nœud, modifiable en marche</td><td>distance d’arrêt, vitesse maximale</td><td><code>ros2 param set</code></td></tr>
+          </tbody>
+        </table>
+
+        <h3>Découvrir les outils avec turtlesim</h3>
+        <p>turtlesim est un simulateur 2D minimal fourni avec ROS&nbsp;2. Dans chaque terminal, chargez ROS&nbsp;2 (<code>source /opt/ros/jazzy/setup.bash</code>) puis essayez&nbsp;:</p>
+        <ul class="cmds">
+          <li><code>ros2 run turtlesim turtlesim_node</code>, puis <code>ros2 run turtlesim turtle_teleop_key</code> (pilotage au clavier)&nbsp;;</li>
+          <li><code>ros2 node list</code>, <code>ros2 topic list -t</code>, <code>ros2 topic echo /turtle1/pose</code> et <code>rqt_graph</code> pour observer le système&nbsp;;</li>
+          <li><code>ros2 service call /spawn turtlesim/srv/Spawn "{x: 2.0, y: 2.0, theta: 0.0, name: 'tortue2'}"</code> (service&nbsp;: une deuxième tortue)&nbsp;;</li>
+          <li><code>ros2 action send_goal --feedback /turtle1/rotate_absolute turtlesim/action/RotateAbsolute "{theta: 1.57}"</code> (action, avec retours intermédiaires)&nbsp;;</li>
+          <li><code>ros2 param set /turtlesim background_r 150</code> (paramètre&nbsp;: couleur du fond).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Espace de travail, paquet et colcon</h2>
+        <p>Votre code vit dans un <strong>espace de travail</strong>&nbsp;: un dossier dont le sous-dossier <code>src/</code> contient des <strong>paquets</strong>. Un paquet regroupe des nœuds, leurs dépendances (<code>package.xml</code>) et leur configuration d’installation (<code>setup.py</code> pour un paquet Python). L’outil <strong>colcon</strong> (installé avec rosdep par le paquet <code>ros-dev-tools</code>) compile les paquets de <code>src/</code> et crée les dossiers <code>build/</code>, <code>install/</code> et <code>log/</code>.</p>
+
+        <p class="code-title">Terminal · créer et compiler le paquet premiers_pas</p>
+        <pre><code>source /opt/ros/jazzy/setup.bash
+mkdir -p ~/ros2_ws/src &amp;&amp; cd ~/ros2_ws/src
+ros2 pkg create premiers_pas --build-type ament_python --license Apache-2.0 \
+    --dependencies rclpy geometry_msgs sensor_msgs turtlesim
+<span class="c"># Copier cercle.py et arret_urgence.py dans premiers_pas/premiers_pas/, puis ajouter
+# à la liste 'console_scripts' des entry_points de setup.py :
+#     'cercle = premiers_pas.cercle:main',
+#     'arret_urgence = premiers_pas.arret_urgence:main',</span>
+cd ~/ros2_ws
+<span class="c"># rosdep, une seule fois par machine : sudo rosdep init &amp;&amp; rosdep update</span>
+rosdep install -i --from-path src --rosdistro jazzy -y   <span class="c"># dépendances manquantes</span>
+colcon build --symlink-install</code></pre>
+
+        <p>Dans un <strong>nouveau terminal</strong>, chargez l’espace de travail (<code>source ~/ros2_ws/install/setup.bash</code>) puis lancez <code>ros2 run premiers_pas cercle</code>&nbsp;; ne compilez pas dans un terminal où il est déjà chargé. Avec <code>--symlink-install</code>, modifier un fichier Python ne demande pas de recompiler, contrairement à <code>setup.py</code> et <code>package.xml</code>.</p>
+      </section>
+
+      <section>
+        <h2>Publisher et subscriber en Python</h2>
+        <p>Le nœud <code>cercle.py</code> ci-dessous publie dix fois par seconde une consigne <code>geometry_msgs/msg/Twist</code> sur <code>turtle1/cmd_vel</code>&nbsp;: une vitesse linéaire <var>v</var> selon l’axe x de la tortue et une vitesse angulaire ω&nbsp;=&nbsp;<var>v</var>&nbsp;/&nbsp;<var>R</var> autour de l’axe z, d’où un cercle de rayon <var>R</var>. Il s’abonne aussi à <code>turtle1/pose</code> pour afficher la position.</p>
+        <p>Ses fonctions de rappel (<em>callbacks</em>) ne sont jamais appelées directement&nbsp;: <code>rclpy.spin()</code> les exécute quand le minuteur expire ou qu’un message arrive. L’entier <code>10</code> passé à <code>create_publisher</code> donne la QoS par défaut («&nbsp;fiable&nbsp;») avec une file de 10&nbsp;messages. Les paramètres se règlent au lancement (<code>--ros-args -p rayon:=1.5</code>) ou en marche (<code>ros2 param set /cercle rayon 1.0</code>)&nbsp;; écrivez <code>1.0</code> et non <code>1</code>, car le type est fixé par la valeur par défaut. Après Ctrl+C, la tortue s’arrête seule au bout d’une seconde&nbsp;: turtlesim applique un <strong>délai de garde</strong> (<em>watchdog</em>), comme les vrais robots.</p>
+
+        <p class="code-title">premiers_pas/premiers_pas/cercle.py</p>
+        <pre><code>import rclpy
+from rclpy.executors import ExternalShutdownException
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from turtlesim.msg import Pose
+
+
+class Cercle(Node):
+    def __init__(self):
+        super().__init__('cercle')
+        self.declare_parameter('vitesse', 1.0)    <span class="c"># vitesse linéaire (unités/s)</span>
+        self.declare_parameter('rayon', 2.0)      <span class="c"># rayon du cercle (unités)</span>
+        self.pub = self.create_publisher(Twist, 'turtle1/cmd_vel', 10)
+        self.create_subscription(Pose, 'turtle1/pose', self.on_pose, 10)
+        self.create_timer(0.1, self.on_timer)     <span class="c"># période de 0,1 s (10 Hz)</span>
+
+    def on_timer(self):
+        v = self.get_parameter('vitesse').value
+        r = max(self.get_parameter('rayon').value, 0.1)   <span class="c"># évite la division par 0</span>
+        cmd = Twist()
+        cmd.linear.x = v          <span class="c"># avance selon l'axe x de la tortue</span>
+        cmd.angular.z = v / r     <span class="c"># omega = v / R, en rad/s</span>
+        self.pub.publish(cmd)
+
+    def on_pose(self, pose):      <span class="c"># au plus un message par seconde</span>
+        self.get_logger().info(f'x={pose.x:.2f} y={pose.y:.2f}', throttle_duration_sec=1.0)
+
+
+def main():
+    rclpy.init()
+    node = Cercle()
+    try:
+        rclpy.spin(node)          <span class="c"># exécute les callbacks jusqu'à Ctrl+C</span>
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.try_shutdown()</code></pre>
+      </section>
+
+      <section>
+        <h2>Repères et tf2</h2>
+        <p>Un robot manipule de nombreux <strong>repères</strong> (<em>frames</em>)&nbsp;: celui du monde, celui du châssis, celui de chaque capteur. La bibliothèque <strong>tf2</strong> tient à jour l’arbre de ces repères, où chacun a au plus un parent, et calcule à tout instant la transformation (translation et rotation) entre deux d’entre eux. Selon la convention REP&nbsp;103, l’axe x pointe vers l’avant du robot, y vers sa gauche et z vers le haut, et les angles positifs tournent dans le sens trigonométrique. Selon la REP&nbsp;105, la chaîne de repères d’un robot mobile est <code>map</code> → <code>odom</code> → <code>base_link</code> (figure&nbsp;1).</p>
+
+        <figure>
+          <svg width="680" height="104" viewBox="0 0 680 104" role="img" aria-label="Chaîne des repères map, odom, base_link et laser, avec ce qui publie chaque transformation">
+            <defs>
+              <marker id="fl1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#243c30"/></marker>
+            </defs>
+            <rect x="1" y="4" width="116" height="52" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="59" y="26" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="13" fill="#14221c">map</text>
+            <text x="59" y="44" text-anchor="middle" font-family="DM Sans" font-size="10" fill="#47544d">monde, fixe</text>
+            <rect x="189" y="4" width="116" height="52" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="247" y="26" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="13" fill="#14221c">odom</text>
+            <text x="247" y="44" text-anchor="middle" font-family="DM Sans" font-size="10" fill="#47544d">continu, mais dérive</text>
+            <rect x="377" y="4" width="116" height="52" rx="6" fill="#16261e"/>
+            <text x="435" y="26" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="13" fill="#ffffff">base_link</text>
+            <text x="435" y="44" text-anchor="middle" font-family="DM Sans" font-size="10" fill="#d2ec6c">châssis du robot</text>
+            <rect x="563" y="4" width="116" height="52" rx="6" fill="#d2ec6c" stroke="#566b14"/>
+            <text x="621" y="26" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="13" fill="#14221c">laser</text>
+            <text x="621" y="44" text-anchor="middle" font-family="DM Sans" font-size="10" fill="#14221c">capteur</text>
+            <line x1="117" y1="30" x2="187" y2="30" stroke="#243c30" stroke-width="2" marker-end="url(#fl1)"/>
+            <line x1="305" y1="30" x2="375" y2="30" stroke="#243c30" stroke-width="2" marker-end="url(#fl1)"/>
+            <line x1="493" y1="30" x2="561" y2="30" stroke="#243c30" stroke-width="2" marker-end="url(#fl1)"/>
+            <text x="153" y="76" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="10.5" fill="#14221c">SLAM ou AMCL</text>
+            <text x="153" y="91" text-anchor="middle" font-family="DM Sans" font-size="9.5" fill="#47544d">corrige la dérive</text>
+            <text x="341" y="76" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="10.5" fill="#14221c">odométrie</text>
+            <text x="341" y="91" text-anchor="middle" font-family="DM Sans" font-size="9.5" fill="#47544d">roues, centrale inertielle</text>
+            <text x="527" y="76" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="10.5" fill="#14221c">statique</text>
+            <text x="527" y="91" text-anchor="middle" font-family="DM Sans" font-size="9.5" fill="#47544d">modèle URDF</text>
+          </svg>
+          <figcaption>Figure 1 — Chaîne de repères d’un robot mobile (REP&nbsp;105)&nbsp;; sous chaque flèche, ce qui publie la transformation.</figcaption>
+        </figure>
+
+        <p><code>odom</code> est continu mais dérive (glissement des roues, diamètre imprécis)&nbsp;; la localisation corrige cette dérive en publiant <code>map</code> → <code>odom</code>, quitte à faire de petits sauts. La position du lidar, fixe, vient du modèle URDF via <code>robot_state_publisher</code>. Pour essayer sans robot&nbsp;:</p>
+        <ul class="cmds">
+          <li><code>ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0 --z 0.2 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id laser</code> déclare un lidar placé 10&nbsp;cm devant et 20&nbsp;cm au-dessus de <code>base_link</code>&nbsp;;</li>
+          <li><code>ros2 run tf2_ros tf2_echo base_link laser</code> affiche cette transformation (translation 0,1&nbsp;; 0&nbsp;; 0,2)&nbsp;; <code>ros2 run tf2_tools view_frames</code> enregistre l’arbre en PDF, et l’affichage <em>TF</em> de RViz2 le montre en 3D.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Un nœud d’arrêt d’urgence à partir d’un LaserScan</h2>
+        <p>Un lidar 2D mesure des distances dans un plan horizontal en balayant un angle. Chaque balayage produit un message <code>sensor_msgs/msg/LaserScan</code>&nbsp;: la mesure n°&nbsp;<var>i</var> du tableau <code>ranges</code> est prise à l’angle <code>angle_min + i × angle_increment</code>, dans le repère du capteur. Seules les valeurs entre <code>range_min</code> et <code>range_max</code> sont valides&nbsp;; selon la REP&nbsp;117, <code>+inf</code> signifie «&nbsp;aucun écho&nbsp;», <code>-inf</code> «&nbsp;trop proche pour être mesuré&nbsp;» et <code>NaN</code> «&nbsp;mesure erronée&nbsp;». La fonction suivante renvoie la distance du plus proche obstacle devant le robot (axe x du lidar orienté vers l’avant).</p>
+
+        <p class="code-title">premiers_pas/premiers_pas/arret_urgence.py (1/2)</p>
+        <pre><code>import math
+
+import rclpy
+from rclpy.executors import ExternalShutdownException
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+
+
+def distance_devant(scan, demi_angle):
+    """Plus petite distance mesurée dans le cône [-demi_angle, +demi_angle] (rad)."""
+    d_min = math.inf
+    for i, r in enumerate(scan.ranges):
+        a = scan.angle_min + i * scan.angle_increment
+        a = math.atan2(math.sin(a), math.cos(a))     <span class="c"># angle ramené dans [-pi, pi]</span>
+        valide = scan.range_min &lt;= r &lt;= scan.range_max or r == -math.inf   <span class="c"># REP 117</span>
+        if abs(a) &lt;= demi_angle and valide:
+            d_min = min(d_min, r)                     <span class="c"># NaN et +inf sont ignorés</span>
+    return d_min</code></pre>
+
+        <p>Le nœud s’intercale entre la source des consignes (clavier ou Nav2) et le robot&nbsp;: il relaie <code>cmd_vel_in</code> vers <code>cmd_vel</code>, mais annule la marche avant si un obstacle est à moins de <code>distance_arret</code> dans un cône de <span class="nw">±<code>demi_angle_deg</code></span>, ou si le dernier scan date de plus de 0,5&nbsp;s (un capteur muet est un danger). Rotation et recul restent permis pour se dégager. Les deux paramètres sont lus au démarrage (<code>--ros-args -p distance_arret:=0.8</code>). Le scan est reçu avec la QoS <code>qos_profile_sensor_data</code> (<em>best effort</em>)&nbsp;: un abonné <em>reliable</em> ne recevrait rien d’un pilote qui publie en <em>best effort</em>, alors que l’inverse fonctionne.</p>
+
+        <p class="code-title">premiers_pas/premiers_pas/arret_urgence.py (2/2)</p>
+        <pre><code>class ArretUrgence(Node):
+    """Relaie cmd_vel_in vers cmd_vel et bloque la marche avant devant un obstacle."""
+
+    def __init__(self):
+        super().__init__('arret_urgence')
+        self.seuil = self.declare_parameter('distance_arret', 0.5).value   <span class="c"># m</span>
+        self.demi_angle = math.radians(self.declare_parameter('demi_angle_deg', 30.0).value)
+        self.bloque = False
+        self.t_scan = -math.inf                      <span class="c"># instant du dernier scan (ns)</span>
+        self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.create_subscription(LaserScan, 'scan', self.on_scan, qos_profile_sensor_data)
+        self.create_subscription(Twist, 'cmd_vel_in', self.on_cmd, 10)
+
+    def on_scan(self, scan):
+        self.t_scan = self.get_clock().now().nanoseconds
+        bloque = distance_devant(scan, self.demi_angle) &lt; self.seuil
+        if bloque and not self.bloque:               <span class="c"># un obstacle vient d'apparaître</span>
+            self.pub.publish(Twist())                <span class="c"># arrêt immédiat : vitesses nulles</span>
+            self.get_logger().warning('Obstacle devant : marche avant bloquée')
+        self.bloque = bloque
+
+    def on_cmd(self, cmd):
+        age = (self.get_clock().now().nanoseconds - self.t_scan) * 1e-9   <span class="c"># en s</span>
+        if (self.bloque or age &gt; 0.5) and cmd.linear.x &gt; 0.0:
+            cmd.linear.x = 0.0                       <span class="c"># rotation et recul restent permis</span>
+        self.pub.publish(cmd)
+
+
+def main():
+    rclpy.init()
+    node = ArretUrgence()
+    try:
+        rclpy.spin(node)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.try_shutdown()</code></pre>
+
+        <div class="box box-attention">
+          <p class="box-title">Attention · passage au robot réel</p>
+          <ul>
+            <li>Ce nœud est une aide à la conduite, pas une fonction de sécurité&nbsp;: un robot réel doit avoir un <strong>arrêt d’urgence matériel</strong> (bouton coup-de-poing) qui coupe l’alimentation des moteurs, indépendamment du logiciel.</li>
+            <li>Premiers essais roues décollées du sol, puis à 0,2&nbsp;m/s au plus, dans une zone dégagée et sans personne sur la trajectoire.</li>
+            <li>Batteries au lithium&nbsp;: chargeur adapté, charge surveillée sur support ininflammable, pas de décharge profonde, rebut si gonflée.</li>
+          </ul>
+        </div>
+
+        <figure>
+          <svg width="680" height="146" viewBox="0 0 680 146" role="img" aria-label="Graphe de l'exercice : teleop_turtle publie sur cmd_vel_in, ros2 topic pub publie un scan fictif sur scan, arret_urgence relaie les consignes vers turtle1/cmd_vel, lu par turtlesim">
+            <defs>
+              <marker id="fl2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#243c30"/></marker>
+            </defs>
+            <rect x="1" y="8" width="170" height="40" rx="20" fill="#eef0e6" stroke="#243c30"/>
+            <text x="86" y="32" text-anchor="middle" font-family="DM Sans" font-size="12" fill="#14221c">teleop_turtle</text>
+            <rect x="1" y="98" width="170" height="40" rx="20" fill="#eef0e6" stroke="#243c30"/>
+            <text x="86" y="122" text-anchor="middle" font-family="DM Sans" font-size="12" fill="#14221c">ros2 topic pub (scan fictif)</text>
+            <rect x="292" y="50" width="150" height="46" rx="23" fill="#16261e"/>
+            <text x="367" y="77" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="12.5" fill="#ffffff">arret_urgence</text>
+            <rect x="569" y="50" width="110" height="46" rx="23" fill="#d2ec6c" stroke="#566b14"/>
+            <text x="624" y="77" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="12.5" fill="#14221c">turtlesim</text>
+            <path d="M171,28 C230,28 240,64 290,65" fill="none" stroke="#243c30" stroke-width="2" marker-end="url(#fl2)"/>
+            <path d="M171,118 C230,118 240,82 290,81" fill="none" stroke="#243c30" stroke-width="2" marker-end="url(#fl2)"/>
+            <line x1="442" y1="73" x2="567" y2="73" stroke="#243c30" stroke-width="2" marker-end="url(#fl2)"/>
+            <text x="232" y="22" text-anchor="middle" font-family="Consolas, monospace" font-size="11" fill="#566b14">/cmd_vel_in</text>
+            <text x="232" y="136" text-anchor="middle" font-family="Consolas, monospace" font-size="11" fill="#566b14">/scan</text>
+            <text x="505" y="65" text-anchor="middle" font-family="Consolas, monospace" font-size="11" fill="#566b14">/turtle1/cmd_vel</text>
+          </svg>
+          <figcaption>Figure 2 — Graphe de l’exercice&nbsp;: nœuds en pastilles, topics sur les flèches. Le nœud lancé par <code>turtle_teleop_key</code> s’appelle <code>teleop_turtle</code>.</figcaption>
+        </figure>
+
+        <div class="box box-exercice breakable">
+          <p class="box-title">Exercice guidé · Bloquer la tortue devant un obstacle virtuel</p>
+          <p>Faute de lidar, on publie un scan fictif de cinq mesures (de −90° à +90°, pas de 45°) et l’on intercale <code>arret_urgence</code> entre le clavier et turtlesim (figure&nbsp;2). Quatre terminaux, espace de travail chargé&nbsp;:</p>
+          <pre><code>ros2 run turtlesim turtlesim_node
+ros2 run premiers_pas arret_urgence --ros-args -r cmd_vel:=turtle1/cmd_vel
+ros2 run turtlesim turtle_teleop_key --ros-args -r turtle1/cmd_vel:=cmd_vel_in
+ros2 topic pub -r 10 /scan sensor_msgs/msg/LaserScan "{header: {frame_id: laser},
+  angle_min: -1.5708, angle_max: 1.5708, angle_increment: 0.7854,
+  range_min: 0.1, range_max: 10.0, ranges: [2.0, 2.0, 2.0, 2.0, 2.0]}"</code></pre>
+          <ol>
+            <li>Mesures à 2,0&nbsp;m&nbsp;: la tortue avance-t-elle&#8239;? <code>rqt_graph</code> montre-t-il les liaisons de la figure&nbsp;2&#8239;?</li>
+            <li>Republiez avec <code>ranges: [2.0, 2.0, 0.3, 2.0, 2.0]</code> (obstacle droit devant). Que font les flèches haut, gauche et bas&#8239;?</li>
+            <li>Mettez 0,3 en dernière position (obstacle à +90°). L’avance est-elle bloquée&#8239;? Pourquoi&#8239;?</li>
+            <li>Arrêtez <code>ros2 topic pub</code> (Ctrl+C) et essayez d’avancer.</li>
+            <li>Un robot roule à <var>v</var>&nbsp;=&nbsp;0,5&nbsp;m/s, réagit en <var>t</var><sub>r</sub>&nbsp;=&nbsp;0,2&nbsp;s et freine à <var>a</var>&nbsp;=&nbsp;1&nbsp;m/s². Calculez <var>d</var>&nbsp;=&nbsp;<var>v</var>&nbsp;<var>t</var><sub>r</sub>&nbsp;+&nbsp;<var>v</var>²&nbsp;/&nbsp;(2<var>a</var>)&nbsp;: 0,5&nbsp;m suffit-il&#8239;?</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong> liaisons conformes à la figure&nbsp;2&nbsp;; avance refusée dans les cas 2 et 4 seulement&nbsp;; rotation toujours possible&nbsp;; un seul avertissement à l’apparition de l’obstacle.</p>
+          <div class="solution">
+            <p><strong>Corrigé&nbsp;:</strong> cas 2, 0,3&nbsp;m&nbsp;&lt;&nbsp;0,5&nbsp;m&nbsp;: avance annulée, rotation et recul permis. Cas 3, +90° est hors du cône de ±30°&nbsp;: rien n’est bloqué. Cas 4, scan périmé après 0,5&nbsp;s&nbsp;: avance refusée. Cas 5, <var>d</var>&nbsp;=&nbsp;0,1&nbsp;+&nbsp;0,125&nbsp;=&nbsp;0,225&nbsp;m&nbsp;; même en ajoutant la distance du lidar à l’avant du robot, 0,5&nbsp;m laisse une marge à cette vitesse, mais pas à 1&nbsp;m/s (<var>d</var>&nbsp;=&nbsp;0,7&nbsp;m). Prolongements&nbsp;: couloir de la largeur du robot, minuteur qui publie une consigne nulle si le scan est périmé.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <section>
+        <h2>Cartographier et naviguer&nbsp;: SLAM et Nav2</h2>
+        <p>Le <strong>SLAM</strong> (<em>Simultaneous Localization And Mapping</em>) construit une carte tout en s’y localisant. <strong>slam_toolbox</strong>, utilisé par défaut avec Nav2, recale chaque scan sur les précédents et corrige son graphe de poses lors des <strong>fermetures de boucle</strong> (retour dans un lieu connu). Il produit une grille d’occupation (<code>nav_msgs/msg/OccupancyGrid</code>) aux cellules libres, occupées ou inconnues.</p>
+        <p><strong>Nav2</strong> est la pile de navigation de ROS&nbsp;2. Sur une carte connue, AMCL (filtre particulaire) localise le robot&nbsp;; des cartes de coûts «&nbsp;gonflent&nbsp;» les obstacles d’une marge&nbsp;; un planificateur calcule le chemin, un contrôleur le suit, un arbre de comportements orchestre le tout. On le commande par l’action <code>navigate_to_pose</code>.</p>
+        <ul class="cmds">
+          <li>Installer&nbsp;: <code>sudo apt install ros-jazzy-navigation2 ros-jazzy-nav2-bringup ros-jazzy-nav2-minimal-tb\*</code>&nbsp;;</li>
+          <li>cartographier&nbsp;: <code>ros2 launch nav2_bringup tb3_simulation_launch.py slam:=True headless:=False</code> lance Gazebo, un TurtleBot&nbsp;3 simulé, slam_toolbox, Nav2 et RViz2&nbsp;; explorez la pièce avec le bouton <em>Nav2 Goal</em>&nbsp;;</li>
+          <li>enregistrer la carte (<code>carte.pgm</code> et <code>carte.yaml</code>) avec <code>ros2 run nav2_map_server map_saver_cli -f ~/carte</code>, puis naviguer&nbsp;: relancez sans <code>slam:=True</code> avec <code>map:=$HOME/carte.yaml</code>, donnez la position de départ (<em>2D Pose Estimate</em>) et un objectif.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Où intervient l’IA&#8239;?</h2>
+        <p>Localisation, cartographie et planification reposent ici sur des algorithmes classiques, éprouvés et explicables. L’IA (surtout l’apprentissage profond) intervient d’abord dans la <strong>perception</strong>.</p>
+        <table class="ia">
+          <caption>Approche classique et apport de l’IA</caption>
+          <thead>
+            <tr><th scope="col">Fonction</th><th scope="col">Approche classique</th><th scope="col">Apport de l’IA</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Détection d’obstacles</td><td>Lidar 2D&nbsp;: tout ce qui coupe son plan</td><td>Caméra et réseau de détection&nbsp;: obstacles hors de ce plan (plateau de table, objet au sol)</td></tr>
+            <tr><td>Reconnaissance</td><td>Aucune&nbsp;: un obstacle reste un obstacle</td><td>Distinguer une personne d’un meuble pour adapter marge ou vitesse</td></tr>
+            <tr><td>Commande</td><td>Contrôleurs de Nav2 (DWB, MPPI…)</td><td>Politiques apprises par renforcement en simulation</td></tr>
+          </tbody>
+        </table>
+        <p>En pratique, un nœud de perception publie ses détections (<code>vision_msgs/msg/Detection2DArray</code>)&nbsp;; situées dans l’espace grâce à la profondeur et à tf2, elles alimentent une couche de la carte de coûts de Nav2. Sur le calculateur embarqué, la latence du modèle doit être mesurée.</p>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>Topic pour un flux, service pour une question-réponse, action pour une tâche longue et annulable, paramètre pour un réglage&nbsp;; <code>rqt_graph</code> et <code>ros2 topic echo</code> pour diagnostiquer.</li>
+            <li>Un détecteur appris peut manquer un obstacle (faux négatif)&nbsp;: il enrichit la perception sans remplacer les barrières déterministes (arrêt d’urgence matériel, nœud d’arrêt sur lidar, vitesse limitée). Maîtrisez d’abord la chaîne classique, greffez-y l’IA ensuite.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://docs.ros.org/en/jazzy/">Documentation officielle de ROS&nbsp;2 Jazzy (installation, concepts)</a></li>
+        <li><a href="https://docs.ros.org/en/jazzy/Tutorials.html">Tutoriels officiels (outils en ligne de commande, rclpy, tf2)</a></li>
+        <li><a href="https://reps.openrobotics.org/rep-0105/">REP&nbsp;105, repères des plateformes mobiles</a> et <a href="https://reps.openrobotics.org/rep-0117/">REP&nbsp;117, mesures de distance</a></li>
+        <li><a href="https://docs.nav2.org/">Documentation de Nav2</a></li>
+        <li><a href="https://github.com/SteveMacenski/slam_toolbox">slam_toolbox, dépôt officiel</a></li>
+        <li><a href="https://gazebosim.org/docs/">Documentation de Gazebo</a></li>
+        <li><a href="https://willsim.fr/cours/ros2-premiers-pas.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

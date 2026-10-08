@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Robot mobile autonome (ROS 2, SLAM) — Projet WILLSIM</title>
+    <meta name="description" content="Projet WILLSIM en préparation. Un robot mobile sous ROS 2 cartographie son environnement (SLAM), repère les obstacles par vision embarquée et planifie sa route.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/projets/robot-mobile-autonome.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/projets/robot-mobile-autonome.html">
+    <meta property="og:title" content="Robot mobile autonome (ROS 2, SLAM) — Projet WILLSIM">
+    <meta property="og:description" content="Projet WILLSIM en préparation. Un robot mobile sous ROS 2 cartographie son environnement (SLAM), repère les obstacles par vision embarquée et planifie sa route.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Robot mobile autonome (ROS 2, SLAM) — Projet WILLSIM">
+    <meta name="twitter:description" content="Projet WILLSIM en préparation. Un robot mobile sous ROS 2 cartographie son environnement (SLAM), repère les obstacles par vision embarquée et planifie sa route.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : présentation de projet (en préparation) + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CreativeWork",
+          "@id": "https://willsim.fr/projets/robot-mobile-autonome.html#projet",
+          "url": "https://willsim.fr/projets/robot-mobile-autonome.html",
+          "name": "Robot mobile autonome",
+          "description": "Projet WILLSIM en préparation. Un robot mobile sous ROS 2 cartographie son environnement (SLAM), repère les obstacles par vision embarquée et planifie sa route.",
+          "inLanguage": "fr",
+          "creativeWorkStatus": "En préparation",
+          "keywords": "robot mobile, ROS 2, SLAM, lidar, navigation, vision embarquée",
+          "isAccessibleForFree": true,
+          "publisher": {
+            "@type": [
+              "EducationalOrganization",
+              "NGO"
+            ],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "mentions": [
+            {
+              "@type": "Course",
+              "name": "ROS 2 : premiers pas en robotique mobile",
+              "url": "https://willsim.fr/cours/ros2-premiers-pas.html"
+            },
+            {
+              "@type": "Course",
+              "name": "Vision par ordinateur pour la robotique",
+              "url": "https://willsim.fr/cours/vision-robotique-opencv.html"
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Accueil",
+              "item": "https://willsim.fr/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Projets",
+              "item": "https://willsim.fr/#projets"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Robot mobile autonome",
+              "item": "https://willsim.fr/projets/robot-mobile-autonome.html"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/">Cours</a>
+          <a href="/#projets" aria-current="true">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/#projets">Projets</a></li>
+              <li><span aria-current="page">Robot mobile autonome</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Projet associatif · Robotique mobile</p>
+          <h1>Robot mobile autonome</h1>
+          <p class="page-lead">Concevoir un robot capable de cartographier son environnement (SLAM), de reconnaître les obstacles grâce à un modèle de vision embarqué et d'adapter sa trajectoire en temps réel. Le projet s'appuiera sur ROS&nbsp;2, un cadre logiciel libre très répandu en robotique, et commencera entièrement en simulation.</p>
+
+          <div class="page-badges">
+            <span class="status-badge">Projet en préparation</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Statut</dt><dd>En préparation</dd></div>
+            <div><dt>Domaines</dt><dd>Robotique mobile, vision embarquée</dd></div>
+            <div><dt>Compétences</dt><dd>ROS&nbsp;2, SLAM, navigation, vision</dd></div>
+            <div><dt>Matériel envisagé</dt><dd>Base à deux roues, lidar 2D, caméra, nano-ordinateur</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectif-titre">
+            <h2 id="objectif-titre">Objectif du projet</h2>
+            <p>Le projet vise à réaliser un robot à roues capable de se déplacer seul dans une pièce&nbsp;: construire une carte, s'y localiser et rejoindre un point demandé en évitant les obstacles, y compris ceux que le lidar ne voit pas.</p>
+            <ul class="objectives">
+              <li>Mettre au point une base mobile asservie en vitesse, dont l'odométrie est publiée dans ROS&nbsp;2.</li>
+              <li>Cartographier une pièce et s'y localiser grâce au lidar, aux codeurs des roues et à la centrale inertielle.</li>
+              <li>Planifier et suivre une trajectoire jusqu'à un objectif avec la pile de navigation Nav2.</li>
+              <li>Ajouter un modèle de vision embarqué qui signale à la navigation les obstacles détectés par la caméra.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="problematique-titre">
+            <h2 id="problematique-titre">Problématique d'ingénierie</h2>
+            <p>Un robot mobile doit répondre en permanence à trois questions&nbsp;: où suis-je, qu'y a-t-il autour de moi, et comment aller là-bas sans rien heurter&#8239;?</p>
+            <ul>
+              <li><strong>Dérive de l'odométrie&nbsp;:</strong> compter les tours de roues donne une estimation du déplacement qui dérive à cause du glissement et des imprécisions sur le diamètre des roues. La fusion avec la centrale inertielle, par exemple par un filtre de Kalman étendu, la réduit&nbsp;; le recalage des mesures du lidar sur la carte permet ensuite de la corriger.</li>
+              <li><strong>Cartographier et se localiser en même temps&nbsp;:</strong> c'est le problème du SLAM. Une carte imprécise dégrade la localisation, et inversement&nbsp;; les fermetures de boucle (repasser par un lieu déjà cartographié) permettent de corriger l'erreur accumulée.</li>
+              <li><strong>Limites du lidar 2D&nbsp;:</strong> il ne mesure les distances que dans un plan horizontal. Un obstacle plus bas que ce plan, en surplomb ou transparent (une vitre) lui échappe, et il ne distingue pas une personne d'un meuble. C'est là que la vision apporte une information complémentaire.</li>
+              <li><strong>Temps réel et puissance de calcul&nbsp;:</strong> localisation, planification et vision doivent tourner ensemble sur un calculateur embarqué alimenté par batterie. La latence de chaque traitement devra être mesurée.</li>
+              <li><strong>Sécurité&nbsp;:</strong> vitesse limitée, arrêt d'urgence matériel et essais dans une zone dégagée seront indispensables dès les premiers déplacements.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="architecture-titre">
+            <h2 id="architecture-titre">Architecture envisagée</h2>
+            <p>L'architecture reprend l'organisation habituelle d'un robot sous ROS&nbsp;2&nbsp;: des nœuds indépendants qui échangent des messages. L'IA n'intervient que dans la perception visuelle&nbsp;; la cartographie, la localisation et la planification reposent sur des algorithmes classiques, éprouvés et explicables.</p>
+            <ul>
+              <li><strong>Base mobile&nbsp;:</strong> deux roues motrices à entraînement différentiel et une roue folle, motorisées par des motoréducteurs à courant continu équipés de codeurs.</li>
+              <li><strong>Capteurs&nbsp;:</strong> un lidar 2D à balayage sur 360°, une centrale inertielle, les codeurs des roues et une caméra (éventuellement à mesure de profondeur, pour situer dans l'espace les obstacles détectés).</li>
+              <li><strong>Calcul&nbsp;:</strong> un nano-ordinateur sous Linux exécute ROS&nbsp;2&nbsp;; un microcontrôleur gère les tâches temps réel (lecture des codeurs, régulation PID de la vitesse de chaque roue) et dialogue avec ROS&nbsp;2 par liaison série ou au moyen de micro-ROS.</li>
+              <li><strong>Logiciel&nbsp;:</strong> un nœud de pilotage qui convertit les consignes de vitesse (topic <code>/cmd_vel</code>) en vitesses de roues et publie l'odométrie&nbsp;; <code>robot_localization</code> pour la fusion de capteurs&nbsp;; <code>slam_toolbox</code> pour la cartographie&nbsp;; Nav2 pour la planification et le suivi de trajectoire. Un modèle URDF du robot permettra de tester l'ensemble d'abord dans le simulateur Gazebo.</li>
+              <li><strong>Rôle de l'IA&nbsp;:</strong> un modèle de détection d'objets léger et quantifié analyse les images de la caméra. Les obstacles détectés, une fois positionnés grâce à la profondeur ou au lidar, sont ajoutés à la carte de coûts que Nav2 utilise pour planifier la trajectoire.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel envisagé</h2>
+            <p>Liste indicative, à confirmer lors de la rédaction du cahier des charges&nbsp;: aucun matériel n'est encore acheté ni réservé.</p>
+            <ul>
+              <li>un châssis à deux roues motrices et une roue folle&nbsp;;</li>
+              <li>deux motoréducteurs à courant continu avec codeurs et un module de puissance (double pont en H)&nbsp;;</li>
+              <li>un lidar 2D à balayage sur 360°, d'entrée de gamme&nbsp;;</li>
+              <li>une centrale inertielle (accéléromètre et gyroscope)&nbsp;;</li>
+              <li>une caméra, éventuellement à mesure de profondeur&nbsp;;</li>
+              <li>un nano-ordinateur capable d'exécuter ROS&nbsp;2 et un microcontrôleur&nbsp;;</li>
+              <li>une batterie avec circuit de protection, des convertisseurs de tension et un bouton d'arrêt d'urgence.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="etapes-titre">
+            <h2 id="etapes-titre">Étapes prévues</h2>
+            <ol class="steps-list">
+              <li>
+                <h3>La simulation d'abord</h3>
+                <p>Décrire le robot (modèle URDF), le simuler dans Gazebo et y faire fonctionner cartographie et navigation avant toute construction.</p>
+              </li>
+              <li>
+                <h3>Base mobile</h3>
+                <p>Assembler la motorisation, régler l'asservissement de vitesse des roues, puis publier l'odométrie et les transformations entre repères (<code>tf2</code>) dans ROS&nbsp;2.</p>
+              </li>
+              <li>
+                <h3>Localisation et cartographie</h3>
+                <p>Fusionner odométrie et centrale inertielle, cartographier une pièce avec le lidar et enregistrer la carte.</p>
+              </li>
+              <li>
+                <h3>Navigation</h3>
+                <p>Configurer Nav2, régler les cartes de coûts et vérifier, à vitesse réduite, que le robot rejoint ses objectifs sans collision.</p>
+              </li>
+              <li>
+                <h3>Vision embarquée</h3>
+                <p>Intégrer le modèle de détection, ajouter ses détections à la carte de coûts et mesurer la latence de bout en bout.</p>
+              </li>
+              <li>
+                <h3>Essais et comparaison avec la simulation</h3>
+                <p>Comparer les comportements réel et simulé, analyser les écarts et documenter l'ensemble.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="competences-titre">
+            <h2 id="competences-titre">Compétences mobilisées</h2>
+            <div class="skills-tags">
+              <span>ROS&nbsp;2</span>
+              <span>SLAM</span>
+              <span>Lidar</span>
+              <span>Vision embarquée</span>
+              <span>Planification de trajectoire</span>
+            </div>
+            <p>Le projet fait aussi appel à la programmation en Python et en C++, à l'environnement Linux, et à des notions de géométrie (repères, transformations) et d'estimation (filtrage de Kalman).</p>
+          </section>
+
+          <section aria-labelledby="cours-titre">
+            <h2 id="cours-titre">Se former avec les cours WILLSIM</h2>
+            <p>Chacun de ces cours est accompagné d'une fiche PDF gratuite, rédigée par l'équipe pédagogique WILLSIM&nbsp;:</p>
+            <ul>
+              <li><a href="/cours/ros2-premiers-pas.html">ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</a>&nbsp;: pour les nœuds, les topics et les repères (<code>tf2</code>) de ROS&nbsp;2, puis la cartographie (SLAM) et la navigation avec Nav2.</li>
+              <li><a href="/cours/vision-robotique-opencv.html">Vision par ordinateur pour la robotique</a>&nbsp;: pour le traitement d'images et la vision appliquée à la robotique.</li>
+            </ul>
+            <p><a class="text-link" href="/cours/">Voir tous les cours</a></p>
+          </section>
+
+          <section aria-labelledby="contribuer-titre">
+            <h2 id="contribuer-titre">Envie de participer&#8239;?</h2>
+            <div class="page-note">
+              <p>Ce projet est en préparation&nbsp;: le cahier des charges et le matériel sont en cours de définition, aucune réalisation n'est encore engagée.</p>
+            </div>
+            <p>Le projet s'adresse aux étudiants, enseignants et passionnés qui souhaitent apprendre en construisant. Toutes les compétences sont utiles&nbsp;: ROS&nbsp;2 et Linux, électronique et motorisation, mécanique et impression 3D, vision et IA, mais aussi rédaction de la documentation.</p>
+            <p>Pour proposer votre aide, du matériel ou une idée, <a class="text-link" href="/#contact">écrivez à l'équipe via le formulaire de contact</a>.</p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Participer et liens utiles">
+          <section class="cta-card" aria-labelledby="participer-titre">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Projet ouvert</p>
+            <h2 id="participer-titre">Participer au projet</h2>
+            <p>Étudiant, enseignant ou passionné&#8239;? Proposez vos compétences ou votre matériel&nbsp;: l'équipe vous répondra par e-mail.</p>
+            <a class="button button-lime button-full" href="/#contact">
+              <span>Proposer ma participation</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </section>
+
+          <section class="related-links" aria-labelledby="autres-projets-titre">
+            <h2 id="autres-projets-titre">Les autres projets</h2>
+            <ul>
+              <li><a href="/projets/bras-robotique-vision.html"><span class="related-kicker">Projet en préparation</span>Bras robotique guidé par vision</a></li>
+              <li><a href="/projets/maintenance-predictive-moteur.html"><span class="related-kicker">Projet en préparation</span>Maintenance prédictive d'un moteur</a></li>
+              <li><a href="/projets/jumeau-numerique-sim2real.html"><span class="related-kicker">Projet en préparation</span>Du jumeau numérique au robot réel</a></li>
+              <li><a href="/#projets"><span class="related-kicker">Projets</span>Tous les projets en préparation</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

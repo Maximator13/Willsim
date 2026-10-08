@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Apprentissage par renforcement et jumeau numérique — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : agent, récompense et politique, processus de décision markovien, API Gymnasium, PPO avec Stable-Baselines3, jumeau numérique, randomisation de domaine, passage de la simulation au robot réel.">
+    <meta name="keywords" content="apprentissage par renforcement, reinforcement learning, processus de décision markovien, Gymnasium, CartPole, Stable-Baselines3, PPO, conception de la récompense, jumeau numérique, PyBullet, MuJoCo, randomisation de domaine, sim-to-real, sécurité, évaluation">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Styles propres à cette fiche */
+      body { font-size: 9.5pt; line-height: 1.42; }
+      .cover-meta dd { font-size: 8pt; }
+      pre { font-size: 7.6pt; line-height: 1.32; padding: 2.2mm 3.5mm; }
+      pre.long { break-inside: auto; }
+      pre.sortie { padding-block: 1.6mm; border-left-color: #8aa32e; background: #fbfcf6; }
+      th, td { padding: 1.1mm 2.2mm; }
+      .sections h2 { margin-top: 6mm; }
+      .recompense th:first-child { width: 24mm; }
+      .simulateurs th:first-child { width: 24mm; }
+      .fig-large { width: 74%; }
+      .box-title { break-after: avoid; }
+      math[display="block"] { margin: 1mm 0 2mm; break-before: avoid; }
+      figure svg text { font-family: "DM Sans", "Segoe UI", Arial, sans-serif; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>Apprentissage par renforcement et jumeau numérique</h1>
+      <p class="cover-lead">Un agent qui apprend par essais et erreurs peut découvrir seul une loi de commande, à condition de s’entraîner dans une simulation fidèle et de passer prudemment au système réel. Cette fiche pose les bases, entraîne un agent PPO avec Stable-Baselines3 et détaille le chemin de la simulation au robot.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Avancé</dd></div>
+        <div><dt>Durée</dt><dd>10&nbsp;h (5 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Cours «&nbsp;Initiation à l’IA pour l’ingénierie&nbsp;» et bonne pratique de Python</dd></div>
+        <div><dt>Outils</dt><dd>Python&nbsp;3, Gymnasium, Stable-Baselines3 (PPO), PyBullet ou MuJoCo</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>définir agent, environnement, état, action, récompense et politique, et formuler une tâche de commande comme un processus de décision markovien&nbsp;;</li>
+        <li>écrire une boucle Gymnasium et distinguer fin d’épisode (<code>terminated</code>) et troncature (<code>truncated</code>)&nbsp;;</li>
+        <li>entraîner un agent PPO sur CartPole avec Stable-Baselines3 jusqu’à un retour moyen d’au moins 475 sur 20 épisodes d’évaluation, puis concevoir une récompense et programmer une randomisation de domaine&nbsp;;</li>
+        <li>préparer le passage sur un système réel&nbsp;: sources d’écart, sécurités indépendantes de la politique, protocole d’évaluation.</li>
+      </ul>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>Les notions de base</h2>
+        <p>En apprentissage par renforcement (<em>reinforcement learning</em>, RL), personne ne donne la bonne réponse&nbsp;: un <strong>agent</strong>, le programme de commande, agit sur son <strong>environnement</strong> (mécanique, capteurs, simulateur), observe les conséquences et reçoit un nombre, la <strong>récompense</strong>. Il doit découvrir par essais et erreurs comment maximiser la somme des récompenses à venir.</p>
+
+        <figure>
+          <svg class="fig-large" width="640" height="104" viewBox="0 0 640 104" role="img" aria-label="Boucle d’interaction : l’agent envoie une action à l’environnement, qui renvoie le nouvel état et une récompense.">
+            <defs>
+              <marker id="fleche" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#243c30"/>
+              </marker>
+            </defs>
+            <rect x="20" y="12" width="200" height="80" rx="8" fill="#16261e"/>
+            <text x="120" y="42" text-anchor="middle" font-weight="700" font-size="15" fill="#ffffff">Agent</text>
+            <text x="120" y="63" text-anchor="middle" font-size="12" fill="#d2ec6c">politique π(a | s)</text>
+            <text x="120" y="79" text-anchor="middle" font-size="11" fill="#bfd0c3">réseau de neurones</text>
+            <rect x="420" y="12" width="200" height="80" rx="8" fill="#eef0e6" stroke="#243c30"/>
+            <text x="520" y="42" text-anchor="middle" font-weight="700" font-size="15" fill="#14221c">Environnement</text>
+            <text x="520" y="63" text-anchor="middle" font-size="11" fill="#14221c">simulateur (jumeau numérique)</text>
+            <text x="520" y="79" text-anchor="middle" font-size="11" fill="#14221c">ou système réel</text>
+            <line x1="222" y1="40" x2="416" y2="40" stroke="#243c30" stroke-width="2" marker-end="url(#fleche)"/>
+            <text x="320" y="31" text-anchor="middle" font-weight="700" font-size="12" fill="#14221c">action a<tspan font-size="9" dy="3">t</tspan></text>
+            <line x1="418" y1="62" x2="224" y2="62" stroke="#243c30" stroke-width="2" marker-end="url(#fleche)"/>
+            <text x="320" y="80" text-anchor="middle" font-weight="700" font-size="12" fill="#14221c">nouvel état s<tspan font-size="9" dy="3">t+1</tspan></text>
+            <text x="320" y="97" text-anchor="middle" font-weight="700" font-size="12" fill="#14221c">récompense r<tspan font-size="9" dy="3">t+1</tspan></text>
+          </svg>
+          <figcaption>Figure 1 — La boucle agent-environnement, répétée à chaque pas de temps.</figcaption>
+        </figure>
+
+        <p>À chaque pas de temps <i>t</i>, l’agent reçoit l’<strong>état</strong> <i>s<sub>t</sub></i> (en pratique une <strong>observation</strong>, partie mesurée de l’état, parfois incomplète ou bruitée), choisit une <strong>action</strong> <i>a<sub>t</sub></i>, discrète ou continue, puis reçoit la récompense <i>r</i><sub><i>t</i>+1</sub>, seule traduction de l’objectif. Sa <strong>politique</strong> π(<i>a</i>&nbsp;|&nbsp;<i>s</i>), souvent un réseau de neurones, donne la probabilité de choisir <i>a</i> dans l’état <i>s</i>. Un <strong>épisode</strong> va de l’état initial à un échec, une réussite ou une limite de durée. Pour un pendule inversé sur un chariot, l’état réunit position et vitesse du chariot, angle et vitesse angulaire du pendule&nbsp;; l’action pousse à gauche ou à droite&nbsp;; la récompense vaut +1 par pas où le pendule tient.</p>
+
+        <h3>Retour, facteur d’actualisation et valeur</h3>
+        <p>L’agent ne cherche pas la meilleure récompense immédiate, mais le meilleur <strong>retour</strong>, somme actualisée des récompenses à venir&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <msub><mi>G</mi><mi>t</mi></msub>
+            <mo>=</mo>
+            <msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub>
+            <mo>+</mo>
+            <mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub>
+            <mo>+</mo>
+            <msup><mi>γ</mi><mn>2</mn></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>3</mn></mrow></msub>
+            <mo>+</mo><mo>⋯</mo>
+            <mo>=</mo>
+            <munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi>∞</mi></munderover>
+            <msup><mi>γ</mi><mi>k</mi></msup>
+            <msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub>
+          </mrow>
+        </math>
+        <p>Le <strong>facteur d’actualisation</strong> γ, compris entre 0 et 1, règle l’horizon de l’agent, qui vaut environ 1/(1&nbsp;−&nbsp;γ) pas&nbsp;: avec γ&nbsp;=&nbsp;0,99 et une commande à 50&nbsp;Hz, l’agent regarde environ 100 pas, soit 2&nbsp;s, devant lui. La <strong>fonction de valeur</strong> <i>V</i><sup>π</sup>(<i>s</i>), retour moyen obtenu depuis l’état <i>s</i> en suivant π, est au cœur de la plupart des algorithmes, dont PPO.</p>
+
+        <h3>Le processus de décision markovien</h3>
+        <p>Formellement, la tâche est un <strong>processus de décision markovien</strong> (PDM, en anglais <em>MDP</em>)&nbsp;: des états, des actions, une dynamique <i>P</i>(<i>s</i>′&nbsp;|&nbsp;<i>s</i>,&nbsp;<i>a</i>) (probabilité d’arriver en <i>s</i>′ après l’action <i>a</i> dans l’état <i>s</i>), une récompense et le facteur γ. On cherche la politique qui maximise le retour moyen. Le simulateur ou le robot jouent le rôle de <i>P</i>&nbsp;: l’agent n’a pas besoin de leurs équations (apprentissage <em>sans modèle</em>). L’hypothèse clé est la <strong>propriété de Markov</strong>&nbsp;: l’état présent contient toute l’information utile pour prédire la suite. C’est une affaire de choix des mesures&nbsp;: l’angle seul d’un pendule ne dit pas dans quel sens il tombe, l’angle et la vitesse angulaire, si. Sinon, le problème est <em>partiellement observable</em>&nbsp;: on donne à la politique ses dernières observations et actions, ou l’état estimé par un observateur.</p>
+      </section>
+
+      <section>
+        <h2>L’API Gymnasium&nbsp;: <code>reset</code> et <code>step</code></h2>
+        <p>Gymnasium (fondation Farama) fixe l’interface entre algorithmes et environnements, simulés ou réels. Installation&nbsp;: <code>pip install gymnasium stable-baselines3</code> (PyTorch inclus).</p>
+        <ul>
+          <li><code>env.reset(seed=…)</code> renvoie <code>(observation, info)</code>&nbsp;; la graine rend l’épisode reproductible. <code>env.step(action)</code> applique l’action pendant un pas et renvoie <code>(observation, récompense, terminated, truncated, info)</code>. <code>observation_space</code> et <code>action_space</code> décrivent les valeurs possibles (<code>Box</code>, <code>Discrete(n)</code>).</li>
+          <li><code>terminated</code> signale un état terminal de la tâche (chute, but atteint)&nbsp;; <code>truncated</code>, une interruption extérieure, en général une limite de durée. Après une troncature, la suite aurait continué&nbsp;: Stable-Baselines3 en tient compte dans l’estimation de la valeur.</li>
+        </ul>
+        <p>Dans <strong>CartPole-v1</strong>, un chariot de 1&nbsp;kg porte un pendule de 0,1&nbsp;kg et de 1&nbsp;m (<code>length</code>, 0,5&nbsp;m, est la demi-longueur). L’observation contient <i>x</i>, la vitesse du chariot, l’angle θ et la vitesse angulaire du pendule. Tous les 0,02&nbsp;s, l’agent applique une force de 10&nbsp;N vers la gauche (action 0) ou vers la droite (action 1). Il reçoit +1 par pas&nbsp;; l’épisode se termine si le pendule dépasse 12° ou si le chariot sort de ±2,4&nbsp;m, et il est tronqué à 500 pas. On considère la tâche résolue à partir d’un retour moyen de 475.</p>
+
+        <p class="code-title">boucle_gymnasium.py</p>
+        <pre class="long"><code>import gymnasium as gym
+import numpy as np
+
+env = gym.make("CartPole-v1")
+env.action_space.seed(0)
+print(env.observation_space.shape, env.action_space)  <span class="c"># x, v, θ, ω ; 0 = gauche, 1 = droite</span>
+
+
+def politique_manuelle(obs):
+    """Pousse le chariot du côté où le pendule va tomber."""
+    x, v, theta, omega = obs
+    return int(theta + 0.5 * omega &gt; 0)
+
+
+politiques = {"aléatoire": lambda obs: env.action_space.sample(),
+              "manuelle": politique_manuelle}
+for nom, politique in politiques.items():
+    retours = []
+    for episode in range(20):
+        obs, info = env.reset(seed=episode)
+        retour, fini = 0.0, False
+        while not fini:
+            obs, r, terminated, truncated, info = env.step(politique(obs))
+            retour += r
+            fini = terminated or truncated  <span class="c"># chute ou limite de 500 pas</span>
+        retours.append(retour)
+    print(f"{nom} : retour moyen {np.mean(retours):.0f} ± {np.std(retours):.0f}")
+env.close()</code></pre>
+        <p class="code-title">Sortie</p>
+        <pre class="sortie"><code>(4,) Discrete(2)
+aléatoire : retour moyen 23 ± 13
+manuelle : retour moyen 500 ± 0</code></pre>
+        <p>Au hasard, le pendule tombe en moyenne après 23 pas&nbsp;; la règle manuelle tient les 500 pas des 20 épisodes&nbsp;: CartPole se résout sans apprentissage. C’est un banc d’essai&nbsp;; le renforcement devient utile quand on ne sait pas écrire la loi de commande (dynamique mal connue, contacts, nombreuses articulations).</p>
+      </section>
+
+      <section>
+        <h2>Entraîner PPO sur CartPole avec Stable-Baselines3</h2>
+        <p>PPO (<em>Proximal Policy Optimization</em>, Schulman et al., 2017) est un algorithme <strong>acteur-critique</strong>&nbsp;: un réseau, l’acteur, représente la politique π<sub>θ</sub>(<i>a</i>&nbsp;|&nbsp;<i>s</i>) de paramètres θ&nbsp;; un second, le critique, estime la fonction de valeur. Chaque itération alterne une <strong>collecte</strong>, où la politique actuelle joue <code>n_steps</code> pas dans chaque copie de l’environnement, et une <strong>mise à jour</strong>&nbsp;: on calcule pour chaque pas l’<em>avantage</em> <i>Â<sub>t</sub></i>, qui mesure de combien l’action a fait mieux que prévu par le critique (estimation GAE), puis on améliore les deux réseaux en <code>n_epochs</code> passes par mini-lots. Pour limiter chaque mise à jour, le rapport ρ<sub><i>t</i></sub>(θ)&nbsp;=&nbsp;π<sub>θ</sub>(<i>a<sub>t</sub></i>&nbsp;|&nbsp;<i>s<sub>t</sub></i>)&nbsp;/&nbsp;π<sub>θ<sub>old</sub></sub>(<i>a<sub>t</sub></i>&nbsp;|&nbsp;<i>s<sub>t</sub></i>) entre nouvelle et ancienne probabilité de l’action jouée est écrêté dans [1&nbsp;−&nbsp;ε&nbsp;;&nbsp;1&nbsp;+&nbsp;ε]&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <msup><mi>L</mi><mtext>CLIP</mtext></msup><mo>(</mo><mi>θ</mi><mo>)</mo>
+            <mo>=</mo>
+            <msub><mi>𝔼</mi><mi>t</mi></msub>
+            <mo>[</mo>
+            <mi>min</mi><mo>(</mo>
+            <msub><mi>ρ</mi><mi>t</mi></msub><msub><mover><mi>A</mi><mo>^</mo></mover><mi>t</mi></msub>
+            <mo>,</mo>
+            <mi>clip</mi><mo>(</mo><msub><mi>ρ</mi><mi>t</mi></msub><mo>,</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo>,</mo><mn>1</mn><mo>+</mo><mi>ε</mi><mo>)</mo>
+            <msub><mover><mi>A</mi><mo>^</mo></mover><mi>t</mi></msub>
+            <mo>)</mo>
+            <mo>]</mo>
+          </mrow>
+        </math>
+        <p>On maximise <i>L</i><sup>CLIP</sup>&nbsp;: une action meilleure que prévu (<i>Â<sub>t</sub></i>&nbsp;&gt;&nbsp;0) devient plus probable, mais l’objectif ne gagne plus rien au-delà d’un rapport 1&nbsp;+&nbsp;ε. La perte totale ajoute l’erreur du critique et, en option, un bonus d’entropie pour l’exploration. Stable, pour actions discrètes ou continues, PPO est un bon premier choix.</p>
+
+        <p class="code-title">entrainer_ppo.py</p>
+        <pre><code>import gymnasium as gym
+from stable_baselines3 import PPO
+from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.monitor import Monitor
+
+<span class="c"># 4 copies de l'environnement, simulées l'une après l'autre</span>
+vec_env = make_vec_env("CartPole-v1", n_envs=4, seed=0)
+
+model = PPO("MlpPolicy", vec_env, seed=0, verbose=1)  <span class="c"># réglages par défaut</span>
+model.learn(total_timesteps=100_000)
+model.save("ppo_cartpole")  <span class="c"># crée ppo_cartpole.zip</span>
+
+<span class="c"># Évaluation sur un environnement distinct, politique déterministe</span>
+eval_env = Monitor(gym.make("CartPole-v1"))
+moyenne, ecart = evaluate_policy(model, eval_env, n_eval_episodes=20,
+                                 deterministic=True)
+print(f"Retour moyen : {moyenne:.1f} ± {ecart:.1f}")</code></pre>
+        <p>Avec Gymnasium&nbsp;1.4, Stable-Baselines3&nbsp;2.9 et PyTorch&nbsp;2.14 sur processeur, <code>learn</code> a effectué 13 itérations de 4&nbsp;×&nbsp;2048&nbsp;=&nbsp;8192 pas, soit 106&nbsp;496 pas, car il termine toujours la collecte en cours. Le retour moyen des épisodes d’entraînement est passé de 22 à 498, et l’évaluation affiche <code>Retour moyen : 500.0 ± 0.0</code>. Comptez quelques minutes sans carte graphique&nbsp;; d’une machine à l’autre, les valeurs intermédiaires varient un peu, même à graine égale. Le hasard pèse lourd&nbsp;: ne comparez deux réglages que sur plusieurs graines.</p>
+        <p>Réglages par défaut&nbsp;: <code>n_steps=2048</code>, <code>batch_size=64</code>, <code>n_epochs=10</code>, <code>learning_rate=3e-4</code>, <code>gamma=0.99</code>, <code>clip_range=0.2</code> (ε). Quatre indicateurs du tableau affiché à chaque itération suffisent&nbsp;:</p>
+        <ul>
+          <li><code>rollout/ep_rew_mean</code>, retour moyen des derniers épisodes, qui doit monter vers 500&nbsp;;</li>
+          <li><code>train/approx_kl</code> et <code>train/clip_fraction</code>, ampleur des mises à jour&nbsp;: s’ils s’envolent, le pas d’apprentissage est trop grand&nbsp;;</li>
+          <li><code>train/explained_variance</code>, qualité du critique, proche de 1 s’il prédit bien des retours qui varient. Ici, montée à 0,97, elle retombe près de 0 une fois CartPole résolu&nbsp;: les retours à prédire deviennent presque identiques&nbsp;;</li>
+          <li><code>train/entropy_loss</code>, opposé de l’entropie de la politique, qui tend vers 0 quand elle devient déterministe (ici de −0,68 à −0,41).</li>
+        </ul>
+              </section>
+
+      <section>
+        <h2>Concevoir la récompense</h2>
+        <p>L’agent optimise la récompense à la lettre. Exemple pour maintenir à la verticale un pendule entraîné par un moteur (angle du pendule θ, nul en haut&nbsp;; angle du bras α&nbsp;; commande <i>u</i> normalisée dans [−1&nbsp;;&nbsp;1])&nbsp;:</p>
+        <table class="recompense">
+          <caption>Termes d’une récompense par pas et risques associés</caption>
+          <thead>
+            <tr><th scope="col">Terme</th><th scope="col">Exemple</th><th scope="col">Effet recherché</th><th scope="col">Risque si son poids est mal choisi</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Objectif</td><td>cos θ</td><td>Redresser et maintenir le pendule</td><td>—</td></tr>
+            <tr><td>Écart secondaire</td><td>−<i>w</i><sub>1</sub>&nbsp;α²</td><td>Garder le bras près du centre</td><td>Trop fort&nbsp;: le pendule est négligé</td></tr>
+            <tr><td>Effort</td><td>−<i>w</i><sub>2</sub>&nbsp;<i>u</i>²</td><td>Commande modérée, moins d’échauffement</td><td>Trop fort&nbsp;: l’agent ne bouge plus</td></tr>
+            <tr><td>Douceur</td><td>−<i>w</i><sub>3</sub>&nbsp;(<i>u<sub>t</sub></i>&nbsp;−&nbsp;<i>u<sub>t−1</sub></i>)²</td><td>Éviter le broutement de la commande</td><td>Trop fort&nbsp;: réactions trop lentes</td></tr>
+            <tr><td>Échec</td><td>−10 en butée, fin d’épisode</td><td>Rendre l’échec coûteux</td><td>Voir le premier piège ci-dessous</td></tr>
+          </tbody>
+        </table>
+        <ul>
+          <li><strong>Mourir pour ne plus payer.</strong> Si chaque pas coûte et que l’échec termine l’épisode, échouer vite devient la meilleure stratégie&nbsp;: gardez une récompense positive dans la zone souhaitée.</li>
+          <li><strong>Le détournement de récompense.</strong> L’agent optimise ce qui est écrit, pas ce qui était voulu&nbsp;: récompensez seulement une vitesse angulaire faible, et le pendule immobile en bas devient une solution parfaite.</li>
+          <li><strong>Creuse ou dense.</strong> Une récompense creuse (1 en cas de succès, 0 sinon) est fidèle mais rarement rencontrée par hasard&nbsp;; une récompense dense guide l’exploration mais oriente la solution. Le façonnage par potentiel, qui ajoute γ&nbsp;Φ(<i>s</i>′)&nbsp;−&nbsp;Φ(<i>s</i>), guide l’agent sans changer la politique optimale (Ng, Harada et Russell, 1999).</li>
+          <li><strong>De la méthode.</strong> Grandeurs normalisées, termes ajoutés un par un, et toujours regarder l’agent&nbsp;: la courbe de retour ne dit pas comment il gagne ses points.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Jumeau numérique et choix d’un simulateur</h2>
+        <p>Un <strong>jumeau numérique</strong> est le modèle numérique d’un système physique précis, alimenté par ses mesures et recalé sur elles&nbsp;: il ne décrit pas «&nbsp;un pendule&nbsp;» mais <em>ce</em> pendule, avec ses masses, ses frottements, son moteur et ses capteurs. Il offre des millions de pas d’entraînement sans usure ni danger, plus vite que le temps réel. La démarche forme une boucle&nbsp;: mesures, identification des paramètres, jumeau randomisé, entraînement, transfert prudent, puis nouvelles mesures pour recaler le modèle. Des équations du mouvement intégrées en Python, comme celles de CartPole, suffisent pour un système simple&nbsp;; avec plusieurs corps et des contacts, on prend un moteur physique, choisi selon sa fidélité, sa vitesse, les formats de modèle acceptés (URDF exporté de la CAO) et son intégration avec Gymnasium ou ROS&nbsp;2. Il doit reproduire ce que voit le contrôleur réel&nbsp;: même période de commande, saturation et retard de l’actionneur, seules grandeurs réellement mesurées.</p>
+        <table class="simulateurs">
+          <caption>Deux moteurs physiques libres, utilisables depuis Python</caption>
+          <thead>
+            <tr><th scope="col">Critère</th><th scope="col">PyBullet</th><th scope="col">MuJoCo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Installation</td><td><code>pip install pybullet</code>, licence zlib&nbsp;; modèles URDF, SDF, MJCF</td><td><code>pip install mujoco</code>, licence Apache&nbsp;2.0 (libre depuis 2022)&nbsp;; modèles MJCF (natif), URDF</td></tr>
+            <tr><td>Points forts</td><td>Prise en main rapide, nombreux exemples</td><td>Contacts rapides et précis, environnements <code>gymnasium[mujoco]</code></td></tr>
+            <tr><td>Vigilance</td><td>Développement peu actif (dernière version en janvier 2025)&nbsp;; précompilé pour Linux x86-64 et Python&nbsp;≤&nbsp;3.11 seulement, sinon <code>pip</code> compile les sources (compilateur C++ requis)</td><td>Format MJCF à apprendre&nbsp;; un URDF importé demande souvent des retouches</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Randomisation de domaine</h2>
+        <p>Un jumeau numérique n’est jamais exact. Plutôt que de chercher le modèle parfait, la <strong>randomisation de domaine</strong> entraîne la politique sur une famille de simulateurs dont les paramètres sont tirés au hasard à chaque épisode&nbsp;: si la famille est assez large, le système réel n’est qu’un tirage de plus. On randomise la dynamique (masses, frottements, couple, retard), les capteurs (bruit, biais) et, pour une caméra, textures et éclairage. Les plages entourent les valeurs identifiées&nbsp;: trop étroites, elles n’apportent rien&nbsp;; trop larges, elles rendent la politique timorée, voire impossible à apprendre. Ce wrapper tire la masse et la longueur du pendule et la force du moteur à ±30&nbsp;% de leurs valeurs nominales, et ajoute un bruit de mesure.</p>
+        <p class="code-title">randomisation.py</p>
+        <pre class="long"><code>import gymnasium as gym
+import numpy as np
+
+
+class RandomisationCartPole(gym.Wrapper):
+    """Nouveaux paramètres physiques à chaque épisode, plus un bruit de mesure."""
+
+    def __init__(self, env, ecart=0.3, bruit=0.01):
+        super().__init__(env)
+        self.ecart, self.bruit = ecart, bruit
+        p = env.unwrapped
+        self.nominal = {"masspole": p.masspole, "length": p.length,
+                        "force_mag": p.force_mag}
+
+    def reset(self, *, seed=None, options=None):
+        obs, info = self.env.reset(seed=seed, options=options)
+        p = self.env.unwrapped
+        for nom, valeur in self.nominal.items():  <span class="c"># tirage uniforme à ±30 %</span>
+            facteur = self.np_random.uniform(1 - self.ecart, 1 + self.ecart)
+            setattr(p, nom, valeur * facteur)
+        p.total_mass = p.masscart + p.masspole  <span class="c"># grandeurs dérivées</span>
+        p.polemass_length = p.masspole * p.length
+        return self._mesure(obs), info
+
+    def step(self, action):
+        obs, r, terminated, truncated, info = self.env.step(action)
+        return self._mesure(obs), r, terminated, truncated, info
+
+    def _mesure(self, obs):  <span class="c"># bruit gaussien sur les quatre mesures</span>
+        bruit = self.np_random.normal(0.0, self.bruit, size=obs.shape)
+        return (obs + bruit).astype(np.float32)</code></pre>
+        <p>On l’active avec <code>make_vec_env("CartPole-v1", n_envs=4, seed=0, wrapper_class=RandomisationCartPole)</code>. Les paramètres restent constants pendant un épisode, le bruit change à chaque pas. CartPole ne calcule <code>total_mass</code> et <code>polemass_length</code> qu’à sa création&nbsp;: on les met à jour à la main.</p>
+      </section>
+
+      <section>
+        <h2>L’écart simulation-réalité</h2>
+        <p>Une politique excellente en simulation peut échouer sur le système réel&nbsp;: c’est l’<strong>écart simulation-réalité</strong> (en anglais <em>reality gap</em>), que la démarche <em>sim-to-real</em> cherche à réduire. Le réseau exploite tout le simulateur, y compris ses défauts&nbsp;: une politique «&nbsp;trop bonne&nbsp;» a souvent trouvé une faille du modèle. Sources fréquentes, avec leur symptôme et leurs remèdes&nbsp;:</p>
+        <ul>
+          <li><strong>Frottements, jeux, élasticités</strong> (oscillations, erreur statique)&nbsp;: identification sur essais réels, randomisation&nbsp;;</li>
+          <li><strong>Actionneur</strong>, saturation et zone morte (commande inefficace)&nbsp;: modèle d’actionneur, commande bornée&nbsp;;</li>
+          <li><strong>Capteurs</strong>, bruit, biais et quantification (commande qui broute)&nbsp;: bruit simulé, filtrage, pénalité de douceur&nbsp;;</li>
+          <li><strong>Retard et gigue de la boucle</strong> (oscillations croissantes)&nbsp;: même période qu’en réel, retard simulé&nbsp;;</li>
+          <li><strong>Information privilégiée</strong> (politique inutilisable)&nbsp;: n’observer que ce que les capteurs réels mesurent.</li>
+        </ul>
+        <p>Autres leviers&nbsp;: un historique d’observations et d’actions en entrée de la politique&nbsp;; une <em>correction résiduelle</em> ajoutée à un régulateur classique (PID, retour d’état) plutôt que toute la commande&nbsp;; quelques essais réels pour finir, toutes sécurités actives.</p>
+      </section>
+
+      <section>
+        <h2>Passer sur le matériel réel en sécurité</h2>
+        <p>Une politique apprise n’offre aucune garantie formelle&nbsp;: face à un état jamais vu, sa sortie peut être n’importe quoi. Les sécurités doivent donc être <strong>indépendantes du réseau de neurones</strong> et organisées en couches.</p>
+        <div class="box box-attention">
+          <p class="box-title">Attention · moteurs, alimentation et batteries</p>
+          <ul>
+            <li>Un <strong>arrêt d’urgence matériel</strong> à portée de main, qui coupe la puissance des moteurs, testé avant chaque séance.</li>
+            <li>Un <strong>chien de garde</strong> (<em>watchdog</em>) de communication dans le microcontrôleur&nbsp;: sans commande valide pendant quelques périodes, il arrête le moteur, même si l’ordinateur se fige.</li>
+            <li>Des <strong>butées</strong> et limites vérifiées par le microcontrôleur, personne dans le volume balayé, puissance augmentée progressivement.</li>
+            <li>Une alimentation <strong>limitée en courant</strong> pour les premiers essais, des fusibles&nbsp;; batteries LiPo chargées sous surveillance en sac ignifugé, jamais déchargées sous leur tension minimale.</li>
+          </ul>
+        </div>
+        <p>Côté logiciel, une couche de sécurité testée à part filtre chaque commande avant l’actionneur&nbsp;: saturation, limitation de la variation par pas, et arrêt verrouillé jusqu’à un réarmement volontaire si une mesure sort du domaine prévu, si la commande n’est pas un nombre fini (NaN ou infini) ou si la boucle prend du retard. La commande nulle n’est pas toujours l’état sûr&nbsp;: un bras soumis à la gravité exige un frein. Cette couche complète l’arrêt d’urgence et le chien de garde, sans les remplacer.</p>
+      </section>
+
+      <section>
+        <h2>Évaluer une politique</h2>
+        <p>Le retour affiché pendant l’entraînement mélange des politiques successives et l’exploration. Une évaluation sérieuse suit un protocole écrit à l’avance&nbsp;: un environnement distinct et la politique <strong>déterministe</strong>&nbsp;; au moins 20 épisodes et <strong>plusieurs graines d’entraînement</strong> (3 au minimum, 5 à 10 de préférence), avec moyenne et écart-type ou médiane et quartiles&nbsp;; des <strong>indicateurs métier</strong> (taux de réussite, temps de stabilisation, effort Σ<i>u</i>², violations de limites)&nbsp;; des tests de <strong>robustesse</strong> qui balaient un paramètre physique au-delà des plages d’entraînement&nbsp;; enfin une <strong>référence</strong> classique (PID, retour d’état LQR) évaluée avec le même protocole, en simulation puis sur le système réel.</p>
+
+        <div class="box box-exercice breakable">
+          <p class="box-title">Exercice guidé · une politique robuste à un pendule mal connu</p>
+          <p>La randomisation rend-elle la politique plus robuste&#8239;? Mesurez-le. Lors de nos essais, avec la graine 0, les politiques nominale et randomisée tenaient 500 pas de 0,5 à 2 fois la longueur nominale du pendule&nbsp;; à 2,5 fois, la nominale tenait encore presque toujours, la randomisée une centaine de pas. Avec la graine 1, c’est l’inverse&nbsp;: la nominale échouait dès 2 fois, la randomisée tenait encore 500 pas à 2,5 fois. Une graine ne suffit pas pour conclure.</p>
+          <ol>
+            <li>Entraînez une politique A avec <code>entrainer_ppo.py</code> et une politique B avec en plus <code>wrapper_class=RandomisationCartPole</code>, pour les graines 0, 1 et 2, avec le même nombre de pas.</li>
+            <li>Écrivez <code>env_test(nom, facteur)</code>&nbsp;: créez un <code>CartPole-v1</code>, multipliez l’attribut <code>nom</code> de <code>env.unwrapped</code> par <code>facteur</code>, <em>puis</em> enveloppez-le dans <code>RandomisationCartPole(env, ecart=0.0)</code>, qui garde cette valeur, recalcule les grandeurs dérivées et n’ajoute que le bruit de mesure.</li>
+            <li>Évaluez A et B (20 épisodes, <code>deterministic=True</code>) pour des facteurs de 0,5 à 3 sur <code>length</code> et sur <code>force_mag</code>, puis tracez le retour moyen en fonction du facteur&nbsp;: une courbe par politique, moyenne et écart-type sur les trois graines, plage d’entraînement de B (0,7 à 1,3) repérée.</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong> chaque politique atteint au moins 475 en conditions nominales pour chaque graine&nbsp;; la conclusion donne, chiffres à l’appui, la plage de chaque paramètre où chaque politique reste au-dessus de 475 et dit si la randomisation l’a élargie&nbsp;; le script redonne les mêmes résultats avec les mêmes graines, y compris celle de l’environnement d’évaluation (<code>reset(seed=…)</code> avant <code>evaluate_policy</code>). Pour aller plus loin&nbsp;: ajoutez un retard d’un pas sur l’action.</p>
+        </div>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>L’agent maximise le retour actualisé et prend la récompense, seule description de l’objectif, au pied de la lettre.</li>
+            <li>PPO est un premier choix robuste, à évaluer sur plusieurs graines&nbsp;; un jumeau identifié sur le système réel, une randomisation bien dosée et un simulateur qui reproduit retards et saturations réduisent l’écart simulation-réalité.</li>
+            <li>Sur le matériel, les sécurités ne dépendent jamais du réseau&nbsp;: arrêt d’urgence, chien de garde, limites dans le microcontrôleur.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://stable-baselines3.readthedocs.io/en/master/modules/ppo.html">Stable-Baselines3&nbsp;: PPO</a></li>
+        <li><a href="http://incompleteideas.net/book/the-book-2nd.html">R. S. Sutton et A. G. Barto, <em>Reinforcement Learning: An Introduction</em>, 2<sup>e</sup> édition, en accès libre</a></li>
+        <li><a href="https://arxiv.org/abs/1707.06347">J. Schulman et al., «&nbsp;Proximal Policy Optimization Algorithms&nbsp;», 2017</a></li>
+        <li><a href="https://arxiv.org/abs/1710.06537">X. B. Peng et al., «&nbsp;Sim-to-Real Transfer of Robotic Control with Dynamics Randomization&nbsp;», 2018</a></li>
+        <li><a href="https://willsim.fr/cours/apprentissage-renforcement-sim2real.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

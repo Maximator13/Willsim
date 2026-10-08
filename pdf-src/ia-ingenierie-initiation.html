@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Initiation à l'IA pour l'ingénierie — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : apprentissage automatique sur des données de capteurs avec Python et scikit-learn (régression, classification, métriques, validation croisée).">
+    <meta name="keywords" content="intelligence artificielle, apprentissage automatique, ingénierie, mécatronique, Python, scikit-learn, pandas, régression linéaire, k plus proches voisins, arbre de décision, validation croisée">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Styles propres à cette fiche */
+      body { line-height: 1.45; }
+      .cover-meta dd { font-size: 8pt; }
+      .deroule { margin: 2mm 0 0; font-size: 9pt; color: var(--ink-secondary); }
+      table.confusion { width: auto; margin-left: auto; margin-right: auto; }
+      table.confusion td { text-align: center; min-width: 22mm; }
+      table.confusion td.ok { background: #f4f8e1; font-weight: 700; }
+      pre { font-size: 8pt; line-height: 1.38; padding: 2.5mm 3.5mm; }
+      math[display="block"] { margin: 1mm 0 2mm; break-before: avoid; }
+      .box-title { break-after: avoid; }
+      table.compact { break-inside: avoid; }
+      figure svg text { font-family: "DM Sans", "Segoe UI", Arial, sans-serif; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>Initiation à l'IA pour l'ingénierie</h1>
+      <p class="cover-lead">Découvrir l'apprentissage automatique à partir de mesures de capteurs&nbsp;: préparer les données, prédire une grandeur physique, reconnaître l'état d'une machine et évaluer honnêtement un modèle, avec Python et scikit-learn.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Débutant</dd></div>
+        <div><dt>Durée</dt><dd>6&nbsp;h (3 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Bases de Python (variables, boucles, fonctions)</dd></div>
+        <div><dt>Outils</dt><dd>Python&nbsp;3, NumPy, pandas, scikit-learn, Matplotlib, Jupyter</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>distinguer un problème de régression d'un problème de classification et nommer, dans un cas d'ingénierie, les caractéristiques et la cible&nbsp;;</li>
+        <li>charger un fichier CSV de mesures avec pandas, en retirer les valeurs manquantes ou aberrantes, puis le découper en jeux d'entraînement et de test&nbsp;;</li>
+        <li>entraîner avec scikit-learn une régression linéaire et deux classifieurs&nbsp;: les k plus proches voisins et l'arbre de décision&nbsp;;</li>
+        <li>évaluer un modèle avec la MAE, l'exactitude et la matrice de confusion, et repérer un surapprentissage grâce à la validation croisée.</li>
+      </ul>
+      <p class="deroule"><strong>Déroulé conseillé&nbsp;:</strong> séance&nbsp;1 → sections 1 et 2&nbsp;; séance&nbsp;2 → sections 3 à 5&nbsp;; séance&nbsp;3 → sections 6 et 7 (mini-projet).</p>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>Qu'est-ce que l'apprentissage automatique&#8239;?</h2>
+        <p>Un programme classique applique des règles écrites par un humain, par exemple «&nbsp;si la température dépasse 80&nbsp;°C, arrêter le moteur&nbsp;». En <strong>apprentissage automatique</strong> (<em>machine learning</em>), on fournit au contraire des exemples&nbsp;: un algorithme ajuste lui-même les paramètres d'un <strong>modèle</strong> pour reproduire la relation entre des entrées et une sortie. Le modèle sert ensuite à prédire la sortie pour des données qu'il n'a jamais vues.</p>
+
+        <p>Une <strong>observation</strong> est une ligne du tableau de données (les mesures relevées à un instant)&nbsp;; ses grandeurs d'entrée sont les <strong>caractéristiques</strong> (<em>features</em>, notées X)&nbsp;: courant, température, vibration… La <strong>cible</strong> (notée y) est la grandeur à prédire. Quand elle est connue pour chaque exemple d'entraînement, on parle d'<strong>apprentissage supervisé</strong>&nbsp;: c'est le cadre de cette fiche.</p>
+
+        <p>Si la cible est une valeur numérique continue, par exemple la température d'un moteur selon le courant et l'ambiante, c'est une <strong>régression</strong> (ici&nbsp;: régression linéaire). Si c'est une catégorie, comme l'état d'un moteur (normal, balourd ou surcharge), c'est une <strong>classification</strong> (ici&nbsp;: k plus proches voisins et arbre de décision).</p>
+
+        <figure>
+          <svg width="640" height="124" viewBox="0 0 640 124" role="img" aria-label="Chaîne de traitement : capteurs, fichier CSV, nettoyage, découpage entraînement et test, normalisation et entraînement du modèle, évaluation sur le jeu de test, avec un retour vers le nettoyage si le résultat est insuffisant">
+            <g font-size="11.5" text-anchor="middle">
+              <rect x="1" y="8" width="94" height="62" rx="6" fill="#eef0e6" stroke="#243c30"/>
+              <text x="48" y="30" fill="#14221c" font-weight="700">Capteurs</text>
+              <text x="48" y="46" fill="#47544d" font-size="11">acquisition</text>
+              <text x="48" y="60" fill="#47544d" font-size="11">des mesures</text>
+              <rect x="110" y="8" width="94" height="62" rx="6" fill="#eef0e6" stroke="#243c30"/>
+              <text x="157" y="30" fill="#14221c" font-weight="700">Fichier CSV</text>
+              <text x="157" y="46" fill="#47544d" font-size="11">lecture</text>
+              <text x="157" y="60" fill="#47544d" font-size="11">avec pandas</text>
+              <rect x="219" y="8" width="94" height="62" rx="6" fill="#eef0e6" stroke="#243c30"/>
+              <text x="266" y="30" fill="#14221c" font-weight="700">Nettoyage</text>
+              <text x="266" y="46" fill="#47544d" font-size="11">manquants,</text>
+              <text x="266" y="60" fill="#47544d" font-size="11">aberrants</text>
+              <rect x="328" y="8" width="94" height="62" rx="6" fill="#eef0e6" stroke="#243c30"/>
+              <text x="375" y="30" fill="#14221c" font-weight="700">Découpage</text>
+              <text x="375" y="46" fill="#47544d" font-size="11">entraînement</text>
+              <text x="375" y="60" fill="#47544d" font-size="11">et test</text>
+              <rect x="437" y="8" width="94" height="62" rx="6" fill="#16261e"/>
+              <text x="484" y="30" fill="#ffffff" font-weight="700">Entraînement</text>
+              <text x="484" y="46" fill="#bfd0c3" font-size="11">normalisation</text>
+              <text x="484" y="60" fill="#bfd0c3" font-size="11">+ modèle</text>
+              <rect x="546" y="8" width="94" height="62" rx="6" fill="#d2ec6c" stroke="#566b14"/>
+              <text x="593" y="30" fill="#14221c" font-weight="700">Évaluation</text>
+              <text x="593" y="46" fill="#14221c" font-size="11">sur le jeu</text>
+              <text x="593" y="60" fill="#14221c" font-size="11">de test</text>
+            </g>
+            <g fill="#243c30" stroke="#243c30" stroke-width="2">
+              <line x1="95" y1="39" x2="103" y2="39"/><polygon points="103,35 109,39 103,43" stroke="none"/>
+              <line x1="204" y1="39" x2="212" y2="39"/><polygon points="212,35 218,39 212,43" stroke="none"/>
+              <line x1="313" y1="39" x2="321" y2="39"/><polygon points="321,35 327,39 321,43" stroke="none"/>
+              <line x1="422" y1="39" x2="430" y2="39"/><polygon points="430,35 436,39 430,43" stroke="none"/>
+              <line x1="531" y1="39" x2="539" y2="39"/><polygon points="539,35 545,39 539,43" stroke="none"/>
+            </g>
+            <path d="M593 70 V92 H266 V79" fill="none" stroke="#566b14" stroke-width="1.6" stroke-dasharray="5 4"/>
+            <polygon points="261,79 266,71 271,79" fill="#566b14"/>
+            <text x="320" y="114" font-size="11" text-anchor="middle" fill="#47544d">Résultat insuffisant&#8239;? On améliore les données ou les caractéristiques, et on recommence.</text>
+          </svg>
+          <figcaption>Figure 1 — Chaîne de traitement d'un projet d'apprentissage supervisé. La normalisation s'ajuste après le découpage, sur le seul jeu d'entraînement.</figcaption>
+        </figure>
+
+        <p><strong>Mise en place&nbsp;:</strong> <code>pip install numpy pandas scikit-learn matplotlib jupyterlab</code>, puis <code>jupyter lab</code>. Les extraits s'exécutent dans un notebook ou un script <code>.py</code>&nbsp;; ceux qui portent le même nom de fichier se suivent. Sorties obtenues avec NumPy 1.24 et scikit-learn 1.3&nbsp;: de légers écarts sont possibles avec d'autres versions.</p>
+      </section>
+
+      <section>
+        <h2>Préparer des données de capteurs</h2>
+        <p>Les mesures d'un banc d'essai, d'un automate ou d'un microcontrôleur sont souvent exportées en <strong>CSV</strong>&nbsp;: une ligne par observation, une colonne par grandeur. La bibliothèque pandas les charge dans un <code>DataFrame</code>, un tableau à colonnes nommées. Pour un fichier de tableur français (point-virgule, virgule décimale)&nbsp;: <code>pd.read_csv("mesures.csv", sep=";", decimal=",")</code>.</p>
+
+        <h3>Nettoyer les mesures</h3>
+        <ul>
+          <li><strong>Valeurs manquantes</strong> (<code>NaN</code>, capteur débranché, trame perdue)&nbsp;: on supprime les lignes concernées (<code>dropna</code>) quand elles sont rares.</li>
+          <li><strong>Valeurs aberrantes</strong> (saturation, parasite)&nbsp;: la plage de mesure du capteur et les limites physiques du système sont les meilleurs critères de tri.</li>
+          <li><strong>Unités</strong>&nbsp;: une grandeur garde la même unité dans tout le fichier (pas de mélange A et mA).</li>
+        </ul>
+        <p>L'extrait suivant simule 200 mesures d'un moteur en régime permanent, y introduit trois défauts, les enregistre en CSV, puis relit et nettoie le fichier. Avec des mesures réelles, seule la partie 2 du script sert.</p>
+
+        <p class="code-title">regression_temperature.py — partie 1&nbsp;: données</p>
+        <pre><code>import numpy as np
+import pandas as pd
+
+<span class="c"># 1. Jeu de données synthétique : 200 mesures en régime permanent</span>
+rng = np.random.default_rng(42)              <span class="c"># graine fixe : résultats reproductibles</span>
+n = 200
+df = pd.DataFrame({
+    "t_ambiante": rng.uniform(15, 35, n),    <span class="c"># température ambiante (°C)</span>
+    "courant": rng.uniform(0.5, 2.5, n),     <span class="c"># courant absorbé (A)</span>
+})
+<span class="c"># Échauffement dû aux pertes Joule : environ 8 °C/A² × I², plus un bruit de mesure</span>
+df["t_moteur"] = df["t_ambiante"] + 8 * df["courant"] ** 2 + rng.normal(0, 1.5, n)
+df.loc[[3, 50], "t_moteur"] = np.nan         <span class="c"># deux mesures perdues</span>
+df.loc[7, "courant"] = 99.0                  <span class="c"># une valeur aberrante (capteur saturé)</span>
+df.to_csv("mesures_moteur.csv", index=False)
+
+<span class="c"># 2. Lecture du fichier CSV et nettoyage</span>
+df = pd.read_csv("mesures_moteur.csv")
+df = df.dropna()                             <span class="c"># supprime les lignes incomplètes</span>
+df = df[df["courant"].between(0, 5)]         <span class="c"># garde les valeurs physiquement plausibles</span>
+print(len(df), "lignes conservées")          <span class="c"># 197</span>
+print(df.describe().round(1))</code></pre>
+
+        <h3>Normaliser les caractéristiques</h3>
+        <p>Le courant vaut quelques ampères, la température plusieurs dizaines de degrés&nbsp;: les algorithmes fondés sur des distances, comme les k plus proches voisins, seraient dominés par la grandeur la plus étendue. La <strong>standardisation</strong> ramène chaque caractéristique à une moyenne nulle et un écart-type de 1&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>z</mi><mo>=</mo>
+            <mfrac><mrow><mi>x</mi><mo>−</mo><mi>μ</mi></mrow><mi>σ</mi></mfrac>
+          </mrow>
+        </math>
+        <p>où μ et σ sont la moyenne et l'écart-type de la caractéristique, <strong>calculés sur le jeu d'entraînement</strong> (rôle de <code>StandardScaler</code>). La régression linéaire par moindres carrés et les arbres de décision n'en ont pas besoin&nbsp;: leurs prédictions n'en dépendent pas.</p>
+
+        <h3>Découper en jeux d'entraînement et de test</h3>
+        <p>Seule compte la performance sur des données nouvelles&nbsp;: avant tout apprentissage, on met de côté 20 à 30&nbsp;% des observations, le <strong>jeu de test</strong>. <code>train_test_split</code> fait ce tirage au hasard, <code>random_state</code> le rend reproductible et <code>stratify=y</code> conserve la proportion de chaque classe.</p>
+
+        <div class="box box-attention">
+          <p class="box-title">Attention · fuite de données</p>
+          <p>Calculer μ et σ sur toutes les données avant le découpage fait «&nbsp;fuir&nbsp;» de l'information du test vers l'entraînement&nbsp;: l'évaluation devient trop optimiste. Ajustez toute transformation sur le seul jeu d'entraînement, via un <code>Pipeline</code> (section&nbsp;4). Pour des mesures successives d'un même essai, presque identiques, découpez par essai ou par période, pas au hasard.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Régression linéaire&nbsp;: prédire une grandeur physique</h2>
+        <p>Une régression linéaire modélise la cible comme une somme pondérée des caractéristiques&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mover><mi>y</mi><mo>^</mo></mover><mo>=</mo>
+            <msub><mi>w</mi><mn>0</mn></msub><mo>+</mo>
+            <msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo>
+            <msub><mi>w</mi><mn>2</mn></msub><msub><mi>x</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo>
+          </mrow>
+        </math>
+        <p>L'entraînement choisit les coefficients w<sub>i</sub> qui minimisent la somme des carrés des écarts entre mesures et prédictions (<strong>méthode des moindres carrés</strong>). Le script suivant prédit la température du moteur à partir de l'ambiante et du carré du courant.</p>
+
+        <p class="code-title">regression_temperature.py — partie 2&nbsp;: modèle (à la suite de la partie 1)</p>
+        <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+import matplotlib.pyplot as plt
+
+X = pd.DataFrame({"t_ambiante": df["t_ambiante"],
+                  "courant_carre": df["courant"] ** 2})  <span class="c"># caractéristique choisie : I²</span>
+y = df["t_moteur"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=0)             <span class="c"># 75 % entraînement, 25 % test</span>
+modele = LinearRegression().fit(X_train, y_train)     <span class="c"># entraînement</span>
+y_pred = modele.predict(X_test)                       <span class="c"># prédictions sur le test</span>
+print("Coefficients :", modele.coef_.round(2))
+print("Ordonnée à l'origine :", round(modele.intercept_, 2))
+print(f"MAE sur le test : {mean_absolute_error(y_test, y_pred):.2f} °C")
+plt.scatter(y_test, y_pred)
+plt.plot([15, 80], [15, 80], "k--")                   <span class="c"># droite des prédictions parfaites</span>
+plt.xlabel("Température mesurée (°C)")
+plt.ylabel("Température prédite (°C)")
+plt.show()</code></pre>
+        <p><strong>Pourquoi I²&#8239;?</strong> En régime permanent, l'échauffement d'un moteur est à peu près proportionnel à la puissance qu'il dissipe en chaleur&nbsp;; quand les pertes Joule dominent (P = R·I²), il suit donc le carré du courant. Avec la caractéristique I², le modèle reste linéaire par rapport à ses coefficients, mais capture une relation physique non linéaire&nbsp;: une caractéristique bien choisie vaut souvent mieux qu'un algorithme plus complexe.</p>
+        <p>Le script affiche les coefficients <code>[1.03 7.99]</code>, une ordonnée à l'origine de −0,75 et une MAE de 1,13&nbsp;°C. Le modèle retrouve donc les valeurs de la simulation&nbsp;: environ 1 pour la température ambiante et 8&nbsp;°C/A² pour I². Cette erreur correspond au bruit de mesure simulé (écart-type de 1,5&nbsp;°C, soit une erreur absolue moyenne attendue d'environ 1,2&nbsp;°C)&nbsp;: aucun modèle ne fait mieux que ses mesures. Vérifier que les coefficients ont un sens physique est un excellent test de cohérence.</p>
+      </section>
+
+      <section>
+        <h2>Classification&nbsp;: reconnaître l'état d'une machine</h2>
+        <p>Le jeu de données simulé décrit un moteur dans trois états&nbsp;: <strong>normal</strong>, <strong>balourd</strong> (masse mal répartie sur le rotor&nbsp;: les vibrations augmentent) et <strong>surcharge</strong> (couple résistant excessif&nbsp;: le courant, puis la température, augmentent). Caractéristiques&nbsp;: vitesse vibratoire efficace (mm/s), température du carter (°C) et courant (A). Valeurs choisies pour l'exemple, non normatives, et tirées indépendamment selon une loi normale&nbsp;: c'est une simplification.</p>
+
+        <p class="code-title">etat_moteur.py — partie 1&nbsp;: jeu de données</p>
+        <pre><code>import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(7)                         <span class="c"># graine fixe</span>
+<span class="c"># Moyennes (vibration en mm/s, température en °C, courant en A) de chaque état</span>
+moyennes = {"normal": [2.0, 50, 1.2], "balourd": [3.6, 53, 1.3], "surcharge": [2.4, 70, 2.1]}
+ecarts_types = [0.6, 6, 0.3]
+blocs = []
+for etat, m in moyennes.items():                       <span class="c"># 150 observations par état</span>
+    bloc = pd.DataFrame(rng.normal(m, ecarts_types, size=(150, 3)),
+                        columns=["vibration", "temperature", "courant"])
+    bloc["etat"] = etat
+    blocs.append(bloc)
+df = pd.concat(blocs, ignore_index=True)               <span class="c"># 450 observations</span></code></pre>
+
+        <h3>Les k plus proches voisins (k-NN)</h3>
+        <p>Pour classer une nouvelle observation, l'algorithme cherche les <strong>k</strong> observations d'entraînement les plus proches (distance euclidienne) et retient la classe majoritaire parmi elles. Il ne calcule aucun paramètre&nbsp;: il mémorise les données. Un petit k donne des frontières irrégulières, sensibles au bruit&nbsp;; un grand k, des frontières plus lisses. La normalisation est indispensable.</p>
+
+        <h3>L'arbre de décision</h3>
+        <p>Un arbre pose une suite de questions de la forme «&nbsp;vibration ≤ 2,6&nbsp;mm/s&#8239;?&nbsp;» jusqu'à une feuille qui donne la classe. À chaque nœud, l'algorithme choisit la question qui sépare le mieux les classes (impureté de Gini, critère par défaut de scikit-learn). Un arbre peu profond se lit comme des règles, ce qui facilite le dialogue avec la maintenance. <code>max_depth</code> limite sa profondeur.</p>
+
+        <figure>
+          <svg width="560" height="148" viewBox="0 0 560 148" role="img" aria-label="Arbre de profondeur 2 : si la température est inférieure ou égale à 59,5 °C, on teste la vibration à 2,6 mm/s, en dessous normal, au-dessus balourd ; sinon on teste la vibration à 3,6 mm/s, en dessous surcharge, au-dessus balourd">
+            <g fill="none" stroke="#243c30" stroke-width="1.6">
+              <path d="M280 34 L140 62"/><path d="M280 34 L420 62"/>
+              <path d="M140 92 L70 118"/><path d="M140 92 L210 118"/>
+              <path d="M420 92 L350 118"/><path d="M420 92 L490 118"/>
+            </g>
+            <g font-size="11.5" text-anchor="middle">
+              <rect x="175" y="2" width="210" height="32" rx="6" fill="#16261e"/>
+              <text x="280" y="23" fill="#ffffff" font-weight="700">température ≤ 59,5 °C&#8239;?</text>
+              <rect x="50" y="62" width="180" height="30" rx="6" fill="#eef0e6" stroke="#243c30"/>
+              <text x="140" y="82" fill="#14221c" font-weight="700">vibration ≤ 2,6 mm/s&#8239;?</text>
+              <rect x="330" y="62" width="180" height="30" rx="6" fill="#eef0e6" stroke="#243c30"/>
+              <text x="420" y="82" fill="#14221c" font-weight="700">vibration ≤ 3,6 mm/s&#8239;?</text>
+              <rect x="25" y="118" width="90" height="26" rx="13" fill="#d2ec6c" stroke="#566b14"/>
+              <text x="70" y="135" fill="#14221c">normal</text>
+              <rect x="165" y="118" width="90" height="26" rx="13" fill="#d2ec6c" stroke="#566b14"/>
+              <text x="210" y="135" fill="#14221c">balourd</text>
+              <rect x="305" y="118" width="90" height="26" rx="13" fill="#d2ec6c" stroke="#566b14"/>
+              <text x="350" y="135" fill="#14221c">surcharge</text>
+              <rect x="445" y="118" width="90" height="26" rx="13" fill="#d2ec6c" stroke="#566b14"/>
+              <text x="490" y="135" fill="#14221c">balourd</text>
+            </g>
+            <g font-size="10" fill="#47544d" text-anchor="middle">
+              <text x="196" y="44">oui</text><text x="364" y="44">non</text>
+              <text x="88" y="103">oui</text><text x="192" y="103">non</text>
+              <text x="368" y="103">oui</text><text x="472" y="103">non</text>
+            </g>
+          </svg>
+          <figcaption>Figure 2 — Arbre de profondeur 2 appris sur le jeu d'entraînement de <code>etat_moteur.py</code> (seuils arrondis). Il se lit comme deux règles de diagnostic.</figcaption>
+        </figure>
+
+        <p class="code-title">etat_moteur.py — partie 2&nbsp;: entraîner et tester deux classifieurs</p>
+        <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+X, y = df[["vibration", "temperature", "courant"]], df["etat"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=0)  <span class="c"># mêmes proportions d'états</span>
+knn = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=5))
+arbre = DecisionTreeClassifier(max_depth=3, random_state=0)
+for nom, modele in [("k-NN", knn), ("Arbre", arbre)]:
+    modele.fit(X_train, y_train)                       <span class="c"># entraînement</span>
+    y_pred = modele.predict(X_test)                    <span class="c"># prédictions sur le test</span>
+    print(nom, "- exactitude :", round(accuracy_score(y_test, y_pred), 3))
+    print(confusion_matrix(y_test, y_pred, labels=["normal", "balourd", "surcharge"]))</code></pre>
+        <p><code>make_pipeline</code> enchaîne normalisation et classifieur&nbsp;: μ et σ sont calculés pendant <code>fit</code>, sur le seul jeu d'entraînement. Exactitudes sur le test, données ici pour illustrer les métriques&nbsp;: 0,938 pour le k-NN, 0,903 pour l'arbre.</p>
+      </section>
+
+      <section>
+        <h2>Évaluer un modèle&nbsp;: les métriques</h2>
+        <h3>En régression&nbsp;: l'erreur absolue moyenne (MAE)</h3>
+        <p>
+          <math><mrow><mi>MAE</mi><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><mo>∑</mo><mrow><mo>|</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo>^</mo></mover><mi>i</mi></msub><mo>|</mo></mrow></mrow></math>
+          est la moyenne des écarts absolus entre mesures et prédictions. Exprimée dans l'unité de la cible (ici en °C), elle se compare directement à la précision du capteur ou à la tolérance exigée.</p>
+
+        <h3>En classification&nbsp;: exactitude et matrice de confusion</h3>
+        <p>L'<strong>exactitude</strong> (<em>accuracy</em>) est la proportion de prédictions correctes. Elle peut tromper&nbsp;: si 99&nbsp;% des mesures viennent d'un moteur sain, répondre toujours «&nbsp;normal&nbsp;» donne 99&nbsp;% sans détecter un seul défaut. La <strong>matrice de confusion</strong> détaille les erreurs&nbsp;: dans scikit-learn, une ligne par classe réelle, une colonne par classe prédite.</p>
+        <table class="confusion compact">
+          <caption>Matrice de confusion du k-NN (jeu de test)</caption>
+          <thead>
+            <tr><th scope="col">Réel \ Prédit</th><th scope="col">normal</th><th scope="col">balourd</th><th scope="col">surcharge</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">normal</th><td class="ok">36</td><td>2</td><td>0</td></tr>
+            <tr><th scope="row">balourd</th><td>4</td><td class="ok">34</td><td>0</td></tr>
+            <tr><th scope="row">surcharge</th><td>0</td><td>1</td><td class="ok">36</td></tr>
+          </tbody>
+        </table>
+        <p>La diagonale compte les bonnes réponses&nbsp;: 106 sur 113, soit 0,938. Six des sept erreurs mélangent «&nbsp;normal&nbsp;» et «&nbsp;balourd&nbsp;», dont les plages de vibration se recouvrent. Un balourd non détecté (4 cas) n'a pas le même coût qu'une fausse alarme (2 cas)&nbsp;: on examine donc toujours la matrice entière. <code>classification_report</code> en déduit, classe par classe, la <strong>précision</strong> et le <strong>rappel</strong>.</p>
+      </section>
+
+      <section>
+        <h2>Surapprentissage et validation croisée</h2>
+        <p>Un modèle trop flexible peut apprendre par cœur le bruit des données d'entraînement&nbsp;: excellent sur celles-ci, il se trompe sur des données nouvelles. C'est le <strong>surapprentissage</strong> (<em>overfitting</em>), signalé par un grand écart entre score d'entraînement et score de validation. À l'inverse, un modèle trop simple échoue partout&nbsp;: c'est le <strong>sous-apprentissage</strong>.</p>
+        <p>Pour choisir et régler un modèle (k-NN ou arbre, valeur de k, profondeur…) sans toucher au jeu de test, on utilise la <strong>validation croisée à K blocs</strong>&nbsp;: on découpe le jeu d'entraînement en K blocs, on entraîne K fois le modèle sur K − 1 blocs et on l'évalue sur le bloc restant, chaque bloc servant une fois à l'évaluation. La moyenne des K scores estime la performance, leur écart-type sa stabilité.</p>
+
+        <table class="compact">
+          <caption>Arbres de décision de profondeur croissante, données du script <code>etat_moteur.py</code>&nbsp;: exactitude en apprentissage et validation croisée (moyenne ± écart-type de <code>cross_val_score(arbre, X_train, y_train, cv=5)</code>)</caption>
+          <thead>
+            <tr><th scope="col">max_depth</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">5</th><th scope="col">None (illimitée)</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Apprentissage</th><td>0,65</td><td>0,91</td><td>0,93</td><td>0,96</td><td>1,00</td></tr>
+            <tr><th scope="row">Validation croisée</th><td>0,63 ± 0,04</td><td>0,87 ± 0,06</td><td>0,90 ± 0,04</td><td>0,90 ± 0,05</td><td>0,90 ± 0,05</td></tr>
+          </tbody>
+        </table>
+        <p>Avec une seule question, l'arbre ne donne que deux réponses pour trois états&nbsp;: c'est du sous-apprentissage. Au-delà de la profondeur 3, le score d'apprentissage monte jusqu'à 1,00 quand la validation croisée plafonne autour de 0,90&nbsp;: les nœuds ajoutés apprennent le bruit, pas l'état du moteur. À performance égale, on retient le modèle le plus simple&nbsp;: ici, la profondeur 3.</p>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>Un modèle ne vaut que par ses données&nbsp;: mesures propres, unités cohérentes, caractéristiques ayant un sens physique (I² pour l'échauffement).</li>
+            <li>Le jeu de test est mis de côté avant tout apprentissage et ne sert qu'une fois, à la fin&nbsp;; les transformations (normalisation…) s'ajustent sur l'entraînement seul, via un <code>Pipeline</code>.</li>
+            <li>Régression&nbsp;: MAE, dans l'unité de la grandeur. Classification&nbsp;: exactitude <em>et</em> matrice de confusion.</li>
+            <li>Un grand écart entre score d'entraînement et validation croisée signale un surapprentissage. À score égal, préférez le modèle le plus simple.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Mini-projet&nbsp;: classer l'état d'un moteur</h2>
+        <div class="box box-exercice breakable">
+          <p class="box-title">Exercice guidé · choisir et justifier un classifieur</p>
+          <p>Repartez des données et du découpage de <code>etat_moteur.py</code>&nbsp;; n'utilisez pas le jeu de test avant l'étape&nbsp;4.</p>
+          <ol>
+            <li><strong>Explorer.</strong> Affichez <code>df.groupby("etat").mean()</code> et un nuage de points vibration–température coloré par état. Quelle caractéristique distingue chaque état&#8239;?</li>
+            <li><strong>Régler le k-NN.</strong> Pour k ∈ {1, 3, 5, 11, 21}, estimez par validation croisée à 5 blocs l'exactitude du pipeline <code>StandardScaler</code> + k-NN. Retenez le meilleur k.</li>
+            <li><strong>Comparer.</strong> Idem pour l'arbre, <code>max_depth</code> de 1 à 6. Quelle famille retenez-vous, et pourquoi&#8239;?</li>
+            <li><strong>Évaluer une seule fois.</strong> Entraînez le modèle retenu sur tout le jeu d'entraînement, puis affichez son exactitude et sa matrice de confusion sur le jeu de test.</li>
+            <li><strong>Tester la normalisation.</strong> Passez le courant en mA (colonne × 1000) et comparez en validation croisée le k-NN avec et sans <code>StandardScaler</code>. Expliquez l'écart.</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong></p>
+          <ul>
+            <li>le script s'exécute sans erreur et redonne les mêmes résultats&nbsp;; le jeu de test ne sert qu'à l'étape&nbsp;4&nbsp;;</li>
+            <li>le modèle retenu atteint au moins 0,90 en validation croisée, et l'écart avec le score de test est commenté&nbsp;;</li>
+            <li>la confusion la plus fréquente et l'effet de l'unité du courant sont expliqués.</li>
+          </ul>
+          <div class="solution">
+            <p><strong>Indices&nbsp;:</strong> <code>cross_val_score</code> (module <code>sklearn.model_selection</code>) s'emploie comme dans le tableau de la section&nbsp;6, avec le pipeline comme modèle. Nuage de points&nbsp;: un <code>plt.scatter(…, label=etat)</code> par groupe de <code>df.groupby("etat")</code>, puis <code>plt.legend()</code>. Ordres de grandeur&nbsp;: 0,90 à 0,94 selon k pour le k-NN normalisé&nbsp;; 0,57 à 0,65 sans normalisation avec le courant en mA&nbsp;: ses écarts, de plusieurs centaines de mA, écrasent dans les distances ceux de la vibration (de l'ordre du mm/s), alors que le courant ne distingue que la surcharge.</p>
+          </div>
+        </div>
+
+        <div class="box box-attention">
+          <p class="box-title">Attention · passer à un moteur réel</p>
+          <p>Un modèle de diagnostic aide à décider, il ne remplace jamais les protections d'une machine (arrêt d'urgence, disjoncteur, protection thermique). Pour mesurer sur un vrai moteur&nbsp;: alimentation coupée avant toute intervention sur le câblage ou les capteurs, moteur solidement fixé, pièces tournantes sous carter.</p>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://docs.python.org/fr/3/tutorial/">Tutoriel officiel de Python (en français)</a></li>
+        <li><a href="https://pandas.pydata.org/docs/getting_started/index.html">pandas — prise en main</a></li>
+        <li><a href="https://scikit-learn.org/stable/user_guide.html">scikit-learn — guide de l'utilisateur</a></li>
+        <li><a href="https://scikit-learn.org/stable/common_pitfalls.html">scikit-learn — pièges courants, dont la fuite de données</a></li>
+        <li><a href="https://matplotlib.org/stable/tutorials/index.html">Matplotlib — tutoriels</a></li>
+        <li><a href="https://docs.jupyter.org/en/latest/">Documentation de Jupyter</a></li>
+        <li><a href="https://willsim.fr/cours/ia-ingenierie-initiation.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

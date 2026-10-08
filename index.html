@@ -79,10 +79,10 @@
             "Robotique",
             "Systèmes embarqués",
             "Arduino",
-            "Développement web",
             "Programmation Python",
-            "JavaScript",
-            "Simulation numérique 3D",
+            "Apprentissage automatique",
+            "Simulation numérique",
+            "Jumeau numérique",
             "Formation informatique associative"
           ],
           "areaServed": {
@@ -103,34 +103,121 @@
         },
         {
           "@type": "ItemList",
-          "@id": "https://willsim.fr/#formations-list",
-          "name": "Ateliers et formations de l'association Willsim",
+          "@id": "https://willsim.fr/#cours-list",
+          "name": "Fiches de cours gratuites de l'association WILLSIM",
+          "url": "https://willsim.fr/cours/",
+          "numberOfItems": 7,
           "itemListElement": [
             {
-              "@type": "Course",
+              "@type": "ListItem",
               "position": 1,
-              "name": "Atelier Développement Web & Programmation",
-              "description": "Apprenez à coder des sites et des logiciels : HTML, CSS, JavaScript, Python et projets réels.",
-              "provider": {
-                "@id": "https://willsim.fr/#organization"
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/ia-ingenierie-initiation.html#cours",
+                "url": "https://willsim.fr/cours/ia-ingenierie-initiation.html",
+                "name": "Initiation à l'IA pour l'ingénierie",
+                "description": "Les bases de l'apprentissage automatique appliquées à des mesures techniques : préparer les données, entraîner un modèle, puis évaluer ses performances sur des données qu'il n'a jamais vues.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
               }
             },
             {
-              "@type": "Course",
+              "@type": "ListItem",
               "position": 2,
-              "name": "Atelier Robotique & Systèmes Embarqués",
-              "description": "Assemblez et programmez des robots, manipulez des microcontrôleurs Arduino, ESP32, capteurs et moteurs.",
-              "provider": {
-                "@id": "https://willsim.fr/#organization"
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/commande-moteurs-pid.html#cours",
+                "url": "https://willsim.fr/cours/commande-moteurs-pid.html",
+                "name": "Commande de moteurs et régulation PID",
+                "description": "Piloter un moteur à courant continu en MLI (PWM), mesurer sa vitesse, puis régler un correcteur PID et observer l'effet de chaque terme sur la réponse du système.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
               }
             },
             {
-              "@type": "Course",
+              "@type": "ListItem",
               "position": 3,
-              "name": "Atelier Simulation Numérique & 3D",
-              "description": "Modélisation 3D, physique virtuelle et simulation interactive pour prototyper sans limites.",
-              "provider": {
-                "@id": "https://willsim.fr/#organization"
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/maintenance-predictive.html#cours",
+                "url": "https://willsim.fr/cours/maintenance-predictive.html",
+                "name": "Maintenance prédictive : capteurs et détection d’anomalies",
+                "description": "Mesurer les vibrations d'une machine tournante, en extraire des indicateurs temporels et fréquentiels (valeur efficace, spectre FFT), puis repérer automatiquement un comportement anormal.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/ia-embarquee-tinyml.html#cours",
+                "url": "https://willsim.fr/cours/ia-embarquee-tinyml.html",
+                "name": "IA embarquée sur microcontrôleur (TinyML)",
+                "description": "Entraîner un petit réseau de neurones, le quantifier en entiers 8 bits et l'exécuter sur un microcontrôleur qui ne dispose que de quelques centaines de kilo-octets de mémoire vive.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/ros2-premiers-pas.html#cours",
+                "url": "https://willsim.fr/cours/ros2-premiers-pas.html",
+                "name": "ROS 2 : premiers pas en robotique mobile",
+                "description": "Comprendre l'architecture de ROS 2 (nœuds, topics, repères tf2), écrire ses premiers nœuds en Python, puis cartographier et naviguer avec un robot mobile simulé.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/vision-robotique-opencv.html#cours",
+                "url": "https://willsim.fr/cours/vision-robotique-opencv.html",
+                "name": "Vision par ordinateur pour la robotique",
+                "description": "Traiter les images d'une caméra pour détecter des objets, calibrer le capteur et convertir une position en pixels en coordonnées utilisables par un robot.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 7,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html#cours",
+                "url": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html",
+                "name": "Apprentissage par renforcement et jumeau numérique",
+                "description": "Entraîner une politique de commande par apprentissage par renforcement dans un simulateur physique, puis préparer son transfert vers un robot réel en réduisant l'écart entre simulation et réalité.",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "provider": {
+                  "@id": "https://willsim.fr/#organization"
+                }
               }
             }
           ]
@@ -181,7 +268,7 @@
          de Manrope, police du H1 (élément LCP). @font-face dans styles.css. -->
     <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- ?v= : à incrémenter à chaque mise en ligne pour invalider le cache navigateur -->
-    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="styles.css?v=4">
   </head>
 
   <body>
@@ -197,11 +284,13 @@
           <span class="brand-text">willsim<span class="brand-period">.</span></span>
         </a>
 
-        <!-- Navigation bureau (« Notre approche » reste accessible via le tiroir et le pied de page) -->
+        <!-- Navigation bureau : libellés courts pour tenir sur une ligne dès 1025 px
+             (« Notre approche » reste accessible via le tiroir et le pied de page) -->
         <nav class="main-nav" aria-label="Navigation principale">
-          <a href="#mission">Notre mission</a>
-          <a href="#formations">Nos formations</a>
+          <a href="#mission">Mission</a>
+          <a href="#formations">Ateliers</a>
           <a href="#projets">Projets IA</a>
+          <a href="#cours">Cours</a>
           <a href="#association">L’association</a>
           <a href="#faq">FAQ</a>
           <a href="#contact">Contact</a>
@@ -253,26 +342,30 @@
           </a>
           <a class="mobile-nav-link" href="#formations">
             <span class="link-num">02</span>
-            <span class="link-label">Nos formations</span>
+            <span class="link-label">Nos ateliers</span>
           </a>
           <a class="mobile-nav-link" href="#projets">
             <span class="link-num">03</span>
             <span class="link-label">Projets IA</span>
           </a>
-          <a class="mobile-nav-link" href="#association">
+          <a class="mobile-nav-link" href="#cours">
             <span class="link-num">04</span>
+            <span class="link-label">Fiches de cours</span>
+          </a>
+          <a class="mobile-nav-link" href="#association">
+            <span class="link-num">05</span>
             <span class="link-label">L’association</span>
           </a>
           <a class="mobile-nav-link" href="#approche">
-            <span class="link-num">05</span>
+            <span class="link-num">06</span>
             <span class="link-label">Notre approche</span>
           </a>
           <a class="mobile-nav-link" href="#faq">
-            <span class="link-num">06</span>
+            <span class="link-num">07</span>
             <span class="link-label">Questions fréquentes</span>
           </a>
           <a class="mobile-nav-link" href="#contact">
-            <span class="link-num">07</span>
+            <span class="link-num">08</span>
             <span class="link-label">Nous contacter</span>
           </a>
         </nav>
@@ -347,14 +440,14 @@
                 srcset="assets/img/atelier-code-600.webp 600w, assets/img/atelier-code-900.webp 900w"
                 sizes="(max-width: 1024px) 92vw, 560px"
                 width="900" height="599"
-                alt="Atelier d'apprentissage du code et de programmation web - Association Willsim"
+                alt="Atelier d'apprentissage du code et de la programmation - Association Willsim"
                 fetchpriority="high"
                 decoding="async"
               >
               <figcaption>
                 <span class="photo-tag">01 · PROGRAMMATION</span>
-                <strong>Développement Web &amp; Logiciel</strong>
-                <span class="photo-sub">Du code à vos premières applications</span>
+                <strong>Programmation Python pour l'IA</strong>
+                <span class="photo-sub">Du code à vos premiers modèles</span>
               </figcaption>
             </figure>
 
@@ -386,7 +479,7 @@
               >
               <figcaption>
                 <span class="photo-tag">03 · INNOVATION</span>
-                <strong>Simulation &amp; 3D</strong>
+                <strong>Simulation &amp; jumeau numérique</strong>
               </figcaption>
             </figure>
           </div>
@@ -400,7 +493,7 @@
             <span class="trust-number">100%</span>
             <div class="trust-content">
               <strong>Axé sur la pratique</strong>
-              <p>Projets réels et manipulations dès les premières séances.</p>
+              <p>Des ateliers prévus autour de manipulations et de projets concrets.</p>
             </div>
           </div>
           <div class="trust-item">
@@ -411,10 +504,10 @@
             </div>
           </div>
           <div class="trust-item">
-            <span class="trust-number">1:1</span>
+            <span class="trust-number">7</span>
             <div class="trust-content">
-              <strong>Accompagnement humain</strong>
-              <p>Mentorat adapté à votre rythme et vos objectifs personnels.</p>
+              <strong>Fiches de cours gratuites</strong>
+              <p>En PDF, sous licence CC BY-NC-SA 4.0.</p>
             </div>
           </div>
           <div class="trust-item">
@@ -456,7 +549,7 @@
               </span>
               <h3>Ressources pédagogiques gratuites</h3>
               <p>
-                Créer, centraliser et diffuser en ligne des ressources gratuites (tutoriels, fiches de synthèse, exemples de code) pour appliquer l'IA à des cas concrets d'ingénierie.
+                Créer, centraliser et diffuser en ligne des ressources gratuites (tutoriels, fiches de synthèse, exemples de code) pour appliquer l'IA à des cas concrets d'ingénierie. Premières ressources en ligne&nbsp;: <a class="text-link" href="/cours/">nos fiches de cours gratuites</a>.
               </p>
             </article>
             <article class="purpose-pillar">
@@ -490,12 +583,12 @@
             <h2>Des cours et ateliers pratiques <br>pour tous les niveaux.</h2>
           </div>
           <p class="section-intro">
-            L'association <strong>Willsim</strong> prépare des ateliers structurés et 100&nbsp;% pratiques. Que vous cherchiez une <strong>association de robotique</strong> pour expérimenter sur matériel réel ou des cours de code, nous vous accompagnerons étape par étape. Nos formations en intelligence artificielle sont présentées juste après, dans <a href="#projets">Projets &amp; formations à venir</a>.
+            L'association <strong>Willsim</strong> prépare des ateliers structurés et 100&nbsp;% pratiques. Que vous cherchiez une <strong>association de robotique</strong> pour expérimenter sur matériel réel ou des cours de code, nous vous accompagnerons étape par étape. Nos formations en intelligence artificielle sont présentées juste après, dans <a href="#projets">Projets &amp; formations à venir</a>, et nos <a href="#cours">fiches de cours gratuites</a> sont déjà disponibles.
           </p>
         </div>
 
         <div class="program-grid">
-          <!-- Carte 1 : Dév -->
+          <!-- Carte 1 : Programmation Python -->
           <article class="program-card">
             <div class="card-head">
               <span class="program-number">01</span>
@@ -506,16 +599,16 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
               </span>
             </div>
-            <h3>Développement Web &amp; Programmation</h3>
+            <h3>Programmation Python pour l'IA et l'ingénierie</h3>
             <p class="card-desc">
-              Apprenez à coder des applications interactives, maîtrisez les langages Python et JavaScript, et concevez des logiciels complets avec l'aide de nos mentors associatifs.
+              Notre futur atelier de programmation&nbsp;: écrire du Python pour manipuler des mesures techniques, préparer des données et entraîner vos premiers modèles d'apprentissage automatique, en versionnant votre travail avec Git.
+              Fiche de cours associée&nbsp;: <a class="text-link" href="/cours/ia-ingenierie-initiation.html">Initiation à l'IA pour l'ingénierie</a>.
             </p>
             <div class="skills-tags">
-              <span>HTML / CSS</span>
-              <span>JavaScript</span>
               <span>Python</span>
-              <span>Git &amp; GitHub</span>
-              <span>API REST</span>
+              <span>NumPy / pandas</span>
+              <span>scikit-learn</span>
+              <span>Git</span>
             </div>
             <div class="card-footer">
               <span class="card-meta">Format hybride · Débutant à Avancé</span>
@@ -539,6 +632,7 @@
             <h3>Atelier Robotique &amp; Systèmes Embarqués</h3>
             <p class="card-desc">
               Notre futur atelier de robotique&nbsp;: manipuler des capteurs, moteurs et cartes Arduino ou ESP32, et assembler vos premiers robots autonomes et connectés.
+              Fiche de cours associée&nbsp;: <a class="text-link" href="/cours/commande-moteurs-pid.html">Commande de moteurs et régulation PID</a>.
             </p>
             <div class="skills-tags">
               <span>Arduino</span>
@@ -566,18 +660,19 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
               </span>
             </div>
-            <h3>Simulation & Modélisation 3D</h3>
+            <h3>Simulation &amp; jumeau numérique</h3>
             <p class="card-desc">
-              Explorez la physique virtuelle, la modélisation spatiale et les environnements de simulation numérique pour prototyper sans contrainte matérielle.
+              Entraîner et tester une commande dans un environnement de simulation physique avant de passer au matériel, pour prototyper sans contrainte matérielle.
+              Fiche de cours associée&nbsp;: <a class="text-link" href="/cours/apprentissage-renforcement-sim2real.html">Apprentissage par renforcement et jumeau numérique</a>.
             </p>
             <div class="skills-tags">
-              <span>Moteurs 3D</span>
-              <span>Simulation Physique</span>
-              <span>Jumeaux Numériques</span>
-              <span>Visualisation</span>
+              <span>Simulation physique</span>
+              <span>Gymnasium</span>
+              <span>Jumeau numérique</span>
+              <span>Sim-to-real</span>
             </div>
             <div class="card-footer">
-              <span class="card-meta">Études de cas · Projets sur mesure</span>
+              <span class="card-meta">Études de cas · Projets guidés</span>
               <a href="#contact" class="card-link" aria-label="Participer à l'atelier simulation">
                 <span>Participer</span> <span aria-hidden="true">↗</span>
               </a>
@@ -588,7 +683,8 @@
       </section>
 
       <!-- Section Projets & formations à venir : rien n'est présenté comme déjà réalisé
-           (association créée en septembre 2026) ; badges de statut à mettre à jour au lancement -->
+           (association créée en septembre 2026) ; badges de statut à mettre à jour au lancement.
+           Cartes entièrement cliquables : lien .card-link-stretched dans le h3 -->
       <section class="projects section-padding" id="projets" aria-labelledby="projets-title">
         <div class="page-width">
           <div class="section-heading">
@@ -608,7 +704,7 @@
                 <span class="program-number">01</span>
                 <span class="program-badge">Projet en préparation</span>
               </div>
-              <h3>Bras robotique guidé par vision</h3>
+              <h3><a class="card-link-stretched" href="/projets/bras-robotique-vision.html">Bras robotique guidé par vision</a></h3>
               <p class="card-desc">
                 Objectif&nbsp;: repérer des objets avec une caméra, les identifier grâce à un modèle de détection, puis les saisir et les trier automatiquement avec un bras robotique (pick-and-place).
               </p>
@@ -627,7 +723,7 @@
                 <span class="program-number">02</span>
                 <span class="program-badge">Projet en préparation</span>
               </div>
-              <h3>Maintenance prédictive d'un moteur</h3>
+              <h3><a class="card-link-stretched" href="/projets/maintenance-predictive-moteur.html">Maintenance prédictive d'un moteur</a></h3>
               <p class="card-desc">
                 Objectif&nbsp;: mesurer les vibrations et le courant d'un moteur électrique, entraîner un modèle de détection d'anomalies, puis l'embarquer au plus près du moteur pour signaler une dérive avant la panne.
               </p>
@@ -646,7 +742,7 @@
                 <span class="program-number">03</span>
                 <span class="program-badge">Projet en préparation</span>
               </div>
-              <h3>Robot mobile autonome</h3>
+              <h3><a class="card-link-stretched" href="/projets/robot-mobile-autonome.html">Robot mobile autonome</a></h3>
               <p class="card-desc">
                 Objectif&nbsp;: concevoir un robot capable de cartographier son environnement (SLAM), de reconnaître les obstacles grâce à un modèle de vision embarqué et d'adapter sa trajectoire en temps réel.
               </p>
@@ -665,7 +761,7 @@
                 <span class="program-number">04</span>
                 <span class="program-badge">Projet en préparation</span>
               </div>
-              <h3>Du jumeau numérique au robot réel</h3>
+              <h3><a class="card-link-stretched" href="/projets/jumeau-numerique-sim2real.html">Du jumeau numérique au robot réel</a></h3>
               <p class="card-desc">
                 Objectif&nbsp;: entraîner un contrôleur par apprentissage par renforcement dans une simulation, puis le transférer sur un robot physique et mesurer l'écart entre simulation et réalité.
               </p>
@@ -681,17 +777,17 @@
             <article class="program-card">
               <div class="card-head">
                 <span class="program-number">05</span>
-                <span class="program-badge program-badge-training">Formation à venir</span>
+                <span class="program-badge program-badge-training">Fiche PDF disponible</span>
               </div>
-              <h3>Initiation à l'IA pour l'ingénierie</h3>
+              <h3><a class="card-link-stretched" href="/cours/ia-ingenierie-initiation.html">Initiation à l'IA pour l'ingénierie</a></h3>
               <p class="card-desc">
-                Comprendre les bases de l'apprentissage automatique et les appliquer à des données techniques&nbsp;: mesures de capteurs, signaux et images.
+                Comprendre les bases de l'apprentissage automatique et les appliquer à des mesures techniques&nbsp;: préparer les données, entraîner un modèle, puis évaluer ses performances sur des données qu'il n'a jamais vues. La fiche de cours est disponible gratuitement&nbsp;; les sessions en atelier sont à venir.
               </p>
               <div class="skills-tags">
                 <span>Python</span>
                 <span>Apprentissage automatique</span>
                 <span>Analyse de données</span>
-                <span>Réseaux de neurones</span>
+                <span>scikit-learn</span>
               </div>
             </article>
 
@@ -699,11 +795,11 @@
             <article class="program-card">
               <div class="card-head">
                 <span class="program-number">06</span>
-                <span class="program-badge program-badge-training">Formation à venir</span>
+                <span class="program-badge program-badge-training">Fiche PDF disponible</span>
               </div>
-              <h3>IA embarquée sur microcontrôleur</h3>
+              <h3><a class="card-link-stretched" href="/cours/ia-embarquee-tinyml.html">IA embarquée sur microcontrôleur (TinyML)</a></h3>
               <p class="card-desc">
-                Faire tourner un petit réseau de neurones directement sur un microcontrôleur&nbsp;: collecte des données, entraînement, optimisation puis déploiement sur la carte.
+                Faire tourner un petit réseau de neurones directement sur un microcontrôleur&nbsp;: collecte des données, entraînement, optimisation puis déploiement sur la carte. La fiche de cours est disponible gratuitement&nbsp;; les sessions en atelier sont à venir.
               </p>
               <div class="skills-tags">
                 <span>TinyML</span>
@@ -718,6 +814,162 @@
           <p class="projects-cta">
             Une idée de projet, l'envie de vous former ou de contribuer&#8239;?
             <a href="#contact">Proposez un projet ou rejoignez-nous <span aria-hidden="true">↗</span></a>
+          </p>
+        </div>
+      </section>
+
+      <!-- Section Fiches de cours : ressources pédagogiques gratuites prévues par l'article 2
+           des statuts (fiches PDF disponibles ; sessions en atelier à venir, aucune date fixée) -->
+      <section class="section-padding" id="cours" aria-labelledby="cours-title">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> RESSOURCES PÉDAGOGIQUES GRATUITES</p>
+              <h2 id="cours-title">Nos fiches de cours <br>gratuites.</h2>
+            </div>
+            <p class="section-intro">
+              Diffuser gratuitement des ressources pédagogiques en ligne fait partie de l'objet inscrit dans nos statuts. Chaque cours dispose d'une page détaillée et d'une fiche PDF rédigées par l'équipe pédagogique <strong>WILLSIM</strong>, publiées sous licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" rel="license noopener">CC BY-NC-SA 4.0</a>. Les sessions en atelier sont à venir.
+            </p>
+          </div>
+
+          <div class="course-grid">
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">01</span>
+                <span class="program-badge">Débutant</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/ia-ingenierie-initiation.html">Initiation à l'IA pour l'ingénierie</a></h3>
+              <p class="card-desc">Les bases de l'apprentissage automatique appliquées à des mesures techniques&nbsp;: préparer les données, entraîner un modèle, puis évaluer ses performances sur des données qu'il n'a jamais vues.</p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>pandas</span>
+                <span>scikit-learn</span>
+                <span>Jupyter</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">6&nbsp;h · 3&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">02</span>
+                <span class="program-badge">Débutant</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/commande-moteurs-pid.html">Commande de moteurs et régulation PID</a></h3>
+              <p class="card-desc">Piloter un moteur à courant continu en MLI (PWM), mesurer sa vitesse, puis régler un correcteur PID et observer l'effet de chaque terme sur la réponse du système.</p>
+              <div class="skills-tags">
+                <span>Microcontrôleur</span>
+                <span>Moteur à courant continu</span>
+                <span>MLI (PWM)</span>
+                <span>Correcteur PID</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">6&nbsp;h · 3&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">03</span>
+                <span class="program-badge">Intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/maintenance-predictive.html">Maintenance prédictive&nbsp;: capteurs et détection d’anomalies</a></h3>
+              <p class="card-desc">Mesurer les vibrations d'une machine tournante, en extraire des indicateurs temporels et fréquentiels (valeur efficace, spectre FFT), puis repérer automatiquement un comportement anormal.</p>
+              <div class="skills-tags">
+                <span>Accéléromètre</span>
+                <span>FFT</span>
+                <span>scikit-learn</span>
+                <span>Isolation Forest</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">6&nbsp;h · 3&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">04</span>
+                <span class="program-badge">Intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/ia-embarquee-tinyml.html">IA embarquée sur microcontrôleur (TinyML)</a></h3>
+              <p class="card-desc">Entraîner un petit réseau de neurones, le quantifier en entiers 8&nbsp;bits et l'exécuter sur un microcontrôleur qui ne dispose que de quelques centaines de kilo-octets de mémoire vive.</p>
+              <div class="skills-tags">
+                <span>Keras</span>
+                <span>LiteRT for Microcontrollers</span>
+                <span>ESP32</span>
+                <span>Quantification int8</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">8&nbsp;h · 4&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">05</span>
+                <span class="program-badge">Débutant à intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/ros2-premiers-pas.html">ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</a></h3>
+              <p class="card-desc">Comprendre l'architecture de ROS&nbsp;2 (nœuds, topics, repères tf2), écrire ses premiers nœuds en Python, puis cartographier et naviguer avec un robot mobile simulé.</p>
+              <div class="skills-tags">
+                <span>ROS 2</span>
+                <span>Python (rclpy)</span>
+                <span>Gazebo</span>
+                <span>SLAM et Nav2</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">8&nbsp;h · 4&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">06</span>
+                <span class="program-badge">Intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/vision-robotique-opencv.html">Vision par ordinateur pour la robotique</a></h3>
+              <p class="card-desc">Traiter les images d'une caméra pour détecter des objets, calibrer le capteur et convertir une position en pixels en coordonnées utilisables par un robot.</p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>OpenCV</span>
+                <span>Calibration caméra</span>
+                <span>Détection d'objets</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">8&nbsp;h · 4&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">07</span>
+                <span class="program-badge">Avancé</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/apprentissage-renforcement-sim2real.html">Apprentissage par renforcement et jumeau numérique</a></h3>
+              <p class="card-desc">Entraîner une politique de commande par apprentissage par renforcement dans un simulateur physique, puis préparer son transfert vers un robot réel en réduisant l'écart entre simulation et réalité.</p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>Apprentissage par renforcement</span>
+                <span>Simulation physique</span>
+                <span>Sim-to-real</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">10&nbsp;h · 5&nbsp;séances</span>
+                <span class="card-link" aria-hidden="true">Voir le cours <span>→</span></span>
+              </div>
+            </article>
+          </div>
+
+          <p class="projects-cta">
+            Niveaux, prérequis et plan détaillé de chaque cours, avec un accès direct aux fiches PDF&nbsp;:
+            <a href="/cours/">Voir tout le catalogue <span aria-hidden="true">→</span></a>
           </p>
         </div>
       </section>
@@ -800,9 +1052,6 @@
               </div>
             </div>
 
-            <div class="mission-actions">
-              <a class="button button-light" href="#contact">Rejoindre l'association <span aria-hidden="true">↗</span></a>
-            </div>
           </div>
         </div>
       </section>
@@ -816,7 +1065,7 @@
             <h2>Progresser à votre rythme, <br>étape par étape.</h2>
           </div>
           <p class="approach-intro">
-            Chaque adhérent arrive avec son histoire, ses compétences et ses objectifs. Nous concevons un parcours sur mesure pour vous faire progresser de façon durable.
+            Chaque adhérent arrive avec son histoire, ses compétences et ses objectifs. Nos ateliers, encore à venir, sont pensés pour vous faire progresser de façon durable, selon votre niveau.
           </p>
         </div>
 
@@ -829,7 +1078,7 @@
             <div class="step-body">
               <h3>Diagnostic personnalisé</h3>
               <p>
-                Nous échangeons sur vos envies, votre niveau actuel et le projet que vous souhaitez mener à bien. Nous définissons ensemble une feuille de route claire.
+                Nous échangerons sur vos envies, votre niveau actuel et le projet que vous souhaitez mener à bien, pour définir ensemble une feuille de route claire.
               </p>
               <ul class="step-list">
                 <li>Bilan des acquis et des ambitions</li>
@@ -847,10 +1096,10 @@
             <div class="step-body">
               <h3>Pratique immersive & Ateliers</h3>
               <p>
-                Fini la théorie passive. Vous écrirez du code, manipulerez du matériel et résoudrez des bugs concrets avec l'appui de membres plus expérimentés.
+                Fini la théorie passive. Vous écrirez du code, manipulerez du matériel et résoudrez des bugs concrets, en vous appuyant sur l'entraide entre membres.
               </p>
               <ul class="step-list">
-                <li>Projets concrets dès le 1er jour</li>
+                <li>Projets concrets dès les premières séances</li>
                 <li>Revue bienveillante du travail</li>
                 <li>Entraide entre adhérents</li>
               </ul>
@@ -870,7 +1119,6 @@
               <ul class="step-list">
                 <li>Déploiement et finalisation de projets</li>
                 <li>Méthodes d'apprentissage autonome</li>
-                <li>Accès au réseau de l'association</li>
               </ul>
             </div>
           </article>
@@ -924,7 +1172,7 @@
             </summary>
             <div class="faq-answer">
               <p>
-                Un simple ordinateur portable classique (Windows, Mac ou Linux) suffit pour débuter. Aucun matériel coûteux n'est exigé. Pour les ateliers de robotique, les composants électroniques, cartes Arduino/ESP32, capteurs et moteurs sont mutualisés par l'association Willsim lors de chaque séance.
+                Un simple ordinateur portable classique (Windows, Mac ou Linux) suffit pour débuter. Aucun matériel coûteux n'est exigé. Pour les ateliers de robotique, les composants électroniques, cartes Arduino/ESP32, capteurs et moteurs seront mis en commun par l'association Willsim lors des séances.
               </p>
             </div>
           </details>
@@ -993,8 +1241,8 @@
               <p>Envoyez-nous un message en un clic pour faire le point sur vos objectifs d'apprentissage.</p>
               
               <a
-                href="mailto:contact@willsim.fr?subject=Demande%20d'information%20-%20Ateliers%20Willsim&amp;body=Bonjour%20l'%C3%A9quipe%20Willsim%2C%0A%0AJe%20souhaiterais%20avoir%20des%20informations%20sur%20vos%20ateliers%20de%20%3A%0A%5B%20%5D%20D%C3%A9veloppement%0A%5B%20%5D%20Robotique%0A%5B%20%5D%20Simulation%0A%0AMon%20niveau%20actuel%20%3A%0AMes%20objectifs%20%3A%0A%0AMerci%20d'avance%20!"
-                class="button button-lime button-full"
+                href="mailto:contact@willsim.fr?subject=Demande%20d'information%20-%20Ateliers%20Willsim&amp;body=Bonjour%20l'%C3%A9quipe%20Willsim%2C%0A%0AJe%20souhaiterais%20avoir%20des%20informations%20sur%20vos%20ateliers%20de%20%3A%0A%5B%20%5D%20Programmation%0A%5B%20%5D%20Robotique%0A%5B%20%5D%20Simulation%0A%0AMon%20niveau%20actuel%20%3A%0AMes%20objectifs%20%3A%0A%0AMerci%20d'avance%20!"
+                class="button button-outline button-full"
               >
                 <span>Envoyer un message à l'association</span>
                 <span class="btn-icon" aria-hidden="true">
@@ -1027,8 +1275,9 @@
           <strong>Navigation</strong>
           <nav aria-label="Navigation secondaire">
             <a href="#mission">Notre mission</a>
-            <a href="#formations">Nos formations</a>
+            <a href="#formations">Nos ateliers</a>
             <a href="#projets">Projets IA</a>
+            <a href="#cours">Fiches de cours</a>
             <a href="#association">L’association</a>
             <a href="#approche">Notre approche</a>
             <a href="#faq">Questions fréquentes</a>
@@ -1069,6 +1318,6 @@
       </div>
     </footer>
 
-    <script src="script.js?v=3" defer></script>
+    <script src="script.js?v=4" defer></script>
   </body>
 </html>

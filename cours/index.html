@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Cours gratuits en IA, robotique et mécatronique — WILLSIM</title>
+    <meta name="description" content="Fiches de cours gratuites en PDF pour appliquer l'IA à l'ingénierie : vision, TinyML, ROS 2, régulation PID, maintenance prédictive. Licence CC BY-NC-SA 4.0.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/cours/">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/cours/">
+    <meta property="og:title" content="Cours gratuits en IA, robotique et mécatronique — WILLSIM">
+    <meta property="og:description" content="Fiches de cours gratuites en PDF pour appliquer l'IA à l'ingénierie : vision, TinyML, ROS 2, régulation PID, maintenance prédictive. Licence CC BY-NC-SA 4.0.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cours gratuits en IA, robotique et mécatronique — WILLSIM">
+    <meta name="twitter:description" content="Fiches de cours gratuites en PDF pour appliquer l'IA à l'ingénierie : vision, TinyML, ROS 2, régulation PID, maintenance prédictive. Licence CC BY-NC-SA 4.0.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : catalogue (CollectionPage + ItemList de cours) et fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "@id": "https://willsim.fr/cours/#page",
+          "url": "https://willsim.fr/cours/",
+          "name": "Fiches de cours gratuites",
+          "description": "Fiches de cours gratuites en PDF pour appliquer l'IA à l'ingénierie : vision, TinyML, ROS 2, régulation PID, maintenance prédictive. Licence CC BY-NC-SA 4.0.",
+          "inLanguage": "fr",
+          "publisher": {
+            "@type": [
+              "EducationalOrganization",
+              "NGO"
+            ],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "mainEntity": {
+            "@id": "https://willsim.fr/cours/#liste"
+          }
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://willsim.fr/cours/#liste",
+          "name": "Fiches de cours gratuites de l'association WILLSIM",
+          "numberOfItems": 7,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/ia-ingenierie-initiation.html#cours",
+                "url": "https://willsim.fr/cours/ia-ingenierie-initiation.html",
+                "name": "Initiation à l'IA pour l'ingénierie",
+                "description": "Les bases de l'apprentissage automatique appliquées à des mesures techniques : préparer les données, entraîner un modèle, puis évaluer ses performances sur des données qu'il n'a jamais vues.",
+                "inLanguage": "fr",
+                "educationalLevel": "Débutant",
+                "timeRequired": "PT6H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/commande-moteurs-pid.html#cours",
+                "url": "https://willsim.fr/cours/commande-moteurs-pid.html",
+                "name": "Commande de moteurs et régulation PID",
+                "description": "Piloter un moteur à courant continu en MLI (PWM), mesurer sa vitesse, puis régler un correcteur PID et observer l'effet de chaque terme sur la réponse du système.",
+                "inLanguage": "fr",
+                "educationalLevel": "Débutant",
+                "timeRequired": "PT6H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/maintenance-predictive.html#cours",
+                "url": "https://willsim.fr/cours/maintenance-predictive.html",
+                "name": "Maintenance prédictive : capteurs et détection d’anomalies",
+                "description": "Mesurer les vibrations d'une machine tournante, en extraire des indicateurs temporels et fréquentiels (valeur efficace, spectre FFT), puis repérer automatiquement un comportement anormal.",
+                "inLanguage": "fr",
+                "educationalLevel": "Intermédiaire",
+                "timeRequired": "PT6H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/ia-embarquee-tinyml.html#cours",
+                "url": "https://willsim.fr/cours/ia-embarquee-tinyml.html",
+                "name": "IA embarquée sur microcontrôleur (TinyML)",
+                "description": "Entraîner un petit réseau de neurones, le quantifier en entiers 8 bits et l'exécuter sur un microcontrôleur qui ne dispose que de quelques centaines de kilo-octets de mémoire vive.",
+                "inLanguage": "fr",
+                "educationalLevel": "Intermédiaire",
+                "timeRequired": "PT8H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/ros2-premiers-pas.html#cours",
+                "url": "https://willsim.fr/cours/ros2-premiers-pas.html",
+                "name": "ROS 2 : premiers pas en robotique mobile",
+                "description": "Comprendre l'architecture de ROS 2 (nœuds, topics, repères tf2), écrire ses premiers nœuds en Python, puis cartographier et naviguer avec un robot mobile simulé.",
+                "inLanguage": "fr",
+                "educationalLevel": "Débutant à intermédiaire",
+                "timeRequired": "PT8H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/vision-robotique-opencv.html#cours",
+                "url": "https://willsim.fr/cours/vision-robotique-opencv.html",
+                "name": "Vision par ordinateur pour la robotique",
+                "description": "Traiter les images d'une caméra pour détecter des objets, calibrer le capteur et convertir une position en pixels en coordonnées utilisables par un robot.",
+                "inLanguage": "fr",
+                "educationalLevel": "Intermédiaire",
+                "timeRequired": "PT8H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 7,
+              "item": {
+                "@type": "Course",
+                "@id": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html#cours",
+                "url": "https://willsim.fr/cours/apprentissage-renforcement-sim2real.html",
+                "name": "Apprentissage par renforcement et jumeau numérique",
+                "description": "Entraîner une politique de commande par apprentissage par renforcement dans un simulateur physique, puis préparer son transfert vers un robot réel en réduisant l'écart entre simulation et réalité.",
+                "inLanguage": "fr",
+                "educationalLevel": "Avancé",
+                "timeRequired": "PT10H",
+                "isAccessibleForFree": true,
+                "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "provider": {
+                  "@type": [
+                    "EducationalOrganization",
+                    "NGO"
+                  ],
+                  "@id": "https://willsim.fr/#organization",
+                  "name": "WILLSIM",
+                  "url": "https://willsim.fr"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Accueil",
+              "item": "https://willsim.fr/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Cours",
+              "item": "https://willsim.fr/cours/"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/" aria-current="page">Cours</a>
+          <a href="/#projets">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><span aria-current="page">Cours</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Ressources pédagogiques gratuites</p>
+          <h1>Fiches de cours gratuites</h1>
+          <p class="page-lead">Comme le prévoient ses statuts, l'association WILLSIM crée et diffuse gratuitement des ressources pédagogiques pour appliquer l'intelligence artificielle à l'ingénierie et à la mécatronique. Chaque cours dispose d'une page détaillée (objectifs, prérequis, plan des séances, matériel) et d'une fiche PDF, à lire en autonomie ou à utiliser en atelier.</p>
+
+          <div class="page-badges">
+            <span class="status-badge status-badge-available">7 fiches PDF disponibles</span>
+            <span class="status-badge">Sessions en atelier à venir</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Cours</dt><dd>7 cours, 4 parcours</dd></div>
+            <div><dt>Volume total</dt><dd>52&nbsp;h (26 séances de 2&nbsp;h)</dd></div>
+            <div><dt>Niveaux</dt><dd>Du débutant à l'avancé</dd></div>
+            <div><dt>Accès</dt><dd>Gratuit, sans inscription</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <section class="section-padding" id="parcours-fondamentaux" aria-labelledby="parcours-fondamentaux-titre">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> Parcours 1 · 1&nbsp;cours</p>
+              <h2 id="parcours-fondamentaux-titre">Fondamentaux de l'IA</h2>
+            </div>
+            <p class="section-intro">Le point de départ conseillé&nbsp;: comprendre ce qu'un modèle apprend à partir de données de mesure, et vérifier qu'il reste fiable sur des données nouvelles avant de l'intégrer à un système réel.</p>
+          </div>
+
+          <div class="course-grid">
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">01</span>
+                <span class="program-badge">Débutant</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/ia-ingenierie-initiation.html">Initiation à l'IA pour l'ingénierie</a></h3>
+              <p class="card-desc">Les bases de l'apprentissage automatique appliquées à des mesures techniques&nbsp;: préparer les données, entraîner un modèle, puis évaluer ses performances sur des données qu'il n'a jamais vues.</p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>pandas</span>
+                <span>scikit-learn</span>
+                <span>Jupyter</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">6&nbsp;h · 3&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-ia-ingenierie-initiation.pdf" type="application/pdf" aria-label="Fiche PDF, Initiation à l'IA pour l'ingénierie">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects section-padding" id="parcours-mecatronique" aria-labelledby="parcours-mecatronique-titre">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> Parcours 2 · 3&nbsp;cours</p>
+              <h2 id="parcours-mecatronique-titre">Mécatronique et commande</h2>
+            </div>
+            <p class="section-intro">Du moteur au microcontrôleur&nbsp;: commander un actionneur, surveiller une machine grâce à ses capteurs, puis embarquer un modèle d'IA au plus près du matériel.</p>
+          </div>
+
+          <div class="course-grid">
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">02</span>
+                <span class="program-badge">Débutant</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/commande-moteurs-pid.html">Commande de moteurs et régulation PID</a></h3>
+              <p class="card-desc">Piloter un moteur à courant continu en MLI (PWM), mesurer sa vitesse, puis régler un correcteur PID et observer l'effet de chaque terme sur la réponse du système.</p>
+              <div class="skills-tags">
+                <span>Microcontrôleur</span>
+                <span>Moteur à courant continu</span>
+                <span>MLI (PWM)</span>
+                <span>Correcteur PID</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">6&nbsp;h · 3&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-commande-moteurs-pid.pdf" type="application/pdf" aria-label="Fiche PDF, Commande de moteurs et régulation PID">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">03</span>
+                <span class="program-badge">Intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/maintenance-predictive.html">Maintenance prédictive&nbsp;: capteurs et détection d’anomalies</a></h3>
+              <p class="card-desc">Mesurer les vibrations d'une machine tournante, en extraire des indicateurs temporels et fréquentiels (valeur efficace, spectre FFT), puis repérer automatiquement un comportement anormal.</p>
+              <div class="skills-tags">
+                <span>Accéléromètre</span>
+                <span>FFT</span>
+                <span>scikit-learn</span>
+                <span>Isolation Forest</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">6&nbsp;h · 3&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-maintenance-predictive.pdf" type="application/pdf" aria-label="Fiche PDF, Maintenance prédictive&nbsp;: capteurs et détection d’anomalies">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">04</span>
+                <span class="program-badge">Intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/ia-embarquee-tinyml.html">IA embarquée sur microcontrôleur (TinyML)</a></h3>
+              <p class="card-desc">Entraîner un petit réseau de neurones, le quantifier en entiers 8&nbsp;bits et l'exécuter sur un microcontrôleur qui ne dispose que de quelques centaines de kilo-octets de mémoire vive.</p>
+              <div class="skills-tags">
+                <span>Keras</span>
+                <span>LiteRT for Microcontrollers</span>
+                <span>ESP32</span>
+                <span>Quantification int8</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">8&nbsp;h · 4&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-ia-embarquee-tinyml.pdf" type="application/pdf" aria-label="Fiche PDF, IA embarquée sur microcontrôleur (TinyML)">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-padding" id="parcours-robotique" aria-labelledby="parcours-robotique-titre">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> Parcours 3 · 2&nbsp;cours</p>
+              <h2 id="parcours-robotique-titre">Robotique et vision</h2>
+            </div>
+            <p class="section-intro">Donner à un robot les moyens de se déplacer et de percevoir&nbsp;: ROS&nbsp;2 pour structurer le logiciel, la vision par ordinateur pour localiser les objets.</p>
+          </div>
+
+          <div class="course-grid">
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">05</span>
+                <span class="program-badge">Débutant à intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/ros2-premiers-pas.html">ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</a></h3>
+              <p class="card-desc">Comprendre l'architecture de ROS&nbsp;2 (nœuds, topics, repères tf2), écrire ses premiers nœuds en Python, puis cartographier et naviguer avec un robot mobile simulé.</p>
+              <div class="skills-tags">
+                <span>ROS 2</span>
+                <span>Python (rclpy)</span>
+                <span>Gazebo</span>
+                <span>SLAM et Nav2</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">8&nbsp;h · 4&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-ros2-premiers-pas.pdf" type="application/pdf" aria-label="Fiche PDF, ROS&nbsp;2&nbsp;: premiers pas en robotique mobile">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">06</span>
+                <span class="program-badge">Intermédiaire</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/vision-robotique-opencv.html">Vision par ordinateur pour la robotique</a></h3>
+              <p class="card-desc">Traiter les images d'une caméra pour détecter des objets, calibrer le capteur et convertir une position en pixels en coordonnées utilisables par un robot.</p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>OpenCV</span>
+                <span>Calibration caméra</span>
+                <span>Détection d'objets</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">8&nbsp;h · 4&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-vision-robotique-opencv.pdf" type="application/pdf" aria-label="Fiche PDF, Vision par ordinateur pour la robotique">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects section-padding" id="parcours-ia-avancee" aria-labelledby="parcours-ia-avancee-titre">
+        <div class="page-width">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> Parcours 4 · 1&nbsp;cours</p>
+              <h2 id="parcours-ia-avancee-titre">IA avancée</h2>
+            </div>
+            <p class="section-intro">Pour les profils à l'aise avec Python et l'apprentissage automatique&nbsp;: apprendre une loi de commande par essais et erreurs en simulation, puis préparer son transfert vers un robot réel.</p>
+          </div>
+
+          <div class="course-grid">
+            <article class="course-card">
+              <div class="card-head">
+                <span class="program-number">07</span>
+                <span class="program-badge">Avancé</span>
+              </div>
+              <h3><a class="card-link-stretched" href="/cours/apprentissage-renforcement-sim2real.html">Apprentissage par renforcement et jumeau numérique</a></h3>
+              <p class="card-desc">Entraîner une politique de commande par apprentissage par renforcement dans un simulateur physique, puis préparer son transfert vers un robot réel en réduisant l'écart entre simulation et réalité.</p>
+              <div class="skills-tags">
+                <span>Python</span>
+                <span>Apprentissage par renforcement</span>
+                <span>Simulation physique</span>
+                <span>Sim-to-real</span>
+              </div>
+              <div class="card-footer">
+                <span class="card-meta">10&nbsp;h · 5&nbsp;séances</span>
+                <a class="button button-outline" href="/assets/pdf/willsim-apprentissage-renforcement-sim2real.pdf" type="application/pdf" aria-label="Fiche PDF, Apprentissage par renforcement et jumeau numérique">Fiche PDF <span aria-hidden="true">↓</span></a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section" aria-labelledby="licence-titre">
+        <div class="page-width">
+          <div class="contact-card">
+            <div class="contact-content">
+              <p class="eyebrow eyebrow-light"><span class="eyebrow-dot"></span> Licence et réutilisation</p>
+              <h2 id="licence-titre">Des ressources libres de circuler.</h2>
+              <p class="contact-lead">
+                Les fiches PDF et les pages de cours sont publiées sous licence Creative Commons BY-NC-SA 4.0. Vous pouvez les copier, les diffuser et les adapter, par exemple pour un club, un projet étudiant ou un cours, à condition de créditer l'association WILLSIM, de ne pas en faire un usage commercial et de partager vos adaptations sous la même licence.
+              </p>
+
+              <div class="contact-details">
+                <div class="detail-row">
+                  <span class="detail-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+                  </span>
+                  <div>
+                    <span class="detail-label">Licence&nbsp;:</span>
+                    <a class="detail-val" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" rel="license noopener">CC BY-NC-SA 4.0, lire le texte de la licence <span aria-hidden="true">↗</span></a>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                  </span>
+                  <div>
+                    <span class="detail-label">Rédaction&nbsp;:</span>
+                    <span class="detail-val">Équipe pédagogique WILLSIM</span>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </span>
+                  <div>
+                    <span class="detail-label">Sessions en atelier&nbsp;:</span>
+                    <span class="detail-val">À venir, aucune date n'est encore fixée</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-action-panel">
+              <div class="action-card-inner">
+                <h3>Être informé des premières sessions</h3>
+                <p>Une question sur un cours, une erreur à signaler dans une fiche ou l'envie de participer à une session&#8239;? Écrivez à l'association.</p>
+                <a class="button button-lime button-full" href="mailto:contact@willsim.fr?subject=Fiches%20de%20cours%20WILLSIM">
+                  <span>Écrire à l'association</span>
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  </span>
+                </a>
+                <span class="action-caption">Sans engagement · Réponse personnalisée</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

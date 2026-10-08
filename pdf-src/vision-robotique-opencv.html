@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Vision par ordinateur pour la robotique — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : seuillage HSV, contours et moments, calibration de caméra, homographie pixels vers millimètres et chaîne pick-and-place avec Python et OpenCV.">
+    <meta name="keywords" content="vision par ordinateur, robotique, OpenCV, Python, NumPy, HSV, moments, calibration de caméra, homographie, pick-and-place, YOLO">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Styles propres à cette fiche */
+      math[display="block"] { margin: 2.5mm 0 3mm; }
+      pre { font-size: 8pt; line-height: 1.4; }
+      .resultat { margin-top: -1mm; font-size: 8.5pt; color: var(--ink-secondary); }
+      .resultat code { font-size: 0.95em; }
+      .pitfalls td:first-child { width: 27%; }
+      figure svg { width: 100%; }
+      .pitfalls { break-inside: avoid; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>Vision par ordinateur pour la robotique</h1>
+      <p class="cover-lead">Repérer une pièce avec une caméra USB, mesurer sa position et son orientation, puis convertir ces pixels en coordonnées utilisables par un bras robotisé&nbsp;: les bases de la vision industrielle avec Python et OpenCV, et une ouverture vers la détection d’objets par réseau de neurones.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Intermédiaire</dd></div>
+        <div><dt>Durée</dt><dd>8&nbsp;h (4 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Python et notions de NumPy</dd></div>
+        <div><dt>Outils</dt><dd>Python, OpenCV, NumPy, caméra USB</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>isoler un objet coloré par seuillage dans l’espace HSV et nettoyer le masque obtenu&nbsp;;</li>
+        <li>calculer le centroïde et l’orientation d’un objet à partir des moments de son contour, à 1&nbsp;pixel et 1&nbsp;degré près sur une image de test&nbsp;;</li>
+        <li>calibrer une caméra avec un damier et interpréter la matrice intrinsèque et l’erreur de reprojection&nbsp;;</li>
+        <li>convertir des pixels en millimètres sur le plan de travail par homographie, et contrôler le résultat sur un repère&nbsp;;</li>
+        <li>décrire la chaîne «&nbsp;détecter, localiser, transmettre&nbsp;» d’un pick-and-place, en citer les principales sources d’erreur et situer les détecteurs neuronaux de la famille YOLO.</li>
+      </ul>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>Représentation d’une image</h2>
+        <p>Pour OpenCV, une image couleur est un tableau NumPy de forme <code>(hauteur, largeur, 3)</code> et de type <code>uint8</code>&nbsp;: chaque pixel contient trois intensités entières de 0 à 255. Deux conventions surprennent souvent&nbsp;:</p>
+        <ul>
+          <li>les canaux sont rangés dans l’ordre <strong>B, G, R</strong> (bleu, vert, rouge)&nbsp;: une image lue par <code>cv2.imread</code> ou <code>cv2.VideoCapture</code> doit être convertie avant d’être affichée par une bibliothèque qui attend du RVB, comme Matplotlib&nbsp;;</li>
+          <li>l’origine est le <strong>coin supérieur gauche</strong>&nbsp;; l’axe des colonnes <em>u</em> (<em>x</em> dans la documentation d’OpenCV) va vers la droite, l’axe des lignes <em>v</em> (<em>y</em>) vers le bas. On lit un pixel avec <code>img[v, u]</code>&nbsp;: la ligne d’abord.</li>
+        </ul>
+        <p>Une image 640&nbsp;×&nbsp;480 en BGR occupe 921&nbsp;600 octets. Comme le temps de calcul croît à peu près avec le nombre de pixels, choisissez la plus petite résolution qui suffit à la précision visée.</p>
+      </section>
+
+      <section>
+        <h2>Espaces colorimétriques et seuillage HSV</h2>
+        <p>En BGR, couleur et luminosité sont mêlées&nbsp;: une même pièce rouge, à l’ombre ou au soleil, a des valeurs B, G, R très différentes. L’espace <strong>HSV</strong> les sépare&nbsp;: <strong>H</strong> (teinte) est un angle sur le cercle chromatique, qu’OpenCV divise par 2 pour les images 8&nbsp;bits afin qu’il tienne dans [0&nbsp;;&nbsp;179]&nbsp;; <strong>S</strong> (saturation) va de 0 (gris) à 255 (couleur vive)&nbsp;; <strong>V</strong> (valeur, la luminosité) de 0 (noir) à 255.</p>
+        <p>Le seuillage garde les pixels dont H, S et V sont compris entre deux bornes&nbsp;: <code>cv2.inRange</code> renvoie un <strong>masque binaire</strong> (255 si le pixel est retenu, 0 sinon). Les bornes basses de S et V écartent le fond grisâtre et les zones sombres, où la teinte n’a plus de sens. Le rouge, à cheval sur 0, demande deux appels à <code>cv2.inRange</code> réunis par <code>cv2.bitwise_or</code>. Une <strong>ouverture</strong> morphologique (érosion puis dilatation) supprime ensuite les pixels isolés, et une <strong>fermeture</strong> (dilatation puis érosion) bouche les petits trous.</p>
+        <table>
+          <caption>Plages de teinte indicatives dans OpenCV, à ajuster sous votre éclairage</caption>
+          <thead>
+            <tr><th scope="col">Couleur</th><th scope="col">Rouge</th><th scope="col">Orange</th><th scope="col">Jaune</th><th scope="col">Vert</th><th scope="col">Bleu</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Teinte</th><td>0° (360°)</td><td>≈&nbsp;30°</td><td>60°</td><td>120°</td><td>240°</td></tr>
+            <tr><th scope="row">H dans OpenCV</th><td>0 à 8 et 170 à 179</td><td>8 à 22</td><td>22 à 35</td><td>35 à 85</td><td>95 à 130</td></tr>
+          </tbody>
+        </table>
+        <p>Le programme de test fabrique sa propre image, ce qui permet de comparer le résultat à la vérité terrain. Sa seconde partie figure à la section suivante.</p>
+        <p class="code-title">detection_piece.py — 1re partie&nbsp;: image de test et seuillage</p>
+        <pre><code>import cv2
+import numpy as np
+
+<span class="c"># Image de test 640 x 480 : fond gris, pièce orange inclinée de 30°, bruit gaussien</span>
+img = np.full((480, 640, 3), 90, np.uint8)
+coins = cv2.boxPoints(((400, 220), (160, 60), 30)).astype(np.int32)  <span class="c"># centre, taille, angle</span>
+cv2.fillPoly(img, [coins], (0, 140, 255))                            <span class="c"># orange, en BGR</span>
+bruit = np.random.default_rng(0).normal(0, 8, img.shape)
+img = np.clip(img + bruit, 0, 255).astype(np.uint8)
+
+<span class="c"># 1. Seuillage HSV (images 8 bits : H dans [0, 179], S et V dans [0, 255])</span>
+hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+masque = cv2.inRange(hsv, (8, 120, 120), (22, 255, 255))
+noyau = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+masque = cv2.morphologyEx(masque, cv2.MORPH_OPEN, noyau)   <span class="c"># ôte les points isolés</span></code></pre>
+      </section>
+
+      <section>
+        <h2>Contours, centroïde et orientation</h2>
+        <p><code>cv2.findContours</code> suit la frontière de chaque zone blanche du masque et renvoie une liste de polygones&nbsp;; avec <code>cv2.RETR_EXTERNAL</code>, seuls les contours extérieurs sont gardés, et l’on écarte les petites taches par leur aire (<code>cv2.contourArea</code>). Les <strong>moments</strong> d’un contour résument sa géométrie&nbsp;: <em>m</em><sub>00</sub> est son aire, les moments d’ordre&nbsp;1 donnent son centroïde (<math><mover><mi>u</mi><mo>‾</mo></mover><mo>,</mo><mover><mi>v</mi><mo>‾</mo></mover></math>), et les moments centrés d’ordre&nbsp;2 (<em>μ</em><sub>20</sub>, <em>μ</em><sub>02</sub>, <em>μ</em><sub>11</sub>), analogues à un tenseur d’inertie, donnent l’angle <em>θ</em> entre l’axe <em>u</em> et l’axe principal («&nbsp;long&nbsp;») de la pièce.</p>
+        <math display="block">
+          <mrow>
+            <mover><mi>u</mi><mo>‾</mo></mover><mo>=</mo>
+            <mfrac><msub><mi>m</mi><mn>10</mn></msub><msub><mi>m</mi><mn>00</mn></msub></mfrac>
+            <mspace width="2em"></mspace>
+            <mover><mi>v</mi><mo>‾</mo></mover><mo>=</mo>
+            <mfrac><msub><mi>m</mi><mn>01</mn></msub><msub><mi>m</mi><mn>00</mn></msub></mfrac>
+            <mspace width="3em"></mspace>
+            <mi>θ</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac>
+            <mi>atan2</mi><mrow><mo>(</mo><mn>2</mn><msub><mi>μ</mi><mn>11</mn></msub><mo>,</mo>
+            <msub><mi>μ</mi><mn>20</mn></msub><mo>−</mo><msub><mi>μ</mi><mn>02</mn></msub><mo>)</mo></mrow>
+          </mrow>
+        </math>
+        <ul>
+          <li>L’axe <em>v</em> étant orienté vers le bas, un angle positif est une rotation dans le <strong>sens horaire</strong> à l’écran.</li>
+          <li><em>θ</em> définit un axe, pas un sens&nbsp;: il est connu <strong>à 180° près</strong>, ce qui suffit pour une pince à deux mors, pas pour une pièce qui a un «&nbsp;avant&nbsp;».</li>
+          <li>Pour un disque, un carré ou un polygone régulier, <em>μ</em><sub>20</sub>&nbsp;=&nbsp;<em>μ</em><sub>02</sub> et <em>μ</em><sub>11</sub>&nbsp;=&nbsp;0 quelle que soit la rotation&nbsp;: <em>θ</em> n’a plus de sens. Pour un carré, <code>cv2.minAreaRect</code> donne une orientation à 90° près&nbsp;; sa convention d’angle a changé selon les versions d’OpenCV, vérifiez-la sur une image de test.</li>
+        </ul>
+        <p class="code-title">detection_piece.py — 2e partie, à la suite de la première&nbsp;: contour et moments</p>
+        <pre><code><span class="c"># 2. Contours extérieurs ; on garde le plus grand</span>
+contours, _ = cv2.findContours(masque, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+if not contours:
+    raise SystemExit("Aucune pièce détectée : revoir les seuils HSV")
+piece = max(contours, key=cv2.contourArea)
+
+<span class="c"># 3. Centroïde et orientation de l'axe principal, par les moments</span>
+m = cv2.moments(piece)
+u, v = m["m10"] / m["m00"], m["m01"] / m["m00"]
+theta = 0.5 * np.degrees(np.arctan2(2 * m["mu11"], m["mu20"] - m["mu02"]))
+print(f"centre = ({u:.1f}, {v:.1f}) px ; orientation = {theta:.1f}°")</code></pre>
+        <p class="resultat">Résultat affiché&nbsp;: <code>centre = (399.5, 219.5) px ; orientation = 29.8°</code> pour une pièce dessinée en (400, 220) à 30°&nbsp;; le demi-pixel d’écart vient des sommets du dessin, tronqués à l’entier. Programmes de la fiche testés avec Python&nbsp;3.8 (NumPy&nbsp;1.24, OpenCV&nbsp;4.5) et Python&nbsp;3.9 (NumPy&nbsp;2.0, OpenCV&nbsp;4.13).</p>
+      </section>
+
+      <section>
+        <h2>Calibration de caméra avec un damier</h2>
+        <p>Le <strong>modèle sténopé</strong> (<em>pinhole</em>) relie un point (<em>X</em>, <em>Y</em>, <em>Z</em>) du repère d’un objet à son pixel (<em>u</em>, <em>v</em>)&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>s</mi>
+            <mrow><mo>[</mo><mtable><mtr><mtd><mi>u</mi></mtd></mtr><mtr><mtd><mi>v</mi></mtd></mtr><mtr><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow>
+            <mo>=</mo><mi>K</mi>
+            <mrow><mo>[</mo><mi>R</mi><mo>|</mo><mi>t</mi><mo>]</mo></mrow>
+            <mrow><mo>[</mo><mtable><mtr><mtd><mi>X</mi></mtd></mtr><mtr><mtd><mi>Y</mi></mtd></mtr><mtr><mtd><mi>Z</mi></mtd></mtr><mtr><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow>
+            <mspace width="2em"></mspace>
+            <mtext>avec</mtext>
+            <mspace width="0.8em"></mspace>
+            <mi>K</mi><mo>=</mo>
+            <mrow><mo>[</mo><mtable>
+              <mtr><mtd><msub><mi>f</mi><mi>x</mi></msub></mtd><mtd><mn>0</mn></mtd><mtd><msub><mi>c</mi><mi>x</mi></msub></mtd></mtr>
+              <mtr><mtd><mn>0</mn></mtd><mtd><msub><mi>f</mi><mi>y</mi></msub></mtd><mtd><msub><mi>c</mi><mi>y</mi></msub></mtd></mtr>
+              <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr>
+            </mtable><mo>]</mo></mrow>
+          </mrow>
+        </math>
+        <p>La <strong>matrice intrinsèque</strong> <em>K</em> contient les focales <em>f<sub>x</sub></em>, <em>f<sub>y</sub></em> (en pixels) et le centre optique (<em>c<sub>x</sub></em>, <em>c<sub>y</sub></em>)&nbsp;; <em>R</em> et <em>t</em> (paramètres extrinsèques) placent l’objet par rapport à la caméra&nbsp;; <em>s</em> est un facteur d’échelle. Un objectif réel ajoute une <strong>distorsion</strong>, surtout radiale (les droites se courbent vers les bords), décrite par les coefficients <em>k</em><sub>1</sub>, <em>k</em><sub>2</sub>, <em>p</em><sub>1</sub>, <em>p</em><sub>2</sub>, <em>k</em><sub>3</sub>.</p>
+        <p>Pour estimer <em>K</em> et la distorsion, on photographie une quinzaine de fois un damier collé sur un support plan et rigide, en variant position, inclinaison et distance, bords de l’image compris. On mesure une case au pied à coulisse, car l’impression peut la modifier. <code>cv2.findChessboardCorners</code> détecte les <strong>coins intérieurs</strong> (9&nbsp;×&nbsp;6 pour 10&nbsp;×&nbsp;7 cases), <code>cv2.cornerSubPix</code> les affine et <code>cv2.calibrateCamera</code> renvoie l’erreur de reprojection RMS, <em>K</em> et la distorsion. Ci-dessous, des vues synthétiques produites par une caméra connue remplacent les photos&nbsp;: on vérifie que la calibration la retrouve. Avec de vraies photos, lisez chaque vue avec <code>cv2.imread</code> et convertissez-la en niveaux de gris.</p>
+        <p class="code-title">calibration_synthetique.py — 1re partie&nbsp;: damier virtuel</p>
+        <pre><code>import cv2
+import numpy as np
+
+<span class="c"># Damier virtuel de 10 x 7 cases de 25 mm (1 px = 1 mm) : 9 x 6 coins intérieurs</span>
+NX, NY, CASE = 9, 6, 25
+cases = np.indices((NY + 1, NX + 1)).sum(axis=0) % 2
+damier = (np.kron(cases, np.ones((CASE, CASE))) * 255).astype(np.uint8)
+damier = cv2.copyMakeBorder(damier, CASE, CASE, CASE, CASE, cv2.BORDER_CONSTANT, value=255)
+centre = np.array([damier.shape[1] / 2, damier.shape[0] / 2, 0])
+objp = np.zeros((NX * NY, 3), np.float32)       <span class="c"># coins dans le plan Z = 0, en mm</span>
+objp[:, :2] = np.mgrid[0:NX, 0:NY].T.reshape(-1, 2) * CASE</code></pre>
+        <p class="code-title">calibration_synthetique.py — 2e partie&nbsp;: vues synthétiques et calibration</p>
+        <pre><code>K_vrai = np.array([[800.0, 0, 320], [0, 800, 240], [0, 0, 1]])  <span class="c"># inconnue en pratique</span>
+rng = np.random.default_rng(1)
+critere = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.01)
+pts_3d, pts_2d = [], []
+for _ in range(15):                              <span class="c"># 15 poses aléatoires du damier</span>
+    R, _ = cv2.Rodrigues(rng.uniform(-0.35, 0.35, 3))
+    t = np.array([0, 0, rng.uniform(550, 750)]) - R @ centre
+    H = K_vrai @ np.column_stack((R[:, 0], R[:, 1], t))    <span class="c"># plan du damier -&gt; image</span>
+    vue = cv2.warpPerspective(damier, H, (640, 480), borderValue=170)
+    ok, coins = cv2.findChessboardCorners(vue, (NX, NY))
+    if ok:
+        pts_2d.append(cv2.cornerSubPix(vue, coins, (5, 5), (-1, -1), critere))
+        pts_3d.append(objp)
+
+rms, K, dist, _, _ = cv2.calibrateCamera(pts_3d, pts_2d, (640, 480), None, None)
+print(f"{len(pts_2d)} vues ; erreur de reprojection RMS = {rms:.3f} px")
+print(np.round(K, 1))</code></pre>
+        <p class="resultat">Résultat affiché&nbsp;: 15 vues, erreur RMS d’environ 0,05&nbsp;px, focales estimées à 799,4&nbsp;px pour 800 et centre optique retrouvé à 0,1&nbsp;px près. Sur de vraies photos, quelques dixièmes de pixel sont un bon résultat&nbsp;; au-delà d’un pixel, cherchez une image floue, un damier gondolé ou une taille de case erronée. La calibration ne vaut que pour une résolution et une mise au point données&nbsp;: désactivez l’autofocus si possible.</p>
+      </section>
+
+      <section>
+        <h2>Des pixels aux millimètres&nbsp;: l’homographie</h2>
+        <p>Quand les pièces reposent sur une table plane, les pixels (<em>u</em>, <em>v</em>) d’une image corrigée de sa distorsion et les points (<em>X</em>, <em>Y</em>) de la table sont liés par une <strong>homographie</strong> <em>H</em>, matrice 3&nbsp;×&nbsp;3 définie à un facteur près (8 degrés de liberté)&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>s</mi>
+            <mrow><mo>[</mo><mtable><mtr><mtd><mi>X</mi></mtd></mtr><mtr><mtd><mi>Y</mi></mtd></mtr><mtr><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow>
+            <mo>=</mo><mi>H</mi>
+            <mrow><mo>[</mo><mtable><mtr><mtd><mi>u</mi></mtd></mtr><mtr><mtd><mi>v</mi></mtd></mtr><mtr><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow>
+          </mrow>
+        </math>
+        <p>Quatre correspondances, sans trois points alignés, suffisent à la calculer&nbsp;; avec davantage de points, <code>cv2.findHomography</code> donne une solution aux moindres carrés et peut écarter les points aberrants (<code>cv2.RANSAC</code>). Astuce&nbsp;: relevez les repères <strong>directement dans le repère du robot</strong>, en y amenant la pointe de la pince&nbsp;; <em>H</em> donne alors des coordonnées robot.</p>
+        <p class="code-title">pixels_vers_robot.py</p>
+        <pre><code>import cv2
+import numpy as np
+
+<span class="c"># Quatre repères collés sur la table : position mesurée dans l'image (px)...</span>
+px = np.float32([[165, 426], [578, 444], [573, 142], [186, 133]])
+<span class="c"># ... et dans le repère du robot (mm), relevée en y amenant la pointe de la pince</span>
+mm = np.float32([[150, 200], [150, -200], [450, -200], [450, 200]])
+H, _ = cv2.findHomography(px, mm)   <span class="c"># 4 points au minimum ; davantage = plus robuste</span>
+
+def pixel_vers_robot(u, v):
+    """Convertit un pixel (u, v) en coordonnées (X, Y) en mm sur le plan de la table."""
+    p = np.float32([[[u, v]]])                   <span class="c"># forme (N, 1, 2) attendue par OpenCV</span>
+    return cv2.perspectiveTransform(p, H)[0, 0]
+
+<span class="c"># Contrôle sur un 5e repère, non utilisé pour le calcul : attendu (380, -120) mm</span>
+X, Y = pixel_vers_robot(494, 207)
+print(f"repère de contrôle : X = {X:.1f} mm ; Y = {Y:.1f} mm")</code></pre>
+        <p class="resultat">Résultat affiché&nbsp;: <code>X = 379.7 mm ; Y = -120.1 mm</code> pour un repère placé en (380, −120)&nbsp;mm&nbsp;; l’écart vient de l’arrondi des pixels des repères. Si la distorsion est visible, corrigez d’abord les pixels des repères et des pièces avec <code>cv2.undistortPoints(points, K, dist, P=K)</code>.</p>
+
+        <h3>Limite&nbsp;: les objets ont une hauteur</h3>
+        <p><em>H</em> n’est exacte que dans le plan qui a servi à la calculer. Le dessus d’une pièce de hauteur <em>h</em> est vu là où son rayon de vue coupe la table, donc plus loin de l’aplomb de la caméra. Pour une caméra verticale à la hauteur <em>Z<sub>c</sub></em>, un point situé à la distance horizontale <em>r</em> de cet aplomb est décalé de <em>e</em>&nbsp;=&nbsp;<em>r</em>·<em>h</em>&nbsp;/&nbsp;(<em>Z<sub>c</sub></em>&nbsp;−&nbsp;<em>h</em>). Avec <em>Z<sub>c</sub></em>&nbsp;=&nbsp;800&nbsp;mm, <em>h</em>&nbsp;=&nbsp;30&nbsp;mm et <em>r</em>&nbsp;=&nbsp;200&nbsp;mm, <em>e</em>&nbsp;≈&nbsp;7,8&nbsp;mm&nbsp;: assez pour manquer la prise. Remèdes&nbsp;: calculer <em>H</em> avec des repères posés à la hauteur du dessus des pièces, ou multiplier la distance du point mesuré à l’aplomb de la caméra par (<em>Z<sub>c</sub></em>&nbsp;−&nbsp;<em>h</em>)&nbsp;/&nbsp;<em>Z<sub>c</sub></em>.</p>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>Une image OpenCV est un tableau NumPy <code>(hauteur, largeur, 3)</code> en BGR, lu par <code>img[v, u]</code>&nbsp;; en HSV, H va de 0 à 179.</li>
+            <li>Centroïde = (<em>m</em><sub>10</sub>/<em>m</em><sub>00</sub>, <em>m</em><sub>01</sub>/<em>m</em><sub>00</sub>)&nbsp;; orientation = ½&nbsp;atan2(2<em>μ</em><sub>11</sub>, <em>μ</em><sub>20</sub>&nbsp;−&nbsp;<em>μ</em><sub>02</sub>), connue à 180° près.</li>
+            <li>La calibration se fait une fois par caméra, résolution et mise au point&nbsp;; l’homographie, une fois par installation, à refaire dès que la caméra bouge.</li>
+            <li>L’homographie n’est exacte que dans le plan qui a servi à la calculer.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Chaîne pick-and-place&nbsp;: détecter, localiser, transmettre</h2>
+        <figure>
+          <svg width="680" height="146" viewBox="0 0 680 146" role="img" aria-label="Chaîne de traitement en huit étapes : capture, correction de la distorsion, seuillage HSV, contour et moments, puis homographie, validation, transmission et mouvement du bras">
+            <g stroke="#243c30" stroke-width="1">
+              <rect x="1" y="1" width="150" height="44" rx="6" fill="#eef0e6"/>
+              <rect x="177" y="1" width="150" height="44" rx="6" fill="#eef0e6"/>
+              <rect x="353" y="1" width="150" height="44" rx="6" fill="#eef0e6"/>
+              <rect x="529" y="1" width="150" height="44" rx="6" fill="#eef0e6"/>
+              <rect x="1" y="101" width="150" height="44" rx="6" fill="#16261e"/>
+              <rect x="177" y="101" width="150" height="44" rx="6" fill="#eef0e6"/>
+              <rect x="353" y="101" width="150" height="44" rx="6" fill="#eef0e6"/>
+              <rect x="529" y="101" width="150" height="44" rx="6" fill="#d2ec6c" stroke="#566b14"/>
+            </g>
+            <g stroke="#243c30" stroke-width="2" fill="none">
+              <line x1="151" y1="23" x2="168" y2="23"/>
+              <line x1="327" y1="23" x2="344" y2="23"/>
+              <line x1="503" y1="23" x2="520" y2="23"/>
+              <line x1="151" y1="123" x2="168" y2="123"/>
+              <line x1="327" y1="123" x2="344" y2="123"/>
+              <line x1="503" y1="123" x2="520" y2="123"/>
+              <polyline points="604,45 604,72 76,72 76,92"/>
+            </g>
+            <g fill="#243c30">
+              <polygon points="167,18 176,23 167,28"/>
+              <polygon points="343,18 352,23 343,28"/>
+              <polygon points="519,18 528,23 519,28"/>
+              <polygon points="167,118 176,123 167,128"/>
+              <polygon points="343,118 352,123 343,128"/>
+              <polygon points="519,118 528,123 519,128"/>
+              <polygon points="71,92 76,101 81,92"/>
+            </g>
+            <g font-family="DM Sans" text-anchor="middle" fill="#14221c">
+              <text x="76" y="20" font-size="12" font-weight="700">1. Capture</text>
+              <text x="76" y="36" font-size="10.5">image BGR 640 × 480</text>
+              <text x="252" y="20" font-size="12" font-weight="700">2. Distorsion</text>
+              <text x="252" y="36" font-size="10.5">correction (K, dist)</text>
+              <text x="428" y="20" font-size="12" font-weight="700">3. Seuillage HSV</text>
+              <text x="428" y="36" font-size="10.5">masque binaire</text>
+              <text x="604" y="20" font-size="12" font-weight="700">4. Contour, moments</text>
+              <text x="604" y="36" font-size="10.5">(u, v, θ) en pixels</text>
+              <text x="76" y="120" font-size="12" font-weight="700" fill="#ffffff">5. Homographie</text>
+              <text x="76" y="136" font-size="10.5" fill="#ffffff">(X, Y, θ) en mm</text>
+              <text x="252" y="120" font-size="12" font-weight="700">6. Validation</text>
+              <text x="252" y="136" font-size="10.5">bornes, stabilité</text>
+              <text x="428" y="120" font-size="12" font-weight="700">7. Transmission</text>
+              <text x="428" y="136" font-size="10.5">liaison série ou ROS 2</text>
+              <text x="604" y="120" font-size="12" font-weight="700">8. Bras robotisé</text>
+              <text x="604" y="136" font-size="10.5">approche, prise, dépose</text>
+            </g>
+          </svg>
+          <figcaption>Figure 1 — Chaîne de traitement d’un pick-and-place guidé par caméra&nbsp;: étapes 1 à 4 sur l’image, 5 à 8 dans le repère du robot.</figcaption>
+        </figure>
+        <p>À chaque cycle, la vision produit une <strong>cible</strong> (<em>X</em>, <em>Y</em>, <em>θ</em>) dans le repère du robot. Une homographie ne conservant pas les angles, on convertit <em>θ</em> en transformant deux points de l’axe de la pièce (le centroïde et un point situé une vingtaine de pixels plus loin dans la direction <em>θ</em>), puis en recalculant l’angle entre les deux points obtenus, de l’axe <em>X</em> du robot vers l’axe <em>Y</em>. Avant tout envoi, on <strong>valide</strong> la cible&nbsp;: atteignable, zone dégagée, aire plausible, détection stable sur plusieurs images.</p>
+        <p>La cible part ensuite vers le bras, par liaison série vers le microcontrôleur qui pilote les servomoteurs ou sur un <em>topic</em> ROS&nbsp;2, dans un format explicite&nbsp;: par exemple, la ligne <code>312.4;-41.0;27.5</code> transmet <em>X</em> et <em>Y</em> en millimètres et <em>θ</em> en degrés, et le microcontrôleur répond <code>OK</code> après avoir vérifié les bornes, <code>ERR</code> sinon. La prise suit une séquence prudente&nbsp;: approche à hauteur de sécurité, descente lente, fermeture de la pince, remontée, dépose. Prenez l’image quand le bras est hors du champ.</p>
+
+        <div class="box box-attention">
+          <p class="box-title">Attention · sécurité</p>
+          <ul>
+            <li>Dégagez la zone de travail et gardez à portée de main un arrêt d’urgence ou l’interrupteur des moteurs&nbsp;; coupez-le avant toute intervention mécanique ou tout recâblage.</li>
+            <li>Alimentez les servomoteurs par une alimentation dédiée, dimensionnée pour leur courant de blocage, jamais par le port USB ni par le régulateur 5&nbsp;V de la carte&nbsp;; reliez les masses.</li>
+            <li>Testez toute nouvelle cible à vitesse réduite et à hauteur de sécurité, mains hors de la zone&nbsp;; vérifiez aussi les bornes côté microcontrôleur, au cas où la vision se tromperait.</li>
+          </ul>
+        </div>
+
+        <div class="box box-exercice breakable">
+          <p class="box-title">Exercice guidé · De l’image à la consigne du bras</p>
+          <p>En réunissant <code>detection_piece.py</code> et <code>pixels_vers_robot.py</code>, écrivez <code>localiser(img)</code>, qui renvoie la cible (<em>X</em>, <em>Y</em>, <em>θ</em>) dans le repère du robot, ou <code>None</code> si aucune pièce n’est visible.</p>
+          <ol>
+            <li>Transformez <code>detection_piece.py</code> en une fonction <code>detecter(img)</code> qui ignore les contours de moins de 500&nbsp;px² et renvoie <code>None</code> s’il n’en reste aucun.</li>
+            <li>Générez cinq images de test&nbsp;: la même pièce de 160&nbsp;×&nbsp;60&nbsp;px en (250, 300) à 0°, en (400, 200) à 45°, en (350, 330) à −60° et en (100, 300) à 0°, puis une image sans pièce.</li>
+            <li>Convertissez le centroïde avec <code>pixel_vers_robot</code>, puis l’orientation par la méthode des deux points, ramenée dans ]−90°&nbsp;;&nbsp;90°].</li>
+            <li>Construisez la trame <code>X;Y;θ</code> avec une décimale et refusez toute cible hors de la zone 150&nbsp;≤&nbsp;<em>X</em>&nbsp;≤&nbsp;450&nbsp;mm, −200&nbsp;≤&nbsp;<em>Y</em>&nbsp;≤&nbsp;200&nbsp;mm.</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong> centroïde à moins de 1&nbsp;px et orientation à moins de 1° des valeurs imposées (angles comparés à 180° près)&nbsp;; aucune exception sur l’image vide&nbsp;; trames égales, à ±1 près sur chaque valeur, à <code>276.9;122.8;-88.0</code>, <code>384.8;-24.7;45.7</code> et <code>251.0;21.9;-28.0</code>&nbsp;; cible de la pièce en (100, 300), où <em>Y</em>&nbsp;≈&nbsp;276&nbsp;mm, refusée.</p>
+          <div class="solution">
+            <p><strong>Indice&nbsp;:</strong> <code>(a - b + 90) % 180 - 90</code> ramène l’écart entre deux angles connus à 180° près dans [−90°&nbsp;;&nbsp;90°[.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Introduction à la détection d’objets par apprentissage profond</h2>
+        <p>Le seuillage HSV atteint ses limites dès que les pièces ne se distinguent plus par leur couleur, que le fond est encombré ou que plusieurs types d’objets se mélangent. Les détecteurs à <strong>réseaux de neurones convolutifs</strong> apprennent alors à reconnaître les objets sur des images annotées. Pour chaque objet, ils renvoient une <strong>boîte englobante</strong>, une <strong>classe</strong> et un <strong>score de confiance</strong> entre 0 et 1&nbsp;; une étape de suppression des non-maxima (NMS) élimine en général les doublons. La famille <strong>YOLO</strong> (<em>You Only Look Once</em>, J.&nbsp;Redmon et coll., 2015) prédit toutes les boîtes en un seul passage du réseau, d’où son usage en temps réel&nbsp;; de nombreuses versions en dérivent, dont celles d’Ultralytics.</p>
+        <p>Une boîte alignée sur les axes de l’image ne donne ni l’orientation ni le contour exact&nbsp;: on applique alors les sections 2 et 3 dans la boîte, ou l’on choisit un modèle de segmentation ou de boîtes orientées (OBB), puis la chaîne continue à l’identique. Ces modèles tournent par exemple avec le module <code>dnn</code> d’OpenCV (format ONNX), après un affinage (<em>fine-tuning</em>) sur des images prises dans les conditions réelles de l’atelier.</p>
+        <p><strong>En résumé&nbsp;:</strong> le seuillage ne demande aucune donnée d’apprentissage, tourne en quelques millisecondes sur un PC en 640&nbsp;×&nbsp;480 et atteint le sous-pixel sur une scène maîtrisée, mais reste sensible au fond et à l’éclairage. Un détecteur neuronal exige souvent plusieurs centaines d’images annotées par classe et davantage de calcul (un GPU ou un NPU aide en temps réel), mais tolère bien mieux les scènes variées.</p>
+      </section>
+
+      <section>
+        <h2>Pièges courants&nbsp;: éclairage, reflets, latence</h2>
+        <table class="pitfalls">
+          <caption>Symptômes fréquents, causes probables et remèdes</caption>
+          <thead>
+            <tr><th scope="col">Symptôme</th><th scope="col">Cause probable</th><th scope="col">Remède</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Seuils instables au fil de la journée, ombres détectées avec la pièce</td><td>lumière du jour, ombres portées, exposition et balance des blancs automatiques</td><td>éclairage artificiel diffus, constant, venant de plusieurs côtés&nbsp;; caméra en réglages manuels</td></tr>
+            <tr><td>Trous dans le masque d’une pièce brillante</td><td>reflets spéculaires&nbsp;: V proche de 255, S faible</td><td>éclairage diffus ou indirect, filtre polarisant, fermeture morphologique</td></tr>
+            <tr><td>Contours flous, centroïde instable</td><td>flou de bougé (exposition longue) ou autofocus</td><td>plus de lumière pour raccourcir l’exposition&nbsp;; mise au point fixe</td></tr>
+            <tr><td>Erreur croissante vers les bords</td><td>distorsion non corrigée, ou caméra déplacée depuis le calcul de <em>H</em></td><td>calibrer&nbsp;; refaire <em>H</em>&nbsp;; contrôler un repère à chaque démarrage</td></tr>
+          </tbody>
+        </table>
+        <p>La <strong>latence</strong> mérite un calcul&nbsp;: une pièce qui défile à 100&nbsp;mm/s, avec 150&nbsp;ms de retard entre la prise de vue et l’action du bras, est déjà 15&nbsp;mm plus loin que la position mesurée. Mesurez ce retard, horodatez les images et compensez. Source souvent ignorée&nbsp;: <code>cv2.VideoCapture</code> garde des images en tampon, et <code>read()</code> peut renvoyer une image ancienne si le traitement est plus lent que la caméra&nbsp;; réduisez ce tampon (<code>cv2.CAP_PROP_BUFFERSIZE</code>, que seuls certains pilotes acceptent) ou lisez les images en continu dans un fil d’exécution séparé.</p>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://docs.opencv.org/4.x/df/d9d/tutorial_py_colorspaces.html">OpenCV&nbsp;: espaces de couleur</a></li>
+        <li><a href="https://docs.opencv.org/4.x/dd/d49/tutorial_py_contour_features.html">OpenCV&nbsp;: caractéristiques des contours (moments)</a></li>
+        <li><a href="https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html">OpenCV&nbsp;: calibration de caméra</a></li>
+        <li><a href="https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html">OpenCV&nbsp;: homographie</a></li>
+        <li><a href="https://numpy.org/doc/stable/">Documentation de NumPy</a></li>
+        <li><a href="https://arxiv.org/abs/1506.02640">Article fondateur de YOLO</a></li>
+        <li><a href="https://docs.ultralytics.com/">Documentation Ultralytics YOLO</a></li>
+        <li><a href="https://willsim.fr/cours/vision-robotique-opencv.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l’équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l’usage de l’intelligence artificielle dans l’ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

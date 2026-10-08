@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>IA embarquée sur microcontrôleur (TinyML) — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : collecter des données d'accéléromètre avec un ESP32, entraîner un petit réseau dense, le quantifier en int8 et l'exécuter avec LiteRT for Microcontrollers.">
+    <meta name="keywords" content="TinyML, IA embarquée, ESP32, MPU-6050, TensorFlow, Keras, LiteRT for Microcontrollers, TensorFlow Lite Micro, quantification int8, tensor arena">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Ajustements propres à cette fiche : code plus compact, tableaux serrés */
+      pre { margin: 2.5mm 0; padding: 2.5mm 3.5mm; font-size: 7.6pt; line-height: 1.26; }
+      .code-title { margin-top: 2.5mm; }
+      .deroule { margin: -1mm 0 0; font-size: 9pt; color: var(--ink-secondary); }
+      .num { text-align: right; white-space: nowrap; }
+      figure.chaine { margin: 3mm 0 2mm; }
+      figure.chaine svg { width: 100%; }
+      .note { font-size: 8.8pt; color: var(--ink-secondary); }
+      .box ul { margin-bottom: 0; }
+      table.bloc { break-inside: avoid; }
+      math[display="block"] { margin: 1mm 0 3mm; }
+      .nw { white-space: nowrap; }
+      .colophon { margin-top: 5mm; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>IA embarquée sur microcontrôleur (TinyML)</h1>
+      <p class="cover-lead">Faire tourner un réseau de neurones sur un ESP32&nbsp;: acquisition des mesures d'un accéléromètre, entraînement d'un petit réseau dense, quantification en entiers 8&nbsp;bits, puis inférence en temps réel sur la carte, mémoire et latence mesurées.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Intermédiaire</dd></div>
+        <div><dt>Durée</dt><dd>8&nbsp;h (4 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Cours «&nbsp;Initiation à l'IA pour l'ingénierie&nbsp;», bases d'Arduino / C++</dd></div>
+        <div><dt>Outils</dt><dd>ESP32, <span class="nw">MPU-6050</span>, Arduino IDE ou PlatformIO, TensorFlow/Keras, LiteRT for Microcontrollers</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>justifier une inférence embarquée plutôt que distante par trois critères&nbsp;: latence, confidentialité, consommation&nbsp;;</li>
+        <li>acquérir des mesures d'accélération à fréquence d'échantillonnage fixe (50&nbsp;Hz) et vérifier cette fréquence&nbsp;;</li>
+        <li>entraîner un réseau dense de moins de 3&nbsp;000 paramètres, le quantifier en int8 et contrôler que la précision perd au plus 2&nbsp;points&nbsp;;</li>
+        <li>déployer le modèle sur ESP32, dimensionner la <em>tensor arena</em> et mesurer la latence d'inférence en microsecondes.</li>
+      </ul>
+    </section>
+
+    <p class="deroule"><strong>Déroulé indicatif&nbsp;:</strong> séance&nbsp;1, sections 1 à 3 (enjeux, chaîne, acquisition)&nbsp;; séance&nbsp;2, section 4 (entraînement)&nbsp;; séance&nbsp;3, sections 5 et 6 (quantification, mémoire)&nbsp;; séance&nbsp;4, sections 7 et 8 (déploiement, latence, exercice guidé).</p>
+
+    <main class="sections">
+      <section>
+        <h2>Pourquoi embarquer l'IA&#8239;?</h2>
+        <p>Le <strong>TinyML</strong> (<em>tiny machine learning</em>) consiste à exécuter des modèles d'apprentissage automatique sur des microcontrôleurs&nbsp;: quelques centaines de kilo-octets de RAM, pas de système d'exploitation complet, de quelques milliwatts à quelques centaines de milliwatts. L'<strong>entraînement</strong> reste sur ordinateur&nbsp;; la carte ne fait que l'<strong>inférence</strong>, c'est-à-dire la prédiction à partir de nouvelles mesures, avec un modèle figé. Fil rouge&nbsp;: reconnaître trois gestes (repos, secousse, cercle) avec un accéléromètre.</p>
+        <table class="bloc">
+          <caption>Inférence distante ou embarquée&nbsp;: les critères de choix</caption>
+          <thead>
+            <tr><th scope="col">Critère</th><th scope="col">Inférence distante (serveur)</th><th scope="col">Inférence embarquée (microcontrôleur)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Latence</td><td>Aller-retour réseau, variable et sans garantie</td><td>Prévisible, limitée au calcul&nbsp;: bien moins d'une milliseconde pour un très petit réseau</td></tr>
+            <tr><td>Confidentialité</td><td>Les mesures brutes quittent l'appareil</td><td>Seule la décision sort (ex.&nbsp;: «&nbsp;secousse&nbsp;»), voire rien</td></tr>
+            <tr><td>Consommation</td><td>La radio domine&nbsp;: d'après la fiche technique de l'ESP32, l'émission <span class="nw">Wi-Fi</span> consomme typiquement de 180 à 240&nbsp;mA</td><td>Calcul bref, la radio peut rester éteinte&nbsp;; fonctionne aussi hors connexion</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>La chaîne complète, de la mesure à la carte</h2>
+        <figure class="chaine">
+          <svg width="640" height="132" viewBox="0 0 640 132" role="img" aria-label="Chaîne TinyML en cinq étapes : collecte sur ESP32, entraînement, quantification et conversion sur PC, déploiement sur ESP32">
+            <text x="56" y="13" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" font-weight="700" fill="#566b14">SUR L'ESP32</text>
+            <text x="320" y="13" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" font-weight="700" fill="#566b14">SUR LE PC (PYTHON)</text>
+            <text x="584" y="13" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" font-weight="700" fill="#566b14">SUR L'ESP32</text>
+            <line x1="132" y1="20" x2="508" y2="20" stroke="#566b14" stroke-width="1"/>
+            <rect x="1" y="28" width="110" height="74" rx="6" fill="#16261e"/>
+            <text x="56" y="52" text-anchor="middle" font-family="Manrope, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#ffffff">1. Collecte</text>
+            <text x="56" y="70" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#d2ec6c">MPU-6050, 50 Hz</text>
+            <text x="56" y="84" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#d2ec6c">→ fichiers CSV</text>
+            <line x1="112" y1="65" x2="122" y2="65" stroke="#243c30" stroke-width="2"/>
+            <polygon points="122,60 131,65 122,70" fill="#243c30"/>
+            <rect x="133" y="28" width="110" height="74" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="188" y="52" text-anchor="middle" font-family="Manrope, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#14221c">2. Entraînement</text>
+            <text x="188" y="70" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#14221c">Keras, float32</text>
+            <text x="188" y="84" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#14221c">150 → 16 → 3</text>
+            <line x1="244" y1="65" x2="254" y2="65" stroke="#243c30" stroke-width="2"/>
+            <polygon points="254,60 263,65 254,70" fill="#243c30"/>
+            <rect x="265" y="28" width="110" height="74" rx="6" fill="#d2ec6c" stroke="#566b14"/>
+            <text x="320" y="52" text-anchor="middle" font-family="Manrope, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#14221c">3. Quantification</text>
+            <text x="320" y="70" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#14221c">float32 → int8</text>
+            <text x="320" y="84" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#14221c">calibration</text>
+            <line x1="376" y1="65" x2="386" y2="65" stroke="#243c30" stroke-width="2"/>
+            <polygon points="386,60 395,65 386,70" fill="#243c30"/>
+            <rect x="397" y="28" width="110" height="74" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="452" y="52" text-anchor="middle" font-family="Manrope, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#14221c">4. Conversion</text>
+            <text x="452" y="70" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#14221c">fichier .tflite</text>
+            <text x="452" y="84" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#14221c">→ model_data.h</text>
+            <line x1="508" y1="65" x2="518" y2="65" stroke="#243c30" stroke-width="2"/>
+            <polygon points="518,60 527,65 518,70" fill="#243c30"/>
+            <rect x="529" y="28" width="110" height="74" rx="6" fill="#16261e"/>
+            <text x="584" y="52" text-anchor="middle" font-family="Manrope, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#ffffff">5. Déploiement</text>
+            <text x="584" y="70" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#d2ec6c">LiteRT Micro</text>
+            <text x="584" y="84" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#d2ec6c">classe + latence</text>
+            <text x="320" y="124" text-anchor="middle" font-family="DM Sans, Segoe UI, sans-serif" font-size="10" fill="#47544d">Le prétraitement (unités, ordre des axes, quantification de l'entrée) doit être identique aux étapes 2 et 5.</text>
+          </svg>
+          <figcaption>Figure 1 — Les cinq étapes de la chaîne TinyML et l'endroit où chacune s'exécute.</figcaption>
+        </figure>
+        <p>Le modèle converti, au format <code>.tflite</code> (sérialisé avec FlatBuffers), est compilé avec le croquis sous forme de tableau C. Sur la carte, l'interpréteur de <strong>LiteRT for Microcontrollers</strong> (anciennement TensorFlow Lite for Microcontrollers, ou TFLM) l'exécute sur chaque nouvelle fenêtre de mesures.</p>
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <p>Le microcontrôleur n'apprend rien&nbsp;: il exécute un modèle figé. Ajouter une classe ou changer de capteur impose de repasser par toute la chaîne. Et la première cause d'échec n'est pas le réseau, mais un prétraitement différent entre le PC et la carte.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Acquérir des données propres</h2>
+        <h3>Câblage</h3>
+        <p>Le <span class="nw">MPU-6050</span> (souvent monté sur un module <span class="nw">GY-521</span>) communique en I2C, à l'adresse 0x68 par défaut. Raccordement&nbsp;: <strong>VCC → 3V3, GND → GND, SDA → GPIO&nbsp;21, SCL → GPIO&nbsp;22</strong>, broches du bus I2C par défaut (<code>Wire</code>) de la plupart des cartes ESP32 DevKit&nbsp;; vérifiez le brochage de la vôtre.</p>
+        <div class="box box-attention">
+          <p class="box-title">Attention · sécurité</p>
+          <ul>
+            <li>Câblez <strong>carte débranchée</strong> et vérifiez VCC et GND avant de brancher l'USB.</li>
+            <li>Alimentez le module en 3,3&nbsp;V (broche 3V3)&nbsp;: l'ESP32 ne tolère pas un bus I2C à 5&nbsp;V.</li>
+            <li>Gestes&nbsp;: carte et capteur fixés sur un support rigide, câble tenu, voisins à distance.</li>
+            <li>LiPo&nbsp;: chargeur protégé, ni court-circuit ni charge sans surveillance, aucune batterie gonflée.</li>
+          </ul>
+        </div>
+
+        <h3>Le croquis d'acquisition</h3>
+        <p>Le croquis échantillonne à 50&nbsp;Hz avec un <strong>échéancier fixe</strong>&nbsp;: chaque échéance est calculée à partir de la précédente, et non de l'instant courant, ce qui évite toute dérive. Le filtre passe-bas numérique du <span class="nw">MPU-6050</span> est réglé à 21&nbsp;Hz, sous la fréquence de Nyquist (25&nbsp;Hz), pour limiter le repliement de spectre. Les gestes de la main étant lents (quelques hertz), 50&nbsp;Hz laisse une marge confortable.</p>
+        <p class="code-title">acquisition.ino — bibliothèque Adafruit MPU6050 (gestionnaire de bibliothèques)</p>
+        <pre><code>#include &lt;Adafruit_MPU6050.h&gt;   <span class="c">// installe aussi Adafruit Unified Sensor et BusIO</span>
+
+const uint32_t kPeriodeUs = 20000;   <span class="c">// 50 Hz</span>
+const float kG = 9.80665f;           <span class="c">// m/s² -> g</span>
+Adafruit_MPU6050 mpu;
+uint32_t echeance;
+
+void setup() {
+  Serial.begin(115200);
+  if (!mpu.begin()) {                <span class="c">// I2C 0x68 ; ESP32 : SDA = GPIO 21, SCL = GPIO 22</span>
+    Serial.println("MPU-6050 introuvable : vérifiez le câblage");
+    while (true) delay(100);
+  }
+  mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);    <span class="c">// passe-bas sous fs/2 = 25 Hz</span>
+  echeance = micros();
+}
+
+void loop() {
+  while ((int32_t)(micros() - echeance) &lt; 0) {}  <span class="c">// attend l'échéance</span>
+  echeance += kPeriodeUs;                        <span class="c">// échéancier fixe : pas de dérive</span>
+  sensors_event_t a, g, t;
+  mpu.getEvent(&amp;a, &amp;g, &amp;t);                      <span class="c">// accélérations en m/s²</span>
+  Serial.printf("%lu,%.3f,%.3f,%.3f\n", (unsigned long)micros(),
+                a.acceleration.x / kG, a.acceleration.y / kG, a.acceleration.z / kG);
+}</code></pre>
+        <p>Ouvrez le moniteur série à 115&nbsp;200&nbsp;bauds, répétez un même geste et copiez les lignes dans un fichier par classe (<code>repos.csv</code>, <code>secousse.csv</code>, <code>cercle.csv</code>). La première colonne est un horodatage en microsecondes&nbsp;: l'écart moyen entre deux lignes doit valoir 20&nbsp;000&nbsp;µs, et un écart isolé nettement plus grand trahit une échéance manquée. Le transtypage en <code>(int32_t)</code> garde la comparaison juste quand <code>micros()</code> déborde, environ toutes les 71&nbsp;minutes.</p>
+      </section>
+
+      <section>
+        <h2>Entraîner un petit réseau dense</h2>
+        <p>Un réseau dense (perceptron multicouche) attend un vecteur de taille fixe. On découpe donc le flux en fenêtres de 1&nbsp;s&nbsp;: 50&nbsp;échantillons × 3&nbsp;axes, aplatis en un vecteur de 150&nbsp;valeurs en g, dans l'ordre <code>ax, ay, az, ax…</code>, ordre à reproduire à l'identique sur la carte. Pour mettre au point la chaîne sans matériel, le script génère des fenêtres <strong>synthétiques</strong> qui imitent les trois gestes&nbsp;; remplacez ensuite <code>fenetre()</code> par la lecture de vos fichiers CSV.</p>
+        <p>Le réseau défini ci-dessous compte 150&nbsp;×&nbsp;16 poids + 16 biais = 2&nbsp;416&nbsp;paramètres dans la couche cachée et 16&nbsp;×&nbsp;3 + 3 = 51 dans la couche de sortie, soit <strong>2&nbsp;467&nbsp;paramètres</strong>&nbsp;: environ 9,9&nbsp;Ko en float32 et 2,5&nbsp;Ko en int8 (poids sur 8&nbsp;bits, biais sur 32&nbsp;bits).</p>
+        <p>Sur ces données synthétiques, faciles par construction, le script ci-dessous atteint 100&nbsp;% de précision sur les 200&nbsp;fenêtres de test&nbsp;: cela valide la chaîne, pas le modèle. Seule l'évaluation sur vos propres enregistrements fait foi.</p>
+        <p class="code-title">tinyml_gestes.py (1/3) — données et entraînement, testé avec TensorFlow 2.20 et Keras 3</p>
+        <pre><code>import numpy as np
+import tensorflow as tf
+
+FS, N = 50, 50                        <span class="c"># 50 Hz, fenêtres de 1 s (50 échantillons)</span>
+rng = np.random.default_rng(0)
+tf.keras.utils.set_random_seed(0)     <span class="c"># résultats reproductibles</span>
+
+def fenetre(c):
+    """Fenêtre synthétique (N, 3) en g ; à remplacer par vos enregistrements."""
+    t = np.arange(N) / FS
+    x = np.zeros((N, 3)) + rng.normal(0, 0.1, 3)  <span class="c"># légère inclinaison de la carte</span>
+    x[:, 2] += 1.0                                 <span class="c"># gravité sur l'axe z</span>
+    f, a, p = rng.uniform(1, 2), rng.uniform(0.3, 0.6), rng.uniform(0, 2 * np.pi)
+    if c == 1:                                     <span class="c"># secousse : 3,5 à 7 Hz selon x</span>
+        x[:, 0] += 2 * a * np.sin(2 * np.pi * 3.5 * f * t + p)
+    elif c == 2:                                   <span class="c"># cercle : x et y en quadrature</span>
+        x[:, 0] += a * np.cos(2 * np.pi * f * t + p)
+        x[:, 1] += a * np.sin(2 * np.pi * f * t + p)
+    return x + rng.normal(0, 0.05, (N, 3))         <span class="c"># bruit de mesure</span>
+
+y = rng.integers(0, 3, 1200)                       <span class="c"># 0 repos, 1 secousse, 2 cercle</span>
+X = np.stack([fenetre(c) for c in y]).reshape(len(y), -1).astype("float32")
+X_app, y_app, X_test, y_test = X[:1000], y[:1000], X[1000:], y[1000:]
+
+model = tf.keras.Sequential([
+    tf.keras.Input(shape=(3 * N,)),                <span class="c"># 150 entrées : ax, ay, az, ax…</span>
+    tf.keras.layers.Dense(16, activation="relu"),
+    tf.keras.layers.Dense(3, activation="softmax"),
+])
+model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",
+              metrics=["accuracy"])
+model.fit(X_app, y_app, epochs=40, batch_size=32, validation_split=0.2, verbose=0)
+print("Précision float32 :", model.evaluate(X_test, y_test, verbose=0)[1])</code></pre>
+      </section>
+
+      <section>
+        <h2>Quantifier en int8 et convertir en tableau C</h2>
+        <p>La quantification affine associe à chaque réel <em>r</em> un entier <em>q</em> sur 8&nbsp;bits grâce à une <strong>échelle</strong> <em>S</em> (<em>scale</em>) et un <strong>point zéro</strong> <em>Z</em> (<em>zero point</em>)&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>r</mi><mo>≈</mo><mi>S</mi><mo>·</mo><mo>(</mo><mi>q</mi><mo>−</mo><mi>Z</mi><mo>)</mo>
+            <mspace width="2em"/>
+            <mi>q</mi><mo>=</mo>
+            <mi>clamp</mi><mo>(</mo>
+            <mi>round</mi><mo>(</mo><mfrac><mi>r</mi><mi>S</mi></mfrac><mo>)</mo><mo>+</mo><mi>Z</mi>
+            <mo>,</mo><mn>−128</mn><mo>,</mo><mn>127</mn><mo>)</mo>
+          </mrow>
+        </math>
+        <p>Les poids sont quantifiés de façon symétrique (<em>Z</em>&nbsp;=&nbsp;0)&nbsp;; les activations, avec une échelle et un point zéro par tenseur, calibrés en faisant passer quelques centaines de fenêtres <strong>représentatives</strong> dans le réseau. C'est la <strong>quantification post-entraînement</strong> (PTQ)&nbsp;: pas de réentraînement, des poids 4&nbsp;fois plus petits et des calculs en entiers, rapides sur microcontrôleur.</p>
+        <p class="code-title">tinyml_gestes.py (2/3) — quantification post-entraînement et conversion</p>
+        <pre><code>def donnees_representatives():                     <span class="c"># calibre les plages d'activation</span>
+    for i in range(200):
+        yield [X_app[i:i + 1]]
+
+conv = tf.lite.TFLiteConverter.from_keras_model(model)
+conv.optimizations = [tf.lite.Optimize.DEFAULT]
+conv.representative_dataset = donnees_representatives
+conv.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+conv.inference_input_type = tf.int8                <span class="c"># entrée et sortie en int8</span>
+conv.inference_output_type = tf.int8
+<span class="c"># une seule échelle de poids par couche dense : voir l'encadré ci-dessous</span>
+conv._experimental_disable_per_channel_quantization_for_dense_layers = True
+modele_int8 = conv.convert()</code></pre>
+        <p class="code-title">tinyml_gestes.py (3/3) — vérification du modèle int8 sur PC et export en tableau C</p>
+        <pre><code>interp = tf.lite.Interpreter(model_content=modele_int8)   <span class="c"># vérification sur PC</span>
+interp.allocate_tensors()
+e, s = interp.get_input_details()[0], interp.get_output_details()[0]
+echelle, zero = e["quantization"]                  <span class="c"># r = S (q - Z)</span>
+justes = 0
+for xi, yi in zip(X_test, y_test):
+    q = np.clip(np.round(xi / echelle) + zero, -128, 127).astype(np.int8)
+    interp.set_tensor(e["index"], q[None, :])
+    interp.invoke()
+    justes += int(np.argmax(interp.get_tensor(s["index"])[0]) == yi)
+print("Précision int8 :", justes / len(y_test), "| S =", echelle, "Z =", zero)
+
+with open("model_data.h", "w", encoding="utf-8") as f:  <span class="c"># comme « xxd -i »</span>
+    f.write("#pragma once\n// Modèle int8 (%d octets)\n" % len(modele_int8))
+    f.write("alignas(16) const unsigned char g_model[] = {%s};\n"
+            % ",".join(str(b) for b in modele_int8))</code></pre>
+        <p>Avec TensorFlow 2.20, la précision int8 est identique à celle du float32 (100&nbsp;%) et l'entrée est quantifiée avec <em>S</em>&nbsp;≈&nbsp;0,011&nbsp;g et <em>Z</em>&nbsp;=&nbsp;−4. Le modèle pèse 4&nbsp;496&nbsp;octets&nbsp;: la description du graphe et de la quantification s'ajoute aux 2,5&nbsp;Ko de poids. Il ne contient que trois opérations, deux <code>FULLY_CONNECTED</code> (ReLU fusionnée) et un <code>SOFTMAX</code>.</p>
+        <div class="box box-attention">
+          <p class="box-title">Attention · une échelle de poids par couche</p>
+          <p>Par défaut, TensorFlow 2.20 donne sa propre échelle de poids à chaque neurone d'une couche dense (quantification <em>par canal</em>). Or le noyau <code>FULLY_CONNECTED</code> de Chirale_TensorFlowLite 2.0.0 n'en lit qu'une, la première, sans aucun message d'erreur&nbsp;: compilé sur PC avec un tel modèle, il ne reproduit les sorties de l'interpréteur Python que pour 24 des 200 fenêtres de test, et la précision tombe à 81&nbsp;%. L'option expérimentale du script impose une échelle par couche&nbsp;: les sorties redeviennent identiques (200 sur 200).</p>
+        </div>
+        <p class="note">TensorFlow 2.20 signale que <code>tf.lite.Interpreter</code> est déprécié au profit du paquet <code>ai-edge-litert</code> (Python 3.10 ou plus)&nbsp;: <code>from ai_edge_litert.interpreter import Interpreter</code>, mêmes méthodes.</p>
+      </section>
+
+      <section>
+        <h2>Contraintes mémoire&nbsp;: flash, RAM et tensor arena</h2>
+        <p>La <strong>flash</strong>, non volatile, contient le programme et les constantes&nbsp;; la <strong>RAM</strong> (SRAM), volatile et rare, contient les variables. L'ESP32 classique offre 520&nbsp;Ko de SRAM interne, dont une partie est prise par le système et les piles radio, et une flash externe, souvent de 4&nbsp;Mo sur les cartes de développement.</p>
+        <p>La <strong>tensor arena</strong> est une zone de RAM réservée une fois pour toutes&nbsp;: l'interpréteur y range les tenseurs d'entrée, de sortie et intermédiaires ainsi que ses propres structures, sans aucune allocation dynamique pendant l'inférence. Sa taille ne se calcule pas simplement à l'avance&nbsp;: partez d'une valeur large (8&nbsp;Ko ici), lisez <code>arena_used_bytes()</code> après <code>AllocateTensors()</code>, puis ajustez avec une marge. Trop petite, elle fait échouer <code>AllocateTensors()</code>&nbsp;; trop grande, elle gaspille de la RAM.</p>
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>Déclarez le modèle <code>const</code>&nbsp;: il reste en flash. Sans <code>const</code>, il serait recopié en RAM au démarrage.</li>
+            <li><code>MicroMutableOpResolver</code> n'enregistre que les opérations du modèle&nbsp;: le code des autres n'est pas lié, ce qui économise de la flash.</li>
+            <li>Mesurez au lieu de deviner&nbsp;: le script Python donne la taille du modèle (4&nbsp;496&nbsp;octets ici), le rapport de compilation celle du programme et des variables globales, <code>arena_used_bytes()</code> celle de l'arena.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Boucle d'inférence et mesure de la latence</h2>
+        <p>Le croquis final reprend l'acquisition, quantifie l'entrée <strong>exactement comme en Python</strong>, appelle <code>Invoke()</code> et le chronomètre. Sous Arduino IDE, installez la bibliothèque <strong>Chirale_TensorFlowLite</strong>, portage de LiteRT for Microcontrollers pour cartes mbed et ESP32 (testé par son auteur sur Arduino Nano ESP32). Sous <span class="nw">ESP-IDF</span> (ou PlatformIO avec ce framework), le composant <strong>esp-tflite-micro</strong> d'Espressif offre la même API, avec des noyaux optimisés (<span class="nw">ESP-NN</span>).</p>
+        <p class="code-title">inference.ino (1/2) — model_data.h placé dans le dossier du croquis</p>
+        <pre><code>#include &lt;Chirale_TensorFlowLite.h&gt;              <span class="c">// à inclure en premier</span>
+#include "tensorflow/lite/micro/micro_interpreter.h"
+#include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
+#include "tensorflow/lite/schema/schema_generated.h"
+#include &lt;Adafruit_MPU6050.h&gt;
+#include "model_data.h"                          <span class="c">// g_model, écrit par le script Python</span>
+
+constexpr int kFenetre = 50, kAxes = 3;          <span class="c">// 1 s à 50 Hz : 150 entrées</span>
+constexpr int kArena = 8 * 1024;                 <span class="c">// à ajuster (voir arena_used_bytes)</span>
+alignas(16) static uint8_t arena[kArena];
+const char* kClasses[] = {"repos", "secousse", "cercle"};
+Adafruit_MPU6050 mpu;
+tflite::MicroInterpreter* interp = nullptr;
+
+void arret(const char* message) { Serial.println(message); while (true) delay(100); }
+
+void setup() {
+  Serial.begin(115200);
+  if (!mpu.begin()) arret("MPU-6050 introuvable");
+  mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  const tflite::Model* modele = tflite::GetModel(g_model);
+  if (modele-&gt;version() != TFLITE_SCHEMA_VERSION) arret("Schéma incompatible");
+  static tflite::MicroMutableOpResolver&lt;2&gt; ops;  <span class="c">// seules les opérations du modèle</span>
+  ops.AddFullyConnected();
+  ops.AddSoftmax();
+  static tflite::MicroInterpreter mi(modele, ops, arena, kArena);
+  interp = &amp;mi;
+  if (interp-&gt;AllocateTensors() != kTfLiteOk) arret("Arena trop petite");
+  Serial.printf("Arena utilisée : %u octets\n", (unsigned)interp-&gt;arena_used_bytes());
+}</code></pre>
+        <p class="code-title">inference.ino (2/2) — acquisition d'une fenêtre, inférence, chronométrage</p>
+        <pre><code>void loop() {
+  TfLiteTensor* entree = interp-&gt;input(0);
+  const float echelle = entree-&gt;params.scale;    <span class="c">// S et Z fixés à la conversion</span>
+  const int zero = entree-&gt;params.zero_point;
+  uint32_t echeance = micros();
+  for (int i = 0; i &lt; kFenetre; i++) {
+    while ((int32_t)(micros() - echeance) &lt; 0) {}
+    echeance += 20000;                           <span class="c">// 50 Hz</span>
+    sensors_event_t a, g, t;
+    mpu.getEvent(&amp;a, &amp;g, &amp;t);
+    const float v[kAxes] = {a.acceleration.x, a.acceleration.y, a.acceleration.z};
+    for (int k = 0; k &lt; kAxes; k++) {            <span class="c">// même quantification qu'en Python</span>
+      int q = (int)lroundf(v[k] / 9.80665f / echelle) + zero;
+      entree-&gt;data.int8[i * kAxes + k] = (int8_t)constrain(q, -128, 127);
+    }
+  }
+  const uint32_t t0 = micros();
+  if (interp-&gt;Invoke() != kTfLiteOk) arret("Échec de l'inférence");
+  const uint32_t duree = micros() - t0;
+  const int8_t* sortie = interp-&gt;output(0)-&gt;data.int8;
+  int c = 0;
+  for (int j = 1; j &lt; 3; j++) if (sortie[j] &gt; sortie[c]) c = j;
+  Serial.printf("%s (inférence : %lu µs)\n", kClasses[c], (unsigned long)duree);
+}</code></pre>
+        <p>La sortie est elle aussi en int8&nbsp;: la quantification étant croissante, la classe la plus probable est l'indice du plus grand entier. Pour une probabilité, déquantifiez&nbsp;: <em>p</em>&nbsp;=&nbsp;<em>S</em>(<em>q</em>&nbsp;−&nbsp;<em>Z</em>), ici <em>S</em>&nbsp;=&nbsp;1/256 et <em>Z</em>&nbsp;=&nbsp;−128, valeurs fixées par le convertisseur pour un softmax. Avec 2&nbsp;448&nbsp;multiplications-accumulations, l'inférence est très courte devant la seconde d'acquisition&nbsp;: mesurez la <strong>moyenne sur 100&nbsp;inférences</strong>, une mesure isolée étant trompeuse (cache de la flash, interruptions). Pour réagir plus vite, faites glisser la fenêtre par pas de 0,5&nbsp;s.</p>
+        <p class="note">Croquis compilés avec le cœur Arduino ESP32 3.3.12, Chirale_TensorFlowLite 2.0.0 et Adafruit MPU6050 2.2.9 (inférence&nbsp;: 349&nbsp;196&nbsp;octets de flash). Une version plus ancienne peut exiger un <code>ErrorReporter</code> en argument de <code>MicroInterpreter</code>.</p>
+      </section>
+
+      <section>
+        <h2>Limites et bonnes pratiques</h2>
+        <ul>
+          <li><strong>Pas de fuite</strong>&nbsp;: séparez apprentissage et test par séance ou par personne, jamais au hasard.</li>
+          <li><strong>Prévoir le rejet</strong>&nbsp;: un softmax choisit toujours une classe&nbsp;; ajoutez une classe «&nbsp;autre&nbsp;».</li>
+          <li><strong>Calibrer sur de vraies mesures</strong>&nbsp;: ici, l'entrée couvre −1,37 à +1,45&nbsp;g&nbsp;; au-delà, elle sature.</li>
+          <li><strong>Comparer carte et PC</strong>&nbsp;: une même fenêtre doit donner les mêmes sorties int8 des deux côtés.</li>
+          <li><strong>Opération manquante</strong>&nbsp;: l'initialisation échoue&nbsp;; ajoutez-la au résolveur (<code>Add…()</code>).</li>
+        </ul>
+
+        <div class="box box-exercice">
+          <p class="box-title">Exercice guidé · Trois gestes, du capteur à la décision</p>
+          <ol>
+            <li>Enregistrez 60&nbsp;fenêtres de 1&nbsp;s par geste (apprentissage), puis 20 lors d'une autre séance (test).</li>
+            <li>Remplacez <code>fenetre()</code> par la lecture de vos CSV&nbsp;; entraînez, quantifiez, exportez <code>model_data.h</code>.</li>
+            <li>Déployez <code>inference.ino</code>, réglez <code>kArena</code> à <code>arena_used_bytes()</code> + 20&nbsp;% et vérifiez l'allocation.</li>
+            <li>Mesurez la latence moyenne d'<code>Invoke()</code> sur 100&nbsp;inférences et la taille du programme.</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong> précision int8 ≥ 90&nbsp;% sur le jeu de test&nbsp;; écart float32/int8 ≤ 2&nbsp;points&nbsp;; arena ajustée et notée&nbsp;; latence, tailles du modèle et du programme consignées en une demi-page.</p>
+          <div class="solution">
+            <p><strong>Indice&nbsp;:</strong> précision décevante&#8239;? Vérifiez d'abord le prétraitement (unités, ordre des axes, orientation), puis variez les enregistrements avant d'ajouter des neurones. Écart float32/int8 trop grand&nbsp;: plus de données représentatives.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://developers.google.com/edge/litert/microcontrollers/overview">LiteRT for Microcontrollers (Google AI Edge)</a></li>
+        <li><a href="https://developers.google.com/edge/litert/conversion/tensorflow/quantization/post_training_integer_quant">Quantification entière post-entraînement</a></li>
+        <li><a href="https://github.com/tensorflow/tflite-micro">Dépôt officiel tflite-micro</a></li>
+        <li><a href="https://github.com/espressif/esp-tflite-micro">Composant esp-tflite-micro (Espressif)</a></li>
+        <li><a href="https://arxiv.org/abs/2010.08678">R. David et al., TensorFlow Lite Micro (article de référence)</a></li>
+        <li><a href="https://willsim.fr/cours/ia-embarquee-tinyml.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

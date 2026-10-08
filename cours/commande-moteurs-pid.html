@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Commande de moteurs et régulation PID — Cours WILLSIM</title>
+    <meta name="description" content="Cours gratuit : MLI et pont en H, codeur en quadrature, mesure de vitesse, PID discret avec anti-windup, réglage et apport de l’IA. Fiche PDF à télécharger.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/cours/commande-moteurs-pid.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/cours/commande-moteurs-pid.html">
+    <meta property="og:title" content="Commande de moteurs et régulation PID — Cours WILLSIM">
+    <meta property="og:description" content="Cours gratuit : MLI et pont en H, codeur en quadrature, mesure de vitesse, PID discret avec anti-windup, réglage et apport de l’IA. Fiche PDF à télécharger.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Commande de moteurs et régulation PID — Cours WILLSIM">
+    <meta name="twitter:description" content="Cours gratuit : MLI et pont en H, codeur en quadrature, mesure de vitesse, PID discret avec anti-windup, réglage et apport de l’IA. Fiche PDF à télécharger.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : cours gratuit + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Course",
+          "@id": "https://willsim.fr/cours/commande-moteurs-pid.html#cours",
+          "url": "https://willsim.fr/cours/commande-moteurs-pid.html",
+          "name": "Commande de moteurs et régulation PID",
+          "description": "Cours gratuit : MLI et pont en H, codeur en quadrature, mesure de vitesse, PID discret avec anti-windup, réglage et apport de l’IA. Fiche PDF à télécharger.",
+          "inLanguage": "fr",
+          "educationalLevel": "Débutant",
+          "timeRequired": "PT6H",
+          "coursePrerequisites": "Bases d’électricité (tension, courant) et d’Arduino",
+          "teaches": [
+            "Modèle du premier ordre du moteur à courant continu et courant de blocage",
+            "Commande par MLI (PWM) et pont en H, sécurité du montage",
+            "Lecture d’un codeur en quadrature par interruptions et mesure de vitesse",
+            "PID discret avec saturation, anti-emballement de l’intégrale et dérivée filtrée",
+            "Réglage manuel, méthode de Ziegler-Nichols et méthode lambda",
+            "Identification d’un modèle à partir de données et apports de l’IA à la commande"
+          ],
+          "isAccessibleForFree": true,
+          "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "provider": {
+            "@type": ["EducationalOrganization", "NGO"],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "associatedMedia": {
+            "@type": "MediaObject",
+            "name": "Fiche de cours (PDF) : Commande de moteurs et régulation PID",
+            "contentUrl": "https://willsim.fr/assets/pdf/willsim-commande-moteurs-pid.pdf",
+            "encodingFormat": "application/pdf"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://willsim.fr/" },
+            { "@type": "ListItem", "position": 2, "name": "Cours", "item": "https://willsim.fr/cours/" },
+            { "@type": "ListItem", "position": 3, "name": "Commande de moteurs et régulation PID", "item": "https://willsim.fr/cours/commande-moteurs-pid.html" }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/" aria-current="true">Cours</a>
+          <a href="/#projets">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/cours/">Cours</a></li>
+              <li><span aria-current="page">Commande de moteurs et PID</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Fiche de cours · Mécatronique</p>
+          <h1>Commande de moteurs et régulation PID</h1>
+          <p class="page-lead">Faire tourner un moteur à la vitesse voulue, quelle que soit la charge, est le geste de base de la mécatronique. Ce cours part du modèle du moteur à courant continu, le commande par MLI et pont en H, mesure sa vitesse avec un codeur, puis construit pas à pas un régulateur PID numérique fiable, avant de montrer ce que l’intelligence artificielle peut y ajouter.</p>
+
+          <div class="page-badges">
+            <span class="status-badge status-badge-available">Fiche PDF disponible</span>
+            <span class="status-badge">Sessions en atelier à venir</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Niveau</dt><dd>Débutant</dd></div>
+            <div><dt>Durée</dt><dd>6&nbsp;h (3 séances de 2&nbsp;h)</dd></div>
+            <div><dt>Prérequis</dt><dd>Bases d’électricité (tension, courant) et d’Arduino</dd></div>
+            <div><dt>Outils</dt><dd>Arduino Uno ou ESP32, motoréducteur à codeur, pont en H (TB6612FNG ou L298N), Python et NumPy</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectifs-titre">
+            <h2 id="objectifs-titre">Objectifs pédagogiques</h2>
+            <p>À l’issue de ce cours, vous serez capable de&nbsp;:</p>
+            <ul class="objectives">
+              <li>relier tension, courant et vitesse d’un moteur à courant continu par un modèle du premier ordre, et calculer son courant de blocage&nbsp;;</li>
+              <li>commander le sens et la vitesse d’un moteur par MLI et pont en H, en respectant les règles de sécurité du montage&nbsp;;</li>
+              <li>compter les fronts d’un codeur en quadrature par interruptions et en déduire une vitesse, en connaissant la résolution de la mesure&nbsp;;</li>
+              <li>programmer un PID discret avec saturation, anti-emballement de l’intégrale et dérivée filtrée, puis le régler à la main, par la méthode de Ziegler-Nichols ou par la méthode lambda&nbsp;;</li>
+              <li>identifier un modèle du moteur à partir de mesures et situer ce que l’IA apporte à la commande, et ce qu’elle ne remplace pas.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="public-titre">
+            <h2 id="public-titre">À qui s’adresse ce cours&#8239;?</h2>
+            <p>Aux étudiants en mécatronique, en génie électrique ou mécanique, aux lycéens des filières technologiques et à tous les passionnés d’électronique qui ont déjà fait clignoter une LED avec un Arduino et veulent passer à un actionneur réellement asservi. C’est aussi une base pour les projets de robotique&nbsp;: chaque roue motorisée, chaque articulation repose sur ce type de boucle.</p>
+            <p><strong>Prérequis&nbsp;:</strong> la loi d’Ohm, la notion de tension et de courant, et l’écriture d’un programme Arduino simple (<code>setup()</code>, <code>loop()</code>, <code>digitalWrite()</code>). Les équations utiles sont introduites dans la fiche&nbsp;; la dernière partie utilise un court script Python avec NumPy.</p>
+          </section>
+
+          <section aria-labelledby="plan-titre">
+            <h2 id="plan-titre">Plan du cours</h2>
+            <ol class="course-toc">
+              <li>
+                <p class="toc-meta">Séance 1 · 2&nbsp;h</p>
+                <h3>Modèle du moteur, MLI, pont en H et sécurité</h3>
+                <p>Équations du moteur à courant continu, modèle du premier ordre et mesure de sa constante de temps, courant de blocage. Modulation de largeur d’impulsion, fréquence de MLI sur Arduino Uno, pont en H et table de commande du TB6612FNG, comparaison avec le L298N, règles de sécurité du montage.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 2 · 2&nbsp;h</p>
+                <h3>Codeur en quadrature, boucle fermée et PID discret</h3>
+                <p>Décodage ×4 d’un codeur incrémental par interruptions, calcul et résolution de la vitesse. Boucle ouverte et boucle fermée, rôle de chaque terme du PID, discrétisation à période fixe, dérivée filtrée de la mesure, saturation et anti-emballement par intégration conditionnelle. Variante ESP32.</p>
+              </li>
+              <li>
+                <p class="toc-meta">Séance 3 · 2&nbsp;h</p>
+                <h3>Réglage, exercice guidé et apport de l’IA</h3>
+                <p>Réglage manuel, méthode du gain critique de Ziegler-Nichols, méthode lambda à partir d’un modèle. Exercice guidé avec critères de réussite chiffrés. Identification par moindres carrés en Python, réglage automatique et apprentissage par renforcement&nbsp;: intérêt et limites.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="apercu-titre">
+            <h2 id="apercu-titre">Aperçu du cours</h2>
+            <h3>Un moteur se comporte comme un premier ordre</h3>
+            <p>En négligeant l’inductance du bobinage, la vitesse d’un moteur à courant continu répond à la tension comme un système du premier ordre de gain <em>K</em> et de constante de temps τ&nbsp;: après un échelon, elle parcourt 63&nbsp;% de sa variation en τ, quelques dizaines de millisecondes pour un petit motoréducteur. Au démarrage, rien ne limite le courant que la résistance du bobinage&nbsp;: un moteur de 4&nbsp;Ω sous 12&nbsp;V appelle 3&nbsp;A, ce qui dimensionne le pont en H, l’alimentation et les câbles.</p>
+
+            <h3>Mesurer la vitesse avec un codeur</h3>
+            <p>Un codeur en quadrature délivre deux signaux décalés d’un quart de période&nbsp;: le nombre de fronts donne l’angle, leur ordre le sens. Un codeur de 11&nbsp;impulsions par tour placé avant un réducteur de rapport 30 fournit 1&nbsp;320&nbsp;fronts par tour de sortie. Comptés par interruptions et relevés toutes les 10&nbsp;ms, ils donnent une vitesse résolue à 4,5&nbsp;tr/min près&nbsp;: à basse vitesse, la mesure «&nbsp;saute&nbsp;» d’un front à l’autre, et la fiche explique comment en tenir compte.</p>
+
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Tableau défilant&nbsp;: Rôle des trois termes du correcteur PID">
+              <table>
+                <caption>Rôle des trois termes du correcteur PID</caption>
+                <thead>
+                  <tr><th scope="col">Terme</th><th scope="col">Agit sur</th><th scope="col">Effet principal</th><th scope="col">Précaution</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Proportionnel</td><td>Erreur présente</td><td>Réponse plus rapide</td><td>Trop fort, il fait osciller</td></tr>
+                  <tr><td>Intégral</td><td>Erreur passée</td><td>Annule l’erreur statique</td><td>Prévoir un anti-emballement</td></tr>
+                  <tr><td>Dérivé</td><td>Tendance de la mesure</td><td>Amortit les oscillations</td><td>Amplifie le bruit&nbsp;: à filtrer</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>Mesurer avant de régler, l’IA en appui</h3>
+            <p>Plutôt que d’ajuster les gains au hasard, le cours fait identifier le gain et la constante de temps du moteur à partir d’un essai en boucle ouverte, puis calcule un correcteur PI par la méthode lambda&nbsp;: avec λ&nbsp;=&nbsp;τ, la vitesse suit en principe la consigne sans dépassement. Cette identification est une régression, brique de base de l’apprentissage automatique&nbsp;; la fiche montre ensuite où l’optimisation et l’apprentissage par renforcement deviennent utiles, et pourquoi un PID bien réglé reste le choix le plus sûr pour une simple boucle de vitesse.</p>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel et logiciels</h2>
+            <ul>
+              <li>Une carte Arduino Uno, ou un ESP32 (cœur Arduino 3.x)&nbsp;: la fiche précise les adaptations nécessaires.</li>
+              <li>Un motoréducteur à courant continu équipé d’un codeur en quadrature, par exemple 11&nbsp;impulsions par tour et réducteur de rapport 30.</li>
+              <li>Un pont en H&nbsp;: module TB6612FNG (13,5&nbsp;V et 1&nbsp;A par voie en continu) ou L298N (jusqu’à 46&nbsp;V et 2&nbsp;A par voie, mais environ 2&nbsp;V de pertes et un radiateur qui chauffe).</li>
+              <li>Une alimentation séparée pour le moteur, protégée par un fusible, et un interrupteur de coupure à portée de main.</li>
+              <li>L’IDE Arduino&nbsp;2 et son traceur série&nbsp;; Python 3 avec NumPy pour l’identification (script testé avec Python&nbsp;3.8 et NumPy&nbsp;1.24).</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="sessions-titre">
+            <h2 id="sessions-titre">Sessions en atelier</h2>
+            <div class="page-note">
+              <p>Les sessions en atelier de ce cours sont en préparation&nbsp;: aucune date n’est encore fixée. La fiche de cours au format PDF est, elle, disponible gratuitement dès maintenant.</p>
+            </div>
+            <p><strong>Sessions en atelier&nbsp;: à venir</strong> — <a class="text-link" href="/#contact">écrivez-nous pour être informé <span aria-hidden="true">↗</span></a></p>
+            <p><a class="text-link" href="/cours/"><span aria-hidden="true">←</span> Retour au catalogue des cours</a></p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Fiche PDF et liens utiles">
+          <section class="download-card" aria-labelledby="telechargement-titre">
+            <span class="download-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            </span>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Ressource gratuite</p>
+            <h2 id="telechargement-titre">Fiche de cours</h2>
+            <p>Modèle du moteur, trois schémas, un programme Arduino complet et commenté, un script Python testé, encadré sécurité, exercice guidé avec critères de réussite et liens vers les documentations officielles.</p>
+            <a class="button button-lime button-full" href="/assets/pdf/willsim-commande-moteurs-pid.pdf" type="application/pdf" aria-describedby="telechargement-meta">
+              <span>Télécharger la fiche PDF</span>
+              <span aria-hidden="true">↓</span>
+            </a>
+            <p class="download-meta" id="telechargement-meta">PDF · 7 pages · 382 Ko</p>
+            <p class="download-licence">© 2026 WILLSIM — Licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" rel="license noopener">CC BY-NC-SA 4.0</a>. Rédaction&nbsp;: équipe pédagogique WILLSIM.</p>
+          </section>
+
+          <section class="related-links" aria-labelledby="liens-titre">
+            <h2 id="liens-titre">Pour aller plus loin</h2>
+            <ul>
+              <li><a href="/cours/apprentissage-renforcement-sim2real.html"><span class="related-kicker">Cours complémentaire</span>Apprentissage par renforcement et jumeau numérique</a></li>
+              <li><a href="/cours/ros2-premiers-pas.html"><span class="related-kicker">Cours complémentaire</span>ROS&nbsp;2&nbsp;: premiers pas en robotique mobile</a></li>
+              <li><a href="/projets/jumeau-numerique-sim2real.html"><span class="related-kicker">Projet lié</span>Du jumeau numérique au robot réel</a></li>
+              <li><a href="/cours/"><span class="related-kicker">Catalogue</span>Tous les cours gratuits</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>Maintenance prédictive d'un moteur — Projet WILLSIM</title>
+    <meta name="description" content="Projet WILLSIM en préparation. Mesurer les vibrations et le courant d'un moteur, puis embarquer un modèle de détection d'anomalies sur un microcontrôleur.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/projets/maintenance-predictive-moteur.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/projets/maintenance-predictive-moteur.html">
+    <meta property="og:title" content="Maintenance prédictive d'un moteur — Projet WILLSIM">
+    <meta property="og:description" content="Projet WILLSIM en préparation. Mesurer les vibrations et le courant d'un moteur, puis embarquer un modèle de détection d'anomalies sur un microcontrôleur.">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Maintenance prédictive d'un moteur — Projet WILLSIM">
+    <meta name="twitter:description" content="Projet WILLSIM en préparation. Mesurer les vibrations et le courant d'un moteur, puis embarquer un modèle de détection d'anomalies sur un microcontrôleur.">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : présentation de projet (en préparation) + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CreativeWork",
+          "@id": "https://willsim.fr/projets/maintenance-predictive-moteur.html#projet",
+          "url": "https://willsim.fr/projets/maintenance-predictive-moteur.html",
+          "name": "Maintenance prédictive d'un moteur",
+          "description": "Projet WILLSIM en préparation. Mesurer les vibrations et le courant d'un moteur, puis embarquer un modèle de détection d'anomalies sur un microcontrôleur.",
+          "inLanguage": "fr",
+          "creativeWorkStatus": "En préparation",
+          "keywords": "maintenance prédictive, analyse vibratoire, détection d'anomalies, IA embarquée, TinyML",
+          "isAccessibleForFree": true,
+          "publisher": {
+            "@type": [
+              "EducationalOrganization",
+              "NGO"
+            ],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "mentions": [
+            {
+              "@type": "Course",
+              "name": "Maintenance prédictive : capteurs et détection d’anomalies",
+              "url": "https://willsim.fr/cours/maintenance-predictive.html"
+            },
+            {
+              "@type": "Course",
+              "name": "IA embarquée sur microcontrôleur (TinyML)",
+              "url": "https://willsim.fr/cours/ia-embarquee-tinyml.html"
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Accueil",
+              "item": "https://willsim.fr/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Projets",
+              "item": "https://willsim.fr/#projets"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Maintenance prédictive d'un moteur",
+              "item": "https://willsim.fr/projets/maintenance-predictive-moteur.html"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/">Cours</a>
+          <a href="/#projets" aria-current="true">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/#projets">Projets</a></li>
+              <li><span aria-current="page">Maintenance prédictive d'un moteur</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Projet associatif · Maintenance et IA embarquée</p>
+          <h1>Maintenance prédictive d'un moteur</h1>
+          <p class="page-lead">Mesurer les vibrations et le courant d'un moteur électrique, entraîner un modèle de détection d'anomalies, puis l'embarquer au plus près du moteur pour signaler une dérive avant la panne. Un projet pour parcourir toute la chaîne de la maintenance prédictive, du capteur jusqu'au modèle embarqué.</p>
+
+          <div class="page-badges">
+            <span class="status-badge">Projet en préparation</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Statut</dt><dd>En préparation</dd></div>
+            <div><dt>Domaines</dt><dd>Traitement du signal, IA embarquée</dd></div>
+            <div><dt>Compétences</dt><dd>Capteurs, analyse spectrale, détection d'anomalies</dd></div>
+            <div><dt>Matériel envisagé</dt><dd>Banc moteur basse tension, accéléromètre, microcontrôleur</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectif-titre">
+            <h2 id="objectif-titre">Objectif du projet</h2>
+            <p>Le projet vise à construire un petit banc d'essai sur lequel on pourra provoquer des défauts mécaniques maîtrisés, puis à concevoir un système embarqué capable de les détecter à partir des mesures, sans dépendre d'un ordinateur.</p>
+            <ul class="objectives">
+              <li>Acquérir de façon synchronisée les vibrations, le courant et la vitesse du moteur, à une fréquence d'échantillonnage adaptée aux phénomènes observés.</li>
+              <li>Extraire des indicateurs pertinents (valeur efficace, facteur de crête, kurtosis, énergie par bandes de fréquence) et les relier à l'état du moteur.</li>
+              <li>Entraîner un modèle de détection d'anomalies sur le fonctionnement normal, puis l'exécuter sur un microcontrôleur.</li>
+              <li>Évaluer le système avec rigueur&nbsp;: détections, fausses alarmes et délai de détection, en le comparant à une méthode simple sans IA.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="problematique-titre">
+            <h2 id="problematique-titre">Problématique d'ingénierie</h2>
+            <p>En maintenance, la difficulté principale n'est pas de mesurer mais d'interpréter&nbsp;: une machine produit en permanence des vibrations normales, et les pannes réelles sont rares.</p>
+            <ul>
+              <li><strong>Peu d'exemples de pannes&nbsp;:</strong> on dispose de nombreuses mesures en fonctionnement normal et de très peu de mesures en défaut. Le modèle sera donc entraîné à reconnaître le comportement normal et à signaler ce qui s'en écarte (détection de nouveauté), plutôt qu'à classer des pannes connues.</li>
+              <li><strong>Signature des défauts&nbsp;:</strong> un balourd se traduit surtout par une vibration à la fréquence de rotation&nbsp;; un désalignement ou un desserrage fait souvent apparaître des harmoniques de cette fréquence. L'analyse spectrale (FFT) permettra de vérifier ces signatures sur le banc.</li>
+              <li><strong>Échantillonnage&nbsp;:</strong> d'après le théorème de Shannon-Nyquist, la fréquence d'échantillonnage doit dépasser le double de la plus haute fréquence présente dans le signal échantillonné&nbsp;: un filtre anti-repliement doit donc limiter la bande passante en amont. Pour un arbre qui tourne à quelques milliers de tours par minute (quelques dizaines de hertz), quelques centaines de hertz de bande passante suffisent pour observer la fréquence de rotation et ses premiers harmoniques, où se manifestent balourd, désalignement et desserrage. Les défauts de roulement, eux, produisent des chocs répétés qui excitent des résonances de plusieurs kilohertz&nbsp;: leur détection demande une bande passante bien plus large et une analyse d'enveloppe.</li>
+              <li><strong>Conditions de fonctionnement&nbsp;:</strong> les vibrations changent avec la vitesse et la charge. Un modèle entraîné à une seule vitesse risque de prendre un simple changement de régime pour une anomalie&nbsp;: la vitesse devra être mesurée et prise en compte.</li>
+              <li><strong>Ressources limitées&nbsp;:</strong> un microcontrôleur dispose de quelques dizaines à quelques centaines de kilo-octets de mémoire vive. Le prétraitement et le modèle devront tenir dans ce budget, avec un temps de calcul compatible avec la cadence des mesures.</li>
+              <li><strong>Choix du seuil d'alerte&nbsp;:</strong> un seuil trop bas multiplie les fausses alarmes, un seuil trop haut laisse passer les défauts. Ce compromis sera réglé sur des données de validation, distinctes des données de test.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="architecture-titre">
+            <h2 id="architecture-titre">Architecture envisagée</h2>
+            <p>La chaîne envisagée va du capteur à l'alerte et s'exécute entièrement sur la carte électronique. L'ordinateur ne sert qu'à l'étude des données et à l'entraînement du modèle.</p>
+            <ul>
+              <li><strong>Banc d'essai&nbsp;:</strong> un moteur à courant continu basse tension entraîne, par un accouplement, un arbre monté sur roulements qui porte un disque. On pourra y provoquer des défauts maîtrisés&nbsp;: petites masses fixées sur le disque (balourd), fixation desserrée, léger désalignement de l'accouplement. La basse tension et un carter de protection autour des pièces tournantes font partie des exigences de sécurité.</li>
+              <li><strong>Capteurs&nbsp;:</strong> un accéléromètre MEMS trois axes fixé près d'un palier, un capteur de courant (à effet Hall, ou résistance de shunt et amplificateur) sur l'alimentation du moteur, et un capteur de vitesse de rotation (codeur ou capteur optique).</li>
+              <li><strong>Calcul&nbsp;:</strong> un microcontrôleur 32&nbsp;bits doté d'une unité de calcul en virgule flottante (par exemple un ESP32-S3, ou un modèle à cœur Arm Cortex-M4F) réalise l'acquisition à cadence fixe, le calcul des indicateurs et l'inférence.</li>
+              <li><strong>Logiciel&nbsp;:</strong> acquisition à cadence fixe (horloge du capteur ou minuterie du microcontrôleur, transfert des échantillons par DMA), découpage en fenêtres, FFT et calcul des indicateurs sur la carte&nbsp;; étude des données et entraînement en Python sur ordinateur&nbsp;; modèle quantifié en entiers 8&nbsp;bits et exécuté avec LiteRT for Microcontrollers (anciennement TensorFlow Lite for Microcontrollers).</li>
+              <li><strong>Rôle de l'IA&nbsp;:</strong> un petit modèle de détection d'anomalies, par exemple un autoencodeur dense entraîné à reconstruire les indicateurs du fonctionnement normal&nbsp;: une erreur de reconstruction élevée signale un comportement inhabituel. Une méthode de référence sans IA (seuil sur la valeur efficace de la vibration) servira de point de comparaison&nbsp;; si elle suffit, c'est elle qu'il faudra retenir.</li>
+              <li><strong>Sorties&nbsp;:</strong> une alerte locale (voyant) et, éventuellement, l'envoi du score d'anomalie par liaison sans fil vers un tableau de bord.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="materiel-titre">
+            <h2 id="materiel-titre">Matériel envisagé</h2>
+            <p>Liste indicative, à confirmer lors de la rédaction du cahier des charges&nbsp;: aucun matériel n'est encore acheté ni réservé.</p>
+            <ul>
+              <li>un moteur à courant continu basse tension et son module de commande (pont en H)&nbsp;;</li>
+              <li>un accouplement, un arbre sur paliers à roulements et un disque percé pour fixer des masses de balourd&nbsp;;</li>
+              <li>un châssis rigide et un carter de protection transparent&nbsp;;</li>
+              <li>un accéléromètre MEMS trois axes capable d'échantillonner à quelques kilohertz au moins&nbsp;;</li>
+              <li>un capteur de courant et un capteur de vitesse de rotation&nbsp;;</li>
+              <li>une carte à microcontrôleur 32&nbsp;bits avec unité de calcul en virgule flottante&nbsp;;</li>
+              <li>une alimentation de laboratoire basse tension, limitée en courant.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="etapes-titre">
+            <h2 id="etapes-titre">Étapes prévues</h2>
+            <ol class="steps-list">
+              <li>
+                <h3>Conception du banc et des défauts</h3>
+                <p>Concevoir un banc sûr (basse tension, carter de protection) sur lequel chaque défaut peut être introduit puis retiré de façon reproductible.</p>
+              </li>
+              <li>
+                <h3>Chaîne d'acquisition</h3>
+                <p>Choisir la fréquence d'échantillonnage, synchroniser vibration, courant et vitesse, puis valider la chaîne en retrouvant la fréquence de rotation dans le spectre.</p>
+              </li>
+              <li>
+                <h3>Campagne de mesures</h3>
+                <p>Enregistrer le fonctionnement normal à plusieurs vitesses et charges, puis chaque défaut. Les mesures en défaut ne serviront jamais à entraîner le modèle&nbsp;: une partie servira à régler le seuil d'alerte, le reste à l'évaluation finale.</p>
+              </li>
+              <li>
+                <h3>Indicateurs et modèles</h3>
+                <p>Calculer les indicateurs, mettre en place la méthode de référence à seuil, entraîner le modèle d'anomalies sur le fonctionnement normal et régler son seuil sur des données de validation.</p>
+              </li>
+              <li>
+                <h3>Embarquement sur la carte</h3>
+                <p>Quantifier le modèle, mesurer la mémoire occupée et le temps d'inférence, et vérifier que les scores calculés sur la carte restent proches de ceux obtenus sur ordinateur.</p>
+              </li>
+              <li>
+                <h3>Évaluation et documentation</h3>
+                <p>Mesurer, pour chaque défaut, le taux de détection, le taux de fausses alarmes et le délai de détection, puis documenter le banc, les données et les résultats.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="competences-titre">
+            <h2 id="competences-titre">Compétences mobilisées</h2>
+            <div class="skills-tags">
+              <span>Capteurs de vibration</span>
+              <span>Mesure de courant</span>
+              <span>Traitement du signal</span>
+              <span>Détection d'anomalies</span>
+              <span>IA embarquée</span>
+            </div>
+            <p>Le projet fait aussi appel à des notions de mécanique vibratoire (balourd, alignement, roulements), à la programmation embarquée en C/C++ et à des outils statistiques pour l'évaluation.</p>
+          </section>
+
+          <section aria-labelledby="cours-titre">
+            <h2 id="cours-titre">Se former avec les cours WILLSIM</h2>
+            <p>Chacun de ces cours est accompagné d'une fiche PDF gratuite, rédigée par l'équipe pédagogique WILLSIM&nbsp;:</p>
+            <ul>
+              <li><a href="/cours/maintenance-predictive.html">Maintenance prédictive&nbsp;: capteurs et détection d’anomalies</a>&nbsp;: pour les capteurs, les indicateurs vibratoires et les méthodes de détection d'anomalies.</li>
+              <li><a href="/cours/ia-embarquee-tinyml.html">IA embarquée sur microcontrôleur (TinyML)</a>&nbsp;: pour optimiser un modèle et le déployer sur un microcontrôleur.</li>
+            </ul>
+            <p><a class="text-link" href="/cours/">Voir tous les cours</a></p>
+          </section>
+
+          <section aria-labelledby="contribuer-titre">
+            <h2 id="contribuer-titre">Envie de participer&#8239;?</h2>
+            <div class="page-note">
+              <p>Ce projet est en préparation&nbsp;: le cahier des charges et le matériel sont en cours de définition, aucune réalisation n'est encore engagée.</p>
+            </div>
+            <p>Le projet s'adresse aux étudiants, enseignants et passionnés qui souhaitent apprendre en construisant. Toutes les compétences sont utiles&nbsp;: mécanique et fabrication du banc, électronique et capteurs, traitement du signal, IA, programmation embarquée, mais aussi rédaction de la documentation.</p>
+            <p>Pour proposer votre aide, du matériel ou une idée, <a class="text-link" href="/#contact">écrivez à l'équipe via le formulaire de contact</a>.</p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Participer et liens utiles">
+          <section class="cta-card" aria-labelledby="participer-titre">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Projet ouvert</p>
+            <h2 id="participer-titre">Participer au projet</h2>
+            <p>Étudiant, enseignant ou passionné&#8239;? Proposez vos compétences ou votre matériel&nbsp;: l'équipe vous répondra par e-mail.</p>
+            <a class="button button-lime button-full" href="/#contact">
+              <span>Proposer ma participation</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </section>
+
+          <section class="related-links" aria-labelledby="autres-projets-titre">
+            <h2 id="autres-projets-titre">Les autres projets</h2>
+            <ul>
+              <li><a href="/projets/bras-robotique-vision.html"><span class="related-kicker">Projet en préparation</span>Bras robotique guidé par vision</a></li>
+              <li><a href="/projets/robot-mobile-autonome.html"><span class="related-kicker">Projet en préparation</span>Robot mobile autonome</a></li>
+              <li><a href="/projets/jumeau-numerique-sim2real.html"><span class="related-kicker">Projet en préparation</span>Du jumeau numérique au robot réel</a></li>
+              <li><a href="/#projets"><span class="related-kicker">Projets</span>Tous les projets en préparation</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

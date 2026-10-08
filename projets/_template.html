@@ -1,0 +1,254 @@
+<!doctype html>
+<!--
+  GABARIT DE PAGE DE PROJET (non publié : .htaccess bloque « _template* »).
+  Copier en /projets/SLUG.html, remplacer TOUS les marqueurs {{...}} puis supprimer ce commentaire.
+  {{SLUG}}             ex. robot-mobile-autonome
+  {{META_TITLE}}       title unique, 50-60 caractères ; {{META_DESCRIPTION}} unique, 140-160 caractères, texte brut
+  {{TITRE}}            titre exact (HTML : &nbsp; avant « : ») ; {{TITRE_TEXTE_BRUT}} même titre pour le JSON-LD
+  {{DOMAINE}}          surtitre, ex. « Vision et robotique »
+  {{CHAPEAU}}          2-3 phrases : objectif du projet
+  {{DOMAINES}} {{COMPETENCES}} {{MATERIEL_ENVISAGE}}  puces d'infos
+  JSON-LD : texte brut, pas d'entités HTML, pas de " non échappé.
+  Honnêteté : le projet est « en préparation ». Rien n'est présenté comme réalisé : pas de résultats,
+  pas de dates, pas de nombre de participants, pas de partenaires. Écrire au futur ou au conditionnel
+  (« le prototype devra… », « étapes prévues »).
+  Règles : aucun style="" ni <script> inline (hors JSON-LD), chemins absolus, ids uniques,
+  un seul bouton plein (celui de la carte « Participer »).
+-->
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17251f">
+    <title>{{META_TITLE}}</title>
+    <meta name="description" content="{{META_DESCRIPTION}}">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <link rel="canonical" href="https://willsim.fr/projets/{{SLUG}}.html">
+
+    <!-- Open Graph et Twitter Card -->
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WILLSIM">
+    <meta property="og:url" content="https://willsim.fr/projets/{{SLUG}}.html">
+    <meta property="og:title" content="{{META_TITLE}}">
+    <meta property="og:description" content="{{META_DESCRIPTION}}">
+    <meta property="og:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{META_TITLE}}">
+    <meta name="twitter:description" content="{{META_DESCRIPTION}}">
+    <meta name="twitter:image" content="https://willsim.fr/assets/img/og-willsim.jpg">
+    <meta name="twitter:image:alt" content="Logo et nom de l'association WILLSIM : robotique, code et IA">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Données structurées : présentation de projet (en préparation) + fil d'Ariane -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CreativeWork",
+          "@id": "https://willsim.fr/projets/{{SLUG}}.html#projet",
+          "url": "https://willsim.fr/projets/{{SLUG}}.html",
+          "name": "{{TITRE_TEXTE_BRUT}}",
+          "description": "{{META_DESCRIPTION}}",
+          "inLanguage": "fr",
+          "creativeWorkStatus": "En préparation",
+          "keywords": "{{MOT_CLE_1}}, {{MOT_CLE_2}}, {{MOT_CLE_3}}",
+          "isAccessibleForFree": true,
+          "publisher": {
+            "@type": ["EducationalOrganization", "NGO"],
+            "@id": "https://willsim.fr/#organization",
+            "name": "WILLSIM",
+            "url": "https://willsim.fr"
+          },
+          "author": {
+            "@id": "https://willsim.fr/#organization"
+          },
+          "mentions": [
+            { "@type": "Course", "name": "{{TITRE_COURS_1}}", "url": "https://willsim.fr/cours/{{SLUG_COURS_1}}.html" },
+            { "@type": "Course", "name": "{{TITRE_COURS_2}}", "url": "https://willsim.fr/cours/{{SLUG_COURS_2}}.html" }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://willsim.fr/" },
+            { "@type": "ListItem", "position": 2, "name": "Projets", "item": "https://willsim.fr/#projets" },
+            { "@type": "ListItem", "position": 3, "name": "{{TITRE_TEXTE_BRUT}}", "item": "https://willsim.fr/projets/{{SLUG}}.html" }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header site-header-sub">
+      <div class="header-container page-width">
+        <a class="brand" href="/" aria-label="WILLSIM, page d'accueil">
+          <img class="brand-logo-img" src="/assets/img/logo-76.webp" width="36" height="36" alt="WILLSIM">
+          <span class="brand-text">willsim<span class="brand-period">.</span></span>
+        </a>
+        <nav class="subnav" aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/cours/">Cours</a>
+          <a href="/#projets" aria-current="true">Projets</a>
+        </nav>
+        <a class="header-cta" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main id="contenu" tabindex="-1">
+      <div class="page-hero">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="/">Accueil</a></li>
+              <li><a href="/#projets">Projets</a></li>
+              <li><span aria-current="page">{{TITRE_COURT}}</span></li>
+            </ol>
+          </nav>
+
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Projet associatif · {{DOMAINE}}</p>
+          <h1>{{TITRE}}</h1>
+          <p class="page-lead">{{CHAPEAU}}</p>
+
+          <div class="page-badges">
+            <span class="status-badge">Projet en préparation</span>
+          </div>
+
+          <dl class="course-meta">
+            <div><dt>Statut</dt><dd>En préparation</dd></div>
+            <div><dt>Domaines</dt><dd>{{DOMAINES}}</dd></div>
+            <div><dt>Compétences</dt><dd>{{COMPETENCES}}</dd></div>
+            <div><dt>Matériel envisagé</dt><dd>{{MATERIEL_ENVISAGE}}</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="page-layout page-width">
+        <div class="page-content">
+          <section aria-labelledby="objectif-titre">
+            <h2 id="objectif-titre">Objectif du projet</h2>
+            <p>{{OBJECTIF_GENERAL}}</p>
+            <ul class="objectives">
+              <li>{{OBJECTIF_TECHNIQUE_1}}</li>
+              <li>{{OBJECTIF_TECHNIQUE_2}}</li>
+              <li>{{OBJECTIF_TECHNIQUE_3}}</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="architecture-titre">
+            <h2 id="architecture-titre">Architecture envisagée</h2>
+            <p>{{ARCHITECTURE_INTRO}}</p>
+            <ul>
+              <li><strong>{{BLOC_1}}&nbsp;:</strong> {{BLOC_1_DESCRIPTION}}</li>
+              <li><strong>{{BLOC_2}}&nbsp;:</strong> {{BLOC_2_DESCRIPTION}}</li>
+              <li><strong>{{BLOC_3}}&nbsp;:</strong> {{BLOC_3_DESCRIPTION}}</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="etapes-titre">
+            <h2 id="etapes-titre">Étapes prévues</h2>
+            <ol class="steps-list">
+              <li>
+                <h3>{{ETAPE_1_TITRE}}</h3>
+                <p>{{ETAPE_1_DESCRIPTION}}</p>
+              </li>
+              <li>
+                <h3>{{ETAPE_2_TITRE}}</h3>
+                <p>{{ETAPE_2_DESCRIPTION}}</p>
+              </li>
+              <li>
+                <h3>{{ETAPE_3_TITRE}}</h3>
+                <p>{{ETAPE_3_DESCRIPTION}}</p>
+              </li>
+              <!-- Dupliquer le <li> pour chaque étape supplémentaire -->
+            </ol>
+          </section>
+
+          <section aria-labelledby="competences-titre">
+            <h2 id="competences-titre">Compétences mobilisées</h2>
+            <div class="skills-tags">
+              <span>{{TAG_1}}</span>
+              <span>{{TAG_2}}</span>
+              <span>{{TAG_3}}</span>
+            </div>
+            <p>Les fiches de cours associées couvrent les notions nécessaires&nbsp;: {{PHRASE_LIEN_COURS}}</p>
+          </section>
+
+          <section aria-labelledby="contribuer-titre">
+            <h2 id="contribuer-titre">Contribuer au projet</h2>
+            <div class="page-note">
+              <p>Ce projet est en préparation&nbsp;: le cahier des charges et le matériel sont en cours de définition, aucune réalisation n'est encore engagée.</p>
+            </div>
+            <p>{{TEXTE_CONTRIBUTION}}</p>
+          </section>
+        </div>
+
+        <aside class="page-aside" aria-label="Participer et liens utiles">
+          <section class="cta-card" aria-labelledby="participer-titre">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Projet ouvert</p>
+            <h2 id="participer-titre">Participer au projet</h2>
+            <p>Étudiant, enseignant ou passionné&#8239;? Proposez vos compétences ou votre matériel&nbsp;: l'équipe vous répondra par e-mail.</p>
+            <a class="button button-lime button-full" href="/#contact">
+              <span>Proposer ma participation</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </section>
+
+          <section class="related-links" aria-labelledby="cours-lies-titre">
+            <h2 id="cours-lies-titre">Se former avant de commencer</h2>
+            <ul>
+              <li><a href="/cours/{{SLUG_COURS_1}}.html"><span class="related-kicker">Cours · fiche PDF gratuite</span>{{TITRE_COURS_1}}</a></li>
+              <li><a href="/cours/{{SLUG_COURS_2}}.html"><span class="related-kicker">Cours · fiche PDF gratuite</span>{{TITRE_COURS_2}}</a></li>
+              <li><a href="/#projets"><span class="related-kicker">Projets</span>Tous les projets en préparation</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <!-- Informations légales de l'association : affichage obligatoire sur toutes les pages -->
+      <section class="footer-legal-info page-width" aria-labelledby="legal-info-title">
+        <h2 id="legal-info-title" class="footer-legal-title">Informations légales</h2>
+        <dl class="legal-facts">
+          <div><dt>Nom de l'organisation</dt><dd>WILLSIM</dd></div>
+          <div><dt>Numéro RNA (Charity ID)</dt><dd>W842013616</dd></div>
+          <div><dt>Adresse du siège social</dt><dd>241 rue Jean Joseph Balechou, 84140 Montfavet</dd></div>
+          <div class="legal-facts-wide"><dt>Mission</dt><dd>Promouvoir, développer et démocratiser l'usage de l'intelligence artificielle dans les domaines de l'ingénierie et de la mécatronique.</dd></div>
+        </dl>
+      </section>
+      <div class="footer-bottom page-width">
+        <span>© <span id="year">2026</span> WILLSIM — Association loi 1901</span>
+        <nav class="footer-legal" aria-label="Informations légales">
+          <a href="/mentions-legales.html">Mentions légales</a>
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/cgu.html">CGU</a>
+          <button type="button" class="link-button" data-cookie-settings>Cookies</button>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/script.js?v=4" defer></script>
+  </body>
+</html>

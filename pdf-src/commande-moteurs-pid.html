@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Commande de moteurs et régulation PID — Fiche de cours WILLSIM</title>
+    <meta name="author" content="Équipe pédagogique WILLSIM">
+    <meta name="description" content="Fiche de cours gratuite : modèle du moteur à courant continu, MLI et pont en H, codeur en quadrature par interruptions, mesure de vitesse, PID discret avec anti-windup, réglage et apport de l'IA.">
+    <meta name="keywords" content="moteur à courant continu, MLI, PWM, pont en H, TB6612FNG, L298N, codeur en quadrature, interruptions, PID, anti-windup, Ziegler-Nichols, méthode lambda, Arduino, ESP32, identification, IA">
+    <link rel="stylesheet" href="print.css">
+    <style>
+      /* Styles propres à cette fiche */
+      body { font-size: 9.6pt; line-height: 1.42; }
+      .sections h2 { margin-top: 6mm; }
+      .colophon { margin-top: 5mm; }
+      p { margin-bottom: 2.2mm; }
+      .sections h3 { margin: 4mm 0 1.5mm; }
+      .box { margin: 3mm 0; padding: 3mm 4mm; }
+      table { break-inside: avoid; }
+      pre { margin: 2.5mm 0; font-size: 7.6pt; line-height: 1.32; padding: 2.5mm 3.5mm; break-inside: auto; }
+      pre.sortie { break-inside: avoid; }
+      figure svg text { font-family: "DM Sans", "Segoe UI", Arial, sans-serif; }  /* lettres grecques : repli Segoe UI */
+      th var, th var + sub { font-weight: 400; }        /* pas de gras italique synthétique */
+      .equations td:first-child { width: 52mm; white-space: nowrap; }
+      .equations td { padding-top: 1mm; padding-bottom: 1mm; }
+      .duo { display: grid; grid-template-columns: 58mm 1fr; gap: 6mm; align-items: center; margin: 3mm 0; break-inside: avoid; }
+      .duo figure, .duo table { margin: 0; }
+      .duo td, .duo th { padding-top: 1mm; padding-bottom: 1mm; }
+      .fig-pont { width: 58mm; }
+      .fig-boucle { width: 120mm; }
+      .fig-quadrature { width: 140mm; }
+      .zn td, .zn th { text-align: center; }
+      .zn td:first-child, .zn th:first-child { text-align: left; }
+      pre.sortie { margin-top: -1mm; border-left-color: var(--accent-text); background: #ffffff; }
+      math[display="block"] { margin: 2mm 0; }
+      .deroule { margin: 2mm 0 0; font-size: 9pt; }
+      .cover-meta dd { font-size: 8pt; }
+      .box li + li { margin-top: 0.6mm; }
+    </style>
+  </head>
+
+  <body>
+    <header class="cover">
+      <div class="cover-top">
+        <img class="cover-logo" src="logo-print.png" alt="">
+        <div>
+          <p class="cover-org">WILLSIM</p>
+          <p class="cover-kind">Fiche de cours · Ressource pédagogique gratuite</p>
+        </div>
+      </div>
+      <h1>Commande de moteurs et régulation PID</h1>
+      <p class="cover-lead">Faire tourner un moteur à la vitesse voulue, quelle que soit la charge, est le geste de base de la mécatronique. Cette fiche construit pas à pas une boucle de vitesse fiable, du modèle du moteur à courant continu au régulateur PID numérique, puis montre ce que l’intelligence artificielle peut y ajouter.</p>
+      <dl class="cover-meta">
+        <div><dt>Niveau</dt><dd>Débutant</dd></div>
+        <div><dt>Durée</dt><dd>6&nbsp;h (3 séances de 2&nbsp;h)</dd></div>
+        <div><dt>Prérequis</dt><dd>Bases d’électricité (tension, courant) et d’Arduino</dd></div>
+        <div><dt>Outils</dt><dd>Arduino ou ESP32, motoréducteur à codeur, pont en H (TB6612FNG ou L298N)</dd></div>
+      </dl>
+    </header>
+
+    <section class="box box-objectifs">
+      <p class="box-title">Objectifs de la fiche</p>
+      <p>À la fin de cette fiche, vous saurez&nbsp;:</p>
+      <ul>
+        <li>relier tension, courant et vitesse d’un moteur à courant continu par un modèle du premier ordre&nbsp;;</li>
+        <li>commander le sens et la vitesse d’un moteur par MLI et pont en H, en sécurité&nbsp;;</li>
+        <li>compter les fronts d’un codeur en quadrature par interruptions et en déduire une vitesse&nbsp;;</li>
+        <li>programmer un PID discret (saturation, anti-emballement, dérivée filtrée), le régler et le valider par des critères chiffrés&nbsp;;</li>
+        <li>situer ce que l’IA apporte à la commande et ce qu’elle ne remplace pas.</li>
+      </ul>
+      <p class="deroule"><strong>Déroulé indicatif&nbsp;:</strong> séance&nbsp;1, sections&nbsp;1 et 2 (modèle, MLI, pont en H, sécurité)&nbsp;; séance&nbsp;2, sections&nbsp;3 et 4 (codeur, boucle fermée, PID)&nbsp;; séance&nbsp;3, sections&nbsp;5 et 6 (réglage, exercice guidé, apport de l’IA).</p>
+    </section>
+
+    <main class="sections">
+      <section>
+        <h2>Modèle simplifié du moteur à courant continu</h2>
+        <p>Un moteur à courant continu (MCC) à balais transforme un courant en couple et, en tournant, produit une tension qui s’oppose à celle qu’on lui applique. Son modèle électromécanique&nbsp;:</p>
+        <table class="equations">
+          <tbody>
+            <tr><td><math><mi>u</mi><mo>=</mo><mi>R</mi><mi>i</mi><mo>+</mo><mi>L</mi><mfrac><mrow><mi mathvariant="normal">d</mi><mi>i</mi></mrow><mrow><mi mathvariant="normal">d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mi>e</mi></math></td><td>Loi des mailles&nbsp;: tension <var>u</var>, résistance <var>R</var>, inductance <var>L</var>, courant <var>i</var>.</td></tr>
+            <tr><td><math><mi>e</mi><mo>=</mo><msub><mi>K</mi><mi>e</mi></msub><mi>ω</mi></math></td><td>Force contre-électromotrice, proportionnelle à la vitesse angulaire ω (rad/s).</td></tr>
+            <tr><td><math><mi>Γ</mi><mo>=</mo><msub><mi>K</mi><mi>t</mi></msub><mi>i</mi></math></td><td>Couple proportionnel au courant&nbsp;; en SI, <var>K</var><sub>t</sub> (N·m/A)&nbsp;=&nbsp;<var>K</var><sub>e</sub> (V·s/rad).</td></tr>
+            <tr><td><math><mi>J</mi><mfrac><mrow><mi mathvariant="normal">d</mi><mi>ω</mi></mrow><mrow><mi mathvariant="normal">d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>Γ</mi><mo>−</mo><mi>f</mi><mi>ω</mi><mo>−</mo><msub><mi>Γ</mi><mi>r</mi></msub></math></td><td>Inertie <var>J</var> ramenée à l’arbre, frottement visqueux <var>f</var>, couple résistant Γ<sub>r</sub>.</td></tr>
+          </tbody>
+        </table>
+
+        <p>La constante de temps électrique <var>L</var>/<var>R</var> étant en général bien plus courte que la constante de temps mécanique, on néglige <var>L</var>. En éliminant <var>i</var> et <var>e</var>, à couple résistant nul, il reste un système du premier ordre&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <mi>τ</mi><mfrac><mrow><mi mathvariant="normal">d</mi><mi>ω</mi></mrow><mrow><mi mathvariant="normal">d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mi>ω</mi><mo>=</mo><mi>K</mi><mi>u</mi>
+            <mspace width="1.2em"></mspace><mtext>avec</mtext><mspace width="0.6em"></mspace>
+            <mi>K</mi><mo>=</mo><mfrac><msub><mi>K</mi><mi>t</mi></msub><mrow><mi>R</mi><mi>f</mi><mo>+</mo><msub><mi>K</mi><mi>t</mi></msub><msub><mi>K</mi><mi>e</mi></msub></mrow></mfrac>
+            <mtext>,</mtext><mspace width="0.8em"></mspace>
+            <mi>τ</mi><mo>=</mo><mfrac><mrow><mi>R</mi><mi>J</mi></mrow><mrow><mi>R</mi><mi>f</mi><mo>+</mo><msub><mi>K</mi><mi>t</mi></msub><msub><mi>K</mi><mi>e</mi></msub></mrow></mfrac>
+          </mrow>
+        </math>
+        <p>Soit <var>H</var>(<var>p</var>)&nbsp;=&nbsp;<var>K</var>&nbsp;/&nbsp;(1&nbsp;+&nbsp;τ<var>p</var>)&nbsp;: après un échelon de tension, la vitesse parcourt 63&nbsp;% de sa variation finale en τ (quelques dizaines de millisecondes pour un petit motoréducteur) et 95&nbsp;% en 3τ.</p>
+        <p><strong>Courant de blocage.</strong> Au démarrage ou arbre bloqué, <var>e</var>&nbsp;=&nbsp;0&nbsp;: seul <var>R</var> limite le courant, <var>I</var><sub>bloc</sub>&nbsp;=&nbsp;<var>U</var>&nbsp;/&nbsp;<var>R</var>, soit 3&nbsp;A pour <var>R</var>&nbsp;=&nbsp;4&nbsp;Ω sous 12&nbsp;V, souvent plus de dix fois le courant à vide. Dimensionnez pont en H, alimentation et câbles en conséquence.</p>
+      </section>
+
+      <section>
+        <h2>MLI (PWM) et pont en H</h2>
+        <h3>La modulation de largeur d’impulsion</h3>
+        <p>Un microcontrôleur ne délivre pas une tension variable de puissance&nbsp;: il commute. La MLI (PWM, <em>pulse width modulation</em>) applique la pleine tension <var>U</var> pendant une fraction α de chaque période&nbsp;; bobinage et inertie lissent courant et vitesse, si bien que le moteur réagit, en première approximation, à la tension moyenne α<var>U</var>. Avec <code>analogWrite(broche, n)</code>, α&nbsp;=&nbsp;<var>n</var>/255. Sur Arduino Uno, cette MLI tourne à environ 490&nbsp;Hz (980&nbsp;Hz sur les broches 5 et 6) et fait siffler le moteur&nbsp;; avec un TB6612FNG, la ligne <code>TCCR1B = (TCCR1B &amp; 0xF8) | 0x01;</code> dans <code>setup()</code> porte les broches 9 et 10 à 31,4&nbsp;kHz, inaudible.</p>
+
+        <h3>Le pont en H</h3>
+        <p>Pour changer de sens, on inverse la tension aux bornes du moteur grâce aux quatre interrupteurs électroniques du pont en H (figure&nbsp;1). Fermer les deux interrupteurs du bas freine le moteur&nbsp;; fermer ceux d’un même bras (S1 et S2, ou S3 et S4) court-circuite l’alimentation. Un circuit intégré pilote donc les interrupteurs, interdit cette combinaison et gère les temps morts.</p>
+
+        <div class="duo">
+          <figure>
+            <svg class="fig-pont" width="280" height="200" viewBox="0 0 280 200" role="img" aria-label="Pont en H : quatre interrupteurs S1 à S4 autour du moteur M ; S1 et S4 fermés, le courant traverse le moteur de gauche à droite">
+              <defs>
+                <marker id="fl-i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#566b14"/></marker>
+              </defs>
+              <path d="M60,20 V100 H120 M160,100 H220 V180" fill="none" stroke="#d2ec6c" stroke-width="10" stroke-linejoin="round"/>
+              <line x1="60" y1="20" x2="220" y2="20" stroke="#14221c" stroke-width="2"/>
+              <line x1="60" y1="180" x2="220" y2="180" stroke="#14221c" stroke-width="2"/>
+              <text x="50" y="25" text-anchor="end" font-weight="700" font-size="13" fill="#14221c">+U</text>
+              <text x="50" y="185" text-anchor="end" font-weight="700" font-size="13" fill="#14221c">0 V</text>
+              <g stroke="#14221c" stroke-width="2" fill="none">
+                <path d="M60,20 V42 M60,68 V132 M60,158 V180 M220,20 V42 M220,68 V132 M220,158 V180 M60,100 H120 M160,100 H220"/>
+                <line x1="60" y1="68" x2="60" y2="42" stroke-width="3"/>
+                <line x1="60" y1="158" x2="74" y2="135" stroke-width="3"/>
+                <line x1="220" y1="68" x2="206" y2="45" stroke-width="3"/>
+                <line x1="220" y1="158" x2="220" y2="132" stroke-width="3"/>
+              </g>
+              <g fill="#ffffff" stroke="#14221c" stroke-width="1.5">
+                <circle cx="60" cy="42" r="3"/><circle cx="60" cy="68" r="3"/><circle cx="60" cy="132" r="3"/><circle cx="60" cy="158" r="3"/>
+                <circle cx="220" cy="42" r="3"/><circle cx="220" cy="68" r="3"/><circle cx="220" cy="132" r="3"/><circle cx="220" cy="158" r="3"/>
+              </g>
+              <g font-weight="700" font-size="13" fill="#14221c" text-anchor="middle">
+                <text x="36" y="60">S1</text><text x="36" y="150">S2</text><text x="246" y="60">S3</text><text x="246" y="150">S4</text>
+              </g>
+              <circle cx="140" cy="100" r="20" fill="#16261e"/>
+              <text x="140" y="105" text-anchor="middle" font-weight="700" font-size="14" fill="#ffffff">M</text>
+              <line x1="118" y1="70" x2="162" y2="70" stroke="#566b14" stroke-width="2" marker-end="url(#fl-i)"/>
+              <text x="140" y="63" text-anchor="middle" font-style="italic" font-size="13" fill="#566b14">i</text>
+            </svg>
+            <figcaption>Figure 1 — S1 et S4 fermés&nbsp;: le courant suit le trajet surligné. S2 et S3 fermés&nbsp;: il traverse le moteur dans l’autre sens.</figcaption>
+          </figure>
+          <table>
+            <caption>Commande d’une voie du TB6612FNG (STBY à l’état haut)</caption>
+            <thead>
+              <tr><th scope="col">IN1</th><th scope="col">IN2</th><th scope="col">PWM</th><th scope="col">Effet</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>H</td><td>L</td><td>H</td><td>rotation dans un sens</td></tr>
+              <tr><td>L</td><td>H</td><td>H</td><td>rotation dans l’autre sens</td></tr>
+              <tr><td colspan="2">IN1 ≠ IN2</td><td>L</td><td>frein (état bas de la MLI)</td></tr>
+              <tr><td>H</td><td>H</td><td>H ou L</td><td>frein (bornes en court-circuit)</td></tr>
+              <tr><td>L</td><td>L</td><td>H</td><td>roue libre (sorties coupées)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Ce freinage pendant l’état bas de la MLI rend la vitesse à peu près proportionnelle à α. Selon leurs fiches techniques, le TB6612FNG (MOSFET) admet 13,5&nbsp;V et 1&nbsp;A par voie en continu, avec peu de pertes&nbsp;; le L298 (bipolaire, MLI sur ENA) monte à 46&nbsp;V et 2&nbsp;A par voie, mais perd environ 2&nbsp;V à 1&nbsp;A et doit être refroidi.</p>
+
+        <div class="box box-attention">
+          <p class="box-title">Attention · sécurité du montage</p>
+          <ul>
+            <li>Alimentez le moteur par une source séparée (bloc protégé ou batterie avec fusible), jamais par le 5&nbsp;V de l’Arduino ou l’USB&nbsp;; reliez les masses.</li>
+            <li>Câblez hors tension&nbsp;; gardez à portée de main un interrupteur qui coupe la puissance&nbsp;: c’est l’arrêt d’urgence.</li>
+            <li>Fixez le moteur, qui peut démarrer dès la mise sous tension&nbsp;; éloignez doigts, cheveux et manches des pièces en rotation.</li>
+            <li>Bloqué, le moteur appelle son courant de blocage et chauffe, le pont aussi&nbsp;: coupez au moindre bruit ou odeur anormale.</li>
+            <li>Batterie au lithium&nbsp;: chargeur adapté, charge surveillée sur support ininflammable&nbsp;; écartez toute batterie gonflée ou abîmée.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Codeur en quadrature et mesure de vitesse</h2>
+        <h3>Deux signaux décalés d’un quart de période</h3>
+        <p>Un codeur incrémental monté sur l’arbre du moteur délivre deux signaux carrés, A et B, décalés d’un quart de période (quadrature)&nbsp;: le nombre de fronts donne l’angle parcouru, leur ordre le sens (figure&nbsp;2). En comptant chaque front de A et de B (décodage ×4), un codeur de <var>N</var> impulsions par tour placé avant un réducteur de rapport <var>G</var> fournit CPR&nbsp;=&nbsp;4<var>NG</var> fronts par tour de sortie&nbsp;: avec <var>N</var>&nbsp;=&nbsp;11 et <var>G</var>&nbsp;=&nbsp;30, CPR&nbsp;=&nbsp;1&nbsp;320, soit 0,27° par front.</p>
+
+        <figure>
+          <svg class="fig-quadrature" width="680" height="112" viewBox="0 0 680 112" role="img" aria-label="Chronogramme des voies A et B d'un codeur en quadrature : A change d'état un quart de période avant B ; chaque front de A ou de B compte plus un">
+            <g font-weight="700" font-size="14" fill="#14221c">
+              <text x="14" y="32">A</text><text x="14" y="80">B</text>
+            </g>
+            <g stroke="#dedfd7" stroke-width="1.2" stroke-dasharray="3 3">
+              <line x1="190" y1="6" x2="190" y2="94"/><line x1="220" y1="6" x2="220" y2="94"/>
+              <line x1="250" y1="6" x2="250" y2="94"/><line x1="280" y1="6" x2="280" y2="94"/>
+            </g>
+            <path d="M40,40 H70 V14 H130 V40 H190 V14 H250 V40 H310 V14 H370 V40 H430 V14 H490 V40 H520" fill="none" stroke="#16261e" stroke-width="2.2"/>
+            <path d="M40,88 H100 V62 H160 V88 H220 V62 H280 V88 H340 V62 H400 V88 H460 V62 H520 V88" fill="none" stroke="#566b14" stroke-width="2.2"/>
+            <g font-weight="700" font-size="10.5" fill="#566b14" text-anchor="middle">
+              <text x="190" y="107">+1</text><text x="220" y="107">+1</text><text x="250" y="107">+1</text><text x="280" y="107">+1</text>
+            </g>
+            <g font-size="11" fill="#14221c">
+              <text x="540" y="34">A en avance sur B&#160;:</text>
+              <text x="540" y="50">+1 par front</text>
+              <text x="540" y="74">B en avance sur A&#160;:</text>
+              <text x="540" y="90">−1 par front</text>
+            </g>
+          </svg>
+          <figcaption>Figure 2 — Voies A et B d’un codeur en quadrature&nbsp;: quatre fronts par impulsion, comptés +1 ou −1 selon le sens.</figcaption>
+        </figure>
+
+        <h3>Compter les fronts par interruptions</h3>
+        <p>À plusieurs milliers de fronts par seconde, une lecture dans <code>loop()</code> en manquerait. Une interruption sur chaque voie exécute donc une routine très courte, qui compare l’état (A,&nbsp;B) précédent au nouveau grâce à une table de 16 cases&nbsp;: +1, −1, ou 0 si les deux voies ont changé à la fois (front manqué ou parasite). Sur l’Uno, seules les broches 2 et 3 acceptent <code>attachInterrupt()</code>. Câblage&nbsp;: PWMA sur D9, AIN1 sur D7, AIN2 sur D8, STBY et VCC au 5&nbsp;V, VM à l’alimentation du moteur, AO1 et AO2 au moteur&nbsp;; codeur en 5&nbsp;V, voies A et B sur D2 et D3&nbsp;; masses reliées.</p>
+
+        <p class="code-title">commande_pid.ino (1/2) · Arduino Uno et TB6612FNG&nbsp;: codeur et pont en H</p>
+        <pre><code>const byte PIN_A = 2, PIN_B = 3, PIN_PWM = 9, PIN_IN1 = 7, PIN_IN2 = 8;
+const float CPR = 4 * 11 * 30.0;            <span class="c">// fronts par tour de sortie : 4 x N x G</span>
+const unsigned long TE_US = 10000;          <span class="c">// période d'échantillonnage : 10 ms</span>
+
+volatile long compteur = 0;                 <span class="c">// modifiés par l'interruption</span>
+volatile byte etatPrec;
+
+void isrCodeur() {                          <span class="c">// appelée à chaque front de A ou de B</span>
+  static const int8_t TABLE[16] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
+  byte etat = (digitalRead(PIN_A) &lt;&lt; 1) | digitalRead(PIN_B);
+  compteur += TABLE[(etatPrec &lt;&lt; 2) | etat];   <span class="c">// +1, -1 ou 0 (parasite)</span>
+  etatPrec = etat;
+}
+
+long lireCompteur() {          <span class="c">// copie protégée : l'Uno lit un long de 4 octets en plusieurs fois</span>
+  noInterrupts(); long n = compteur; interrupts();
+  return n;
+}
+
+void commanderMoteur(float u) {             <span class="c">// u en % de la tension, de -100 à +100</span>
+  u = constrain(u, -100.0, 100.0);
+  digitalWrite(PIN_IN1, u &gt;= 0 ? HIGH : LOW);  <span class="c">// sens de rotation</span>
+  digitalWrite(PIN_IN2, u &gt;= 0 ? LOW : HIGH);
+  analogWrite(PIN_PWM, (int)(fabs(u) * 255 / 100));   <span class="c">// rapport cyclique 0 à 255</span>
+}</code></pre>
+
+        <h3>De la position à la vitesse</h3>
+        <p>Toutes les <var>T</var><sub>e</sub> secondes, l’écart Δ<var>n</var> entre deux lectures du compteur donne la vitesse de l’arbre de sortie&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <msub><mi>ω</mi><mtext>tr/min</mtext></msub><mo>=</mo>
+            <mfrac><mrow><mi mathvariant="normal">Δ</mi><mi>n</mi><mo>×</mo><mn>60</mn></mrow><mrow><mtext>CPR</mtext><mo>×</mo><msub><mi>T</mi><mi>e</mi></msub></mrow></mfrac>
+          </mrow>
+        </math>
+        <p>Un front de plus ou de moins vaut 60&nbsp;/&nbsp;(CPR&nbsp;×&nbsp;<var>T</var><sub>e</sub>), soit 4,5&nbsp;tr/min pour CPR&nbsp;=&nbsp;1&nbsp;320 et <var>T</var><sub>e</sub>&nbsp;=&nbsp;10&nbsp;ms&nbsp;: à 50&nbsp;tr/min, une dizaine de fronts par période seulement, et la mesure «&nbsp;saute&nbsp;» de ±9&nbsp;%. Allonger <var>T</var><sub>e</sub> affine la mesure mais retarde la correction&nbsp;; à basse vitesse, on peut aussi chronométrer l’intervalle entre deux fronts avec <code>micros()</code>.</p>
+      </section>
+
+      <section>
+        <h2>Boucle fermée et PID discret</h2>
+        <p>En <strong>boucle ouverte</strong>, la vitesse obtenue pour un rapport cyclique donné varie avec la charge, la batterie ou la température. En <strong>boucle fermée</strong>, un correcteur compare en permanence la mesure à la consigne et ajuste la commande (figure&nbsp;3)&nbsp;: il rejette ces perturbations mais, trop énergique, rend la boucle oscillante, voire instable.</p>
+        <figure>
+          <svg class="fig-boucle" width="680" height="150" viewBox="0 0 680 150" role="img" aria-label="Schéma-bloc de la boucle de vitesse : consigne, comparateur, PID, MLI et pont en H, moteur soumis au couple résistant, puis codeur qui renvoie la vitesse mesurée au comparateur">
+            <defs>
+              <marker id="fl-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#243c30"/></marker>
+            </defs>
+            <g stroke="#243c30" stroke-width="2" fill="none">
+              <line x1="8" y1="62" x2="86" y2="62" marker-end="url(#fl-b)"/>
+              <line x1="112" y1="62" x2="157" y2="62" marker-end="url(#fl-b)"/>
+              <line x1="250" y1="62" x2="297" y2="62" marker-end="url(#fl-b)"/>
+              <line x1="430" y1="62" x2="477" y2="62" marker-end="url(#fl-b)"/>
+              <line x1="580" y1="62" x2="672" y2="62" marker-end="url(#fl-b)"/>
+              <line x1="530" y1="6" x2="530" y2="40" marker-end="url(#fl-b)"/>
+              <polyline points="630,62 630,126 422,126"/>
+              <polyline points="270,126 100,126 100,77" marker-end="url(#fl-b)"/>
+            </g>
+            <circle cx="630" cy="62" r="3.5" fill="#243c30"/>
+            <circle cx="100" cy="62" r="13" fill="#ffffff" stroke="#243c30" stroke-width="2"/>
+            <text x="100" y="67" text-anchor="middle" font-size="15" fill="#14221c">Σ</text>
+            <rect x="160" y="42" width="90" height="40" rx="6" fill="#16261e"/>
+            <text x="205" y="67" text-anchor="middle" font-weight="700" font-size="13" fill="#ffffff">PID</text>
+            <rect x="300" y="42" width="130" height="40" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="365" y="67" text-anchor="middle" font-size="12" fill="#14221c">MLI + pont en H</text>
+            <rect x="480" y="42" width="100" height="40" rx="6" fill="#d2ec6c" stroke="#566b14"/>
+            <text x="530" y="67" text-anchor="middle" font-weight="700" font-size="12.5" fill="#14221c">Moteur</text>
+            <rect x="272" y="110" width="150" height="32" rx="6" fill="#eef0e6" stroke="#243c30"/>
+            <text x="347" y="130" text-anchor="middle" font-size="12" fill="#14221c">Codeur et calcul</text>
+            <g font-size="11" fill="#47544d" text-anchor="middle">
+              <text x="40" y="54">consigne ω*</text>
+              <text x="134" y="54">e</text>
+              <text x="274" y="54">u (%)</text>
+              <text x="454" y="54">α U</text>
+              <text x="626" y="54">vitesse ω</text>
+              <text x="185" y="120">ω mesurée</text>
+            </g>
+            <text x="540" y="18" font-size="11" fill="#47544d">charge Γ<tspan dy="3" font-size="8.5">r</tspan></text>
+            <g font-weight="700" font-size="13" fill="#14221c">
+              <text x="80" y="56">+</text><text x="106" y="94">−</text>
+            </g>
+          </svg>
+          <figcaption>Figure 3 — Boucle de vitesse&nbsp;: le PID agit sur l’écart <var>e</var> entre consigne et mesure, y compris quand la charge change.</figcaption>
+        </figure>
+
+        <h3>Trois termes complémentaires</h3>
+        <math display="block">
+          <mrow>
+            <mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo>
+            <msub><mi>K</mi><mi>p</mi></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo>
+            <msub><mi>K</mi><mi>i</mi></msub><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>e</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mspace width="0.17em"></mspace><mi mathvariant="normal">d</mi><mi>s</mi><mo>+</mo>
+            <msub><mi>K</mi><mi>d</mi></msub><mfrac><mrow><mi mathvariant="normal">d</mi><mi>e</mi></mrow><mrow><mi mathvariant="normal">d</mi><mi>t</mi></mrow></mfrac>
+          </mrow>
+        </math>
+        <p>Le terme <strong>proportionnel</strong> réagit à l’erreur présente&nbsp;; l’<strong>intégrale</strong> cumule l’erreur passée et annule l’erreur statique&nbsp;; la <strong>dérivée</strong> réagit à la tendance et amortit les oscillations, mais amplifie le bruit. Pour une vitesse, un PI (<var>K</var><sub>d</sub>&nbsp;=&nbsp;0) suffit le plus souvent&nbsp;; la dérivée sert surtout en asservissement de position, où le même PID agit sur l’angle (le compteur) au lieu de la vitesse, comme dans un servomoteur de modélisme, qui mesure l’angle par un potentiomètre.</p>
+
+        <h3>Discrétisation et dérivée filtrée</h3>
+        <p>Le calcul s’exécute à période fixe <var>T</var><sub>e</sub>, d’un dixième à un cinquième de τ environ. L’intégrale devient une somme&nbsp;: <var>I</var><sub><var>k</var></sub>&nbsp;=&nbsp;<var>I</var><sub><var>k</var>−1</sub>&nbsp;+&nbsp;<var>K</var><sub>i</sub>&nbsp;<var>T</var><sub>e</sub>&nbsp;<var>e</var><sub><var>k</var></sub>. On dérive la <em>mesure</em> <var>y</var> plutôt que l’erreur, pour éviter un à-coup de commande à chaque changement de consigne, et on la filtre par un passe-bas de constante de temps <var>T</var><sub>f</sub>&nbsp;:</p>
+        <math display="block">
+          <mrow>
+            <msub><mi>D</mi><mi>k</mi></msub><mo>=</mo><mi>a</mi><msub><mi>D</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo>
+            <mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>a</mi><mo stretchy="false">)</mo><msub><mi>K</mi><mi>d</mi></msub>
+            <mfrac><mrow><msub><mi>y</mi><mi>k</mi></msub><mo>−</mo><msub><mi>y</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><msub><mi>T</mi><mi>e</mi></msub></mfrac>
+            <mspace width="1.2em"></mspace><mtext>avec</mtext><mspace width="0.6em"></mspace>
+            <mi>a</mi><mo>=</mo><mfrac><msub><mi>T</mi><mi>f</mi></msub><mrow><msub><mi>T</mi><mi>f</mi></msub><mo>+</mo><msub><mi>T</mi><mi>e</mi></msub></mrow></mfrac>
+          </mrow>
+        </math>
+
+        <h3>Saturation et anti-emballement de l’intégrale</h3>
+        <p>La commande est bornée à ±100&nbsp;%. Si la consigne est inatteignable, l’intégrale grossit sans fin (emballement, <em>windup</em>)&nbsp;; à la baisse de consigne, elle doit d’abord «&nbsp;se vider&nbsp;» et le moteur reste trop longtemps à fond. Remède le plus simple, l’<strong>intégration conditionnelle</strong>&nbsp;: on n’intègre pas une erreur qui pousserait la commande plus loin dans la saturation.</p>
+
+        <p class="code-title">commande_pid.ino (2/2) · PID, mesure de vitesse et boucle à période fixe</p>
+        <pre><code>float Kp = 0.5, Ki = 10.0, Kd = 0.0;        <span class="c">// gains de départ, u en %, vitesse en tr/min</span>
+const float U_MAX = 100.0, TF = 0.02;       <span class="c">// saturation (%) ; filtre de la dérivée (s)</span>
+float integrale = 0, derivee = 0, mesurePrec = 0;
+
+float pid(float consigne, float mesure, float te) {
+  float e = consigne - mesure;
+  float a = TF / (TF + te);                 <span class="c">// dérivée de la mesure, filtrée</span>
+  derivee = a * derivee - (1 - a) * Kd * (mesure - mesurePrec) / te;
+  mesurePrec = mesure;
+  float iNouv = integrale + Ki * e * te;
+  float u = Kp * e + iNouv + derivee;
+  if (u &gt; U_MAX)       { u = U_MAX;  if (e &gt; 0) iNouv = integrale; }  <span class="c">// anti-emballement :</span>
+  else if (u &lt; -U_MAX) { u = -U_MAX; if (e &lt; 0) iNouv = integrale; }  <span class="c">// pas d'intégration</span>
+  integrale = iNouv;                                                  <span class="c">// vers la saturation</span>
+  return u;
+}
+
+<span class="c">// Boucle à période fixe : mesure de la vitesse, calcul du PID, commande du</span>
+<span class="c">// moteur, puis envoi de consigne, vitesse et commande au traceur série</span>
+unsigned long tPrec;
+long nPrec = 0;
+
+void setup() {
+  pinMode(PIN_A, INPUT_PULLUP);  pinMode(PIN_B, INPUT_PULLUP);
+  pinMode(PIN_IN1, OUTPUT);      pinMode(PIN_IN2, OUTPUT);
+  etatPrec = (digitalRead(PIN_A) &lt;&lt; 1) | digitalRead(PIN_B);
+  attachInterrupt(digitalPinToInterrupt(PIN_A), isrCodeur, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_B), isrCodeur, CHANGE);
+  Serial.begin(115200);
+  tPrec = micros();
+}
+
+void loop() {
+  if (micros() - tPrec &lt; TE_US) return;     <span class="c">// attend la fin de la période</span>
+  tPrec += TE_US;
+  const float te = TE_US * 1e-6;            <span class="c">// en secondes</span>
+  long n = lireCompteur();
+  float vitesse = (n - nPrec) * 60.0 / (CPR * te);          <span class="c">// tr/min</span>
+  nPrec = n;
+  float consigne = (millis() / 2000) % 2 ? 150.0 : 50.0;    <span class="c">// échelons toutes les 2 s</span>
+  float u = pid(consigne, vitesse, te);
+  commanderMoteur(u);
+  Serial.print("consigne:"); Serial.print(consigne);        <span class="c">// format du traceur série</span>
+  Serial.print(" vitesse:"); Serial.print(vitesse);
+  Serial.print(" commande:"); Serial.println(u);
+}</code></pre>
+
+        <p><strong>Avant de fermer la boucle</strong>, remplacez temporairement <code>pid(consigne, vitesse, te)</code> par une commande fixe, par exemple <code>30</code>, et vérifiez au traceur série que la vitesse mesurée est <em>positive</em>. Sinon, échangez les fils A et B&nbsp;: avec un signe inversé, la boucle pousse le moteur à fond au lieu de le corriger.</p>
+
+        <p><strong>Sur ESP32 (cœur Arduino 3.x)</strong>, la logique est en 3,3&nbsp;V et les entrées ne tolèrent pas 5&nbsp;V&nbsp;: VCC du TB6612FNG en 3,3&nbsp;V, codeur en 3,3&nbsp;V ou niveaux adaptés. Sur l’ESP32 classique, les GPIO&nbsp;6 à 11 (mémoire flash), 3 (liaison série USB) et 2 (broche de démarrage) sont à éviter&nbsp;: changez toutes les broches du programme et déclarez <code>void IRAM_ATTR isrCodeur()</code>. Pour une MLI à 20&nbsp;kHz, <code>ledcAttach(PIN_PWM, 20000, 10);</code> dans <code>setup()</code>, puis <code>ledcWrite(PIN_PWM, (int)(fabs(u) * 1023 / 100));</code> au lieu d’<code>analogWrite</code>.</p>
+      </section>
+
+      <section>
+        <h2>Régler le PID</h2>
+        <h3>Réglage manuel</h3>
+        <p>Partez de <var>K</var><sub>i</sub>&nbsp;=&nbsp;<var>K</var><sub>d</sub>&nbsp;=&nbsp;0 et augmentez <var>K</var><sub>p</sub> jusqu’à une réponse rapide, sans oscillation ni commande qui «&nbsp;vibre&nbsp;». Ajoutez <var>K</var><sub>i</sub> jusqu’à annuler l’erreur statique sans dépassement excessif, puis <var>K</var><sub>d</sub> seulement si nécessaire, avec son filtre. Changez un seul gain à la fois et notez chaque essai. Tendances, à vérifier sur votre système&nbsp;: plus de <var>K</var><sub>p</sub> accélère et réduit l’erreur statique sans l’annuler, mais accroît dépassement et bruit&nbsp;; <var>K</var><sub>i</sub> annule l’erreur statique au prix d’un dépassement accru&nbsp;; un <var>K</var><sub>d</sub> modéré réduit le dépassement mais amplifie fortement le bruit.</p>
+
+        <h3>La méthode de Ziegler-Nichols</h3>
+        <p>Publiée en 1942, la méthode du gain critique se pratique en boucle fermée&nbsp;: avec <var>K</var><sub>i</sub>&nbsp;=&nbsp;<var>K</var><sub>d</sub>&nbsp;=&nbsp;0, on augmente <var>K</var><sub>p</sub> jusqu’à des oscillations d’amplitude constante, on relève ce gain critique <var>K</var><sub>u</sub> et la période <var>T</var><sub>u</sub>, puis on applique le tableau, avec <var>K</var><sub>i</sub>&nbsp;=&nbsp;<var>K</var><sub>p</sub>/<var>T</var><sub>i</sub> et <var>K</var><sub>d</sub>&nbsp;=&nbsp;<var>K</var><sub>p</sub><var>T</var><sub>d</sub>.</p>
+        <table class="zn">
+          <caption>Réglages de Ziegler-Nichols par la méthode du gain critique</caption>
+          <thead>
+            <tr><th scope="col">Correcteur</th><th scope="col"><var>K</var><sub>p</sub></th><th scope="col"><var>T</var><sub>i</sub></th><th scope="col"><var>T</var><sub>d</sub></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>P</td><td>0,5&nbsp;<var>K</var><sub>u</sub></td><td>—</td><td>—</td></tr>
+            <tr><td>PI</td><td>0,45&nbsp;<var>K</var><sub>u</sub></td><td><var>T</var><sub>u</sub>&nbsp;/&nbsp;1,2</td><td>—</td></tr>
+            <tr><td>PID</td><td>0,6&nbsp;<var>K</var><sub>u</sub></td><td><var>T</var><sub>u</sub>&nbsp;/&nbsp;2</td><td><var>T</var><sub>u</sub>&nbsp;/&nbsp;8</td></tr>
+          </tbody>
+        </table>
+        <p>Ces réglages visent une oscillation réduite au quart à chaque période, donc un net dépassement, à adoucir ensuite. Sur une boucle de vitesse, seuls les retards (échantillonnage, mesure) font osciller&nbsp;: <var>K</var><sub>u</sub> est élevé, <var>T</var><sub>u</sub> vaut quelques <var>T</var><sub>e</sub> et la résolution du codeur brouille l’observation. Essayez à faible consigne, la main sur l’interrupteur.</p>
+
+        <h3>À partir d’un modèle&nbsp;: la méthode lambda</h3>
+        <p>Connaissant <var>K</var> et τ, on choisit la constante de temps λ voulue en boucle fermée&nbsp;; un PI dont le zéro compense le pôle du moteur, <var>K</var><sub>p</sub>&nbsp;=&nbsp;τ&nbsp;/&nbsp;(<var>K</var>λ) et <var>K</var><sub>i</sub>&nbsp;=&nbsp;1&nbsp;/&nbsp;(<var>K</var>λ), donne alors, sans saturation, une réponse du premier ordre de constante de temps λ, sans dépassement. λ&nbsp;=&nbsp;τ est un choix prudent&nbsp;; un λ plus petit accélère la boucle jusqu’à saturer la commande et amplifie le bruit. Les gains du programme (<var>K</var><sub>p</sub>&nbsp;=&nbsp;0,5, <var>K</var><sub>i</sub>&nbsp;=&nbsp;10) correspondent à <var>K</var>&nbsp;=&nbsp;3&nbsp;tr/min par %, τ&nbsp;=&nbsp;50&nbsp;ms et λ&nbsp;≈&nbsp;33&nbsp;ms.</p>
+
+        <div class="box box-exercice breakable">
+          <p class="box-title">Exercice guidé · Identifier puis asservir votre moteur</p>
+          <p>Montage des sections 2 et 3, programme <code>commande_pid.ino</code>, traceur série à 115&nbsp;200&nbsp;bauds.</p>
+          <ol>
+            <li><strong>Boucle ouverte.</strong> Remplacez <code>pid(consigne, vitesse, te)</code> par <code>((millis() / 2000) % 2 ? 60.0 : 30.0)</code>. Relevez l’écart de vitesse Δω entre les deux paliers et le temps mis pour en parcourir 63&nbsp;%&nbsp;; calculez <var>K</var>&nbsp;=&nbsp;Δω&nbsp;/&nbsp;30 et τ.</li>
+            <li><strong>Méthode lambda.</strong> Calculez <var>K</var><sub>p</sub> et <var>K</var><sub>i</sub> pour λ&nbsp;=&nbsp;τ, rétablissez l’appel à <code>pid</code> et observez les échelons de 50 à 150&nbsp;tr/min. Recommencez avec λ&nbsp;=&nbsp;τ/2 puis τ/4&nbsp;: à partir de quand la commande sature-t-elle&#8239;?</li>
+            <li><strong>Anti-emballement.</strong> Remplacez <code>150.0</code> par une consigne inatteignable, nettement supérieure à 100&nbsp;<var>K</var>. Mesurez le temps mis par la vitesse pour repasser sous 60&nbsp;tr/min après chaque baisse de consigne, puis supprimez les deux instructions <code>iNouv = integrale;</code> et comparez.</li>
+            <li><strong>Ziegler-Nichols (facultatif).</strong> Avec <var>K</var><sub>i</sub>&nbsp;=&nbsp;0 et 50&nbsp;tr/min de consigne, cherchez <var>K</var><sub>u</sub> et <var>T</var><sub>u</sub>&nbsp;; comparez au réglage lambda.</li>
+          </ol>
+          <p><strong>Critères de réussite&nbsp;:</strong> vitesse positive pour une commande positive&nbsp;; avec λ&nbsp;=&nbsp;τ, 63&nbsp;% de l’échelon en un temps proche de λ (à 30&nbsp;% près), dépassement d’un ou deux fronts au plus, vitesse établie centrée sur la consigne à un ou deux fronts près&nbsp;; avec l’anti-emballement, retour sous 60&nbsp;tr/min en moins de 0,5&nbsp;s, nettement plus lent sans.</p>
+          <div class="solution">
+            <p><strong>Indice&nbsp;:</strong> avec <var>K</var>&nbsp;=&nbsp;3&nbsp;tr/min par % et τ&nbsp;=&nbsp;50&nbsp;ms, λ&nbsp;=&nbsp;τ donne <var>K</var><sub>p</sub>&nbsp;≈&nbsp;0,33 et <var>K</var><sub>i</sub>&nbsp;≈&nbsp;6,7&nbsp;; λ&nbsp;=&nbsp;τ/2, 0,67 et 13. À l’échelon de 100&nbsp;tr/min, la commande bondit d’environ 120&nbsp;<var>K</var><sub>p</sub> points depuis environ 17&nbsp;% (100&nbsp;<var>K</var><sub>p</sub> de terme proportionnel, plus 20&nbsp;<var>K</var><sub>p</sub> d’intégrale dès la première période, car <var>K</var><sub>i</sub><var>T</var><sub>e</sub>&nbsp;=&nbsp;0,2&nbsp;<var>K</var><sub>p</sub>)&nbsp;: elle atteint la saturation dès <var>K</var><sub>p</sub>&nbsp;≈&nbsp;0,7, soit λ&nbsp;≈&nbsp;τ/2. Une vitesse qui saute d’un front à l’autre traduit la résolution du codeur (section&nbsp;3.3), pas un défaut de réglage.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Ce que l’IA apporte à la commande</h2>
+        <p>Pour un moteur seul, un PI bien réglé suffit souvent&nbsp;: simple, explicable, éprouvé. L’IA devient utile quand le système est mal connu, évolue dans le temps, ou quand les boucles à régler sont nombreuses.</p>
+        <h3>Identifier le modèle à partir des données</h3>
+        <p>Identifier, c’est estimer les paramètres d’un modèle à partir de mesures&nbsp;: une régression, brique de base de l’apprentissage automatique. Ici, les paramètres du modèle discret <var>y</var><sub><var>k</var>+1</sub>&nbsp;=&nbsp;<var>a</var>&nbsp;<var>y</var><sub><var>k</var></sub>&nbsp;+&nbsp;<var>b</var>&nbsp;<var>u</var><sub><var>k</var></sub> sont estimés par moindres carrés sur des paliers de commande et des mesures bruitées simulées&nbsp;; on en déduit <var>K</var> et τ, puis les gains par la méthode lambda.</p>
+        <p class="code-title">identification.py</p>
+        <pre><code>import numpy as np
+
+rng = np.random.default_rng(1)
+TE, K_VRAI, TAU_VRAI = 0.01, 3.0, 0.05      <span class="c"># « moteur » simulé : gain (tr/min par %), tau (s)</span>
+u = np.repeat(rng.choice([30.0, 60.0, 90.0], 30), 10)    <span class="c"># paliers de commande de 0,1 s (%)</span>
+a = np.exp(-TE / TAU_VRAI)
+w = np.zeros(u.size)
+for k in range(u.size - 1):
+    w[k + 1] = a * w[k] + K_VRAI * (1 - a) * u[k]
+y = w + rng.normal(0.0, 3.0, w.size)                      <span class="c"># mesure bruitée (tr/min)</span>
+
+<span class="c"># Modèle y[k+1] = a.y[k] + b.u[k] : deux paramètres estimés par moindres carrés</span>
+X = np.column_stack([y[:-1], u[:-1]])
+(a_est, b_est), *_ = np.linalg.lstsq(X, y[1:], rcond=None)
+K, tau = b_est / (1 - a_est), -TE / np.log(a_est)
+lam = tau                                                 <span class="c"># méthode lambda, choix prudent</span>
+print(f"K = {K:.2f} tr/min par %, tau = {1000 * tau:.0f} ms")
+print(f"PI : Kp = {tau / (K * lam):.2f}, Ki = {1 / (K * lam):.1f}")</code></pre>
+        <pre class="sortie"><code>K = 2.99 tr/min par %, tau = 50 ms
+PI : Kp = 0.33, Ki = 6.7</code></pre>
+        <p>Sur un vrai moteur, utilisez les mesures de l’étape&nbsp;1 de l’exercice. Un réseau de neurones peut capturer en plus les non-linéarités (frottement sec, zone morte à faible commande), au prix de plus de données et d’une interprétation plus difficile.</p>
+
+        <h3>Régler automatiquement, apprendre par renforcement</h3>
+        <p>Sur le modèle identifié, une optimisation (bayésienne, par exemple) peut chercher les gains qui minimisent l’intégrale de |<var>e</var>|, en simulation puis sur le banc avec des gains bornés&nbsp;; l’autoréglage par relais d’Åström et Hägglund en est l’équivalent classique. En apprentissage par renforcement, un agent apprend par essais et erreurs, dans un simulateur (jumeau numérique), une politique qui maximise une récompense comme −|<var>e</var>|&nbsp;−&nbsp;<var>c</var>&nbsp;<var>u</var>²&nbsp;: utile pour des systèmes non linéaires à plusieurs entrées, comme un robot à pattes, superflu pour une boucle de vitesse, où le PID reste plus sûr et plus facile à justifier. Le cours WILLSIM «&nbsp;Apprentissage par renforcement et jumeau numérique&nbsp;» approfondit cette voie.</p>
+
+        <div class="box box-retenir">
+          <p class="box-title">À retenir</p>
+          <ul>
+            <li>Moteur à courant continu&nbsp;: premier ordre <var>K</var>/(1&nbsp;+&nbsp;τ<var>p</var>), courant de blocage <var>U</var>/<var>R</var>.</li>
+            <li>MLI&nbsp;: tension moyenne α<var>U</var>&nbsp;; pont en H&nbsp;: sens, sans jamais fermer deux interrupteurs d’un même bras.</li>
+            <li>Codeur&nbsp;: décodage ×4 par interruptions, vitesse = Δ<var>n</var>&nbsp;×&nbsp;60&nbsp;/&nbsp;(CPR&nbsp;×&nbsp;<var>T</var><sub>e</sub>), signe vérifié avant de fermer la boucle.</li>
+            <li>PID à période fixe, commande bornée, anti-emballement, dérivée de la mesure filtrée&nbsp;; souvent, un PI suffit.</li>
+            <li>Mesurer, identifier, calculer, vérifier. L’IA aide à identifier et à régler&nbsp;; elle ne remplace ni la compréhension du système ni l’arrêt d’urgence.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <section class="further">
+      <h2>Pour aller plus loin</h2>
+      <ul>
+        <li><a href="https://docs.arduino.cc/language-reference/en/functions/external-interrupts/attachInterrupt/">Arduino, référence de attachInterrupt()</a></li>
+        <li><a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Arduino, «&nbsp;Secrets of Arduino PWM&nbsp;» (minuteries et fréquences de MLI)</a></li>
+        <li><a href="https://fbswiki.org/wiki/index.php/Main_Page">K.&nbsp;J. Åström et R.&nbsp;M. Murray, <em>Feedback Systems</em> (accès libre)</a></li>
+        <li><a href="https://willsim.fr/cours/commande-moteurs-pid.html">Page du cours sur willsim.fr</a></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      <p><strong>Fiche rédigée par l'équipe pédagogique WILLSIM</strong>, association loi 1901 (RNA W842013616) qui promeut l'usage de l'intelligence artificielle dans l'ingénierie et la mécatronique. Version 1.0 – octobre 2026.</p>
+      <p>© 2026 WILLSIM — Licence Creative Commons BY-NC-SA 4.0 (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">creativecommons.org/licenses/by-nc-sa/4.0/deed.fr</a>)&nbsp;: vous pouvez copier, diffuser et adapter cette fiche à des fins non commerciales, en citant WILLSIM et en partageant vos adaptations sous la même licence.</p>
+      <p>Une erreur, une suggestion&#8239;? Écrivez à <a href="mailto:contact@willsim.fr">contact@willsim.fr</a> · <a href="https://willsim.fr">willsim.fr</a></p>
+    </footer>
+  </body>
+</html>

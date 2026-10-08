@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://willsim.fr/</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/ia-ingenierie-initiation.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/ia-embarquee-tinyml.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/vision-robotique-opencv.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/maintenance-predictive.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/ros2-premiers-pas.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/commande-moteurs-pid.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/cours/apprentissage-renforcement-sim2real.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/projets/bras-robotique-vision.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/projets/maintenance-predictive-moteur.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/projets/robot-mobile-autonome.html</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://willsim.fr/projets/jumeau-numerique-sim2real.html</loc><lastmod>2026-10-07</lastmod></url>
   <url><loc>https://willsim.fr/mentions-legales.html</loc><lastmod>2026-10-07</lastmod></url>
   <url><loc>https://willsim.fr/confidentialite.html</loc><lastmod>2026-10-07</lastmod></url>
   <url><loc>https://willsim.fr/cgu.html</loc><lastmod>2026-10-07</lastmod></url>
